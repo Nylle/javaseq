@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import static com.github.nylle.javaseq.Seq.cons;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class ConsTest {
 
@@ -26,14 +27,32 @@ class ConsTest {
         assertThat(rest.rest().rest().first()).isEqualTo(3);
     }
 
-    @Test
-    void getReturnsValueAtIndex() {
-        var sut = Seq.iterate("", x -> x + x.length());
+    @Nested
+    class Get {
 
-        assertThat(sut.get(0)).isEqualTo("");
-        assertThat(sut.get(1)).isEqualTo("0");
-        assertThat(sut.get(2)).isEqualTo("01");
-        assertThat(sut.get(3)).isEqualTo("012");
+        @Test
+        void returnsValueAtIndex() {
+            var sut = Seq.iterate("", x -> x + x.length());
+
+            assertThat(sut.get(0)).isEqualTo("");
+            assertThat(sut.get(1)).isEqualTo("0");
+            assertThat(sut.get(2)).isEqualTo("01");
+            assertThat(sut.get(3)).isEqualTo("012");
+        }
+
+        @Test
+        void throwsForNegativeIndex() {
+            assertThatExceptionOfType(IndexOutOfBoundsException.class)
+                    .isThrownBy(() -> Seq.of(1).get(-1))
+                    .withMessage("Index out of range: -1");
+        }
+
+        @Test
+        void throwsForIndexOutOfBound() {
+            assertThatExceptionOfType(IndexOutOfBoundsException.class)
+                    .isThrownBy(() -> Seq.of(1).get(1))
+                    .withMessage("Index out of range: 1");
+        }
     }
 
     @Test

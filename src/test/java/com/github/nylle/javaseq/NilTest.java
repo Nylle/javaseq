@@ -61,15 +61,7 @@ class NilTest {
         }
 
         @Test
-        void returnsConjWithOneItem() {
-            var sut = Nil.of();
-
-            assertThat(sut.take(1)).isEmpty();
-            assertThat(sut.take(1)).isExactlyInstanceOf(Nil.class);
-        }
-
-        @Test
-        void returnsConjWithMoreThanOneItem() {
+        void returnsNilForMoreThanZeroItems() {
             var sut = Nil.of();
 
             assertThat(sut.take(3)).isEmpty();
