@@ -51,10 +51,6 @@ public class Cons<T> extends AbstractList<T> implements Seq<T> {
             return Nil.of();
         }
 
-        if (n == 1) {
-            return Seq.conj(first, Seq.of());
-        }
-
         return Seq.cons(first, () -> rest().take(n - 1));
     }
 

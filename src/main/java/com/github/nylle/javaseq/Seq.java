@@ -1,5 +1,7 @@
 package com.github.nylle.javaseq;
 
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -10,20 +12,21 @@ public interface Seq<T> extends List<T> {
         return Nil.of();
     }
 
-    static <T> Seq<T> of(T x) {
-        return conj(x, of());
+    @SafeVarargs
+    static <T> Seq<T> of(T... coll) {
+        return of(Arrays.asList(coll).iterator());
     }
 
     static <T> Seq<T> cons(T first, Supplier<Seq<T>> f) {
         return new Cons<>(first, f);
     }
 
-    static <T> Seq<T> conj(T first, Seq<T> rest) {
-        return new Conj<>(first, rest);
-    }
-
     static <T> Seq<T> iterate(T initial, Function<T, T> f) {
         return cons(initial, () -> iterate(f.apply(initial), f));
+    }
+
+    static <T> Seq<T> of(Iterator<T> coll) {
+        return coll.hasNext() ? cons(coll.next(), () -> of(coll)) : of();
     }
 
     T first();

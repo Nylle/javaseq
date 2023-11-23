@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static com.github.nylle.javaseq.Seq.cons;
-import static com.github.nylle.javaseq.Seq.of;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ConsTest {
@@ -39,7 +38,7 @@ class ConsTest {
 
     @Test
     void sizeReturnsSizeOfFiniteSeqOrRunsForever() {
-        var sut = cons(3, () -> cons(-2, () -> cons(8, () -> of(1))));
+        var sut = cons(3, () -> cons(-2, () -> cons(8, () -> Seq.of(1))));
 
         assertThat(sut.size()).isEqualTo(4);
     }
@@ -71,15 +70,7 @@ class ConsTest {
         }
 
         @Test
-        void returnsConjWithOneItem() {
-            var sut = Seq.iterate(0, x -> x + 1);
-
-            assertThat(sut.take(1)).containsExactly(0);
-            assertThat(sut.take(1)).isExactlyInstanceOf(Conj.class);
-        }
-
-        @Test
-        void returnsConsWithMoreThanOneItem() {
+        void returnsConsWithMoreThanZeroItems() {
             var sut = Seq.iterate(0, x -> x + 1);
 
             assertThat(sut.take(3)).containsExactly(0, 1, 2);
