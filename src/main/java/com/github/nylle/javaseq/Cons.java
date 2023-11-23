@@ -47,11 +47,8 @@ public class Cons<T> extends AbstractList<T> implements Seq<T> {
 
     @Override
     public Seq<T> take(long n) {
-        if (n <= 0) {
-            return Nil.of();
-        }
+        return n <= 0 ? Nil.of() : Seq.cons(first, () -> rest().take(n - 1));
 
-        return Seq.cons(first, () -> rest().take(n - 1));
     }
 
     @Override

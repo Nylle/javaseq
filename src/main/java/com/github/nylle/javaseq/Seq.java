@@ -13,8 +13,12 @@ public interface Seq<T> extends List<T> {
     }
 
     @SafeVarargs
-    static <T> Seq<T> of(T... coll) {
-        return of(Arrays.asList(coll).iterator());
+    static <T> Seq<T> of(T... xs) {
+        return of(Arrays.asList(xs).iterator());
+    }
+
+    static <T> Seq<T> of(Iterator<T> coll) {
+        return coll.hasNext() ? cons(coll.next(), () -> of(coll)) : of();
     }
 
     static <T> Seq<T> cons(T first, Supplier<Seq<T>> f) {
@@ -23,10 +27,6 @@ public interface Seq<T> extends List<T> {
 
     static <T> Seq<T> iterate(T initial, Function<T, T> f) {
         return cons(initial, () -> iterate(f.apply(initial), f));
-    }
-
-    static <T> Seq<T> of(Iterator<T> coll) {
-        return coll.hasNext() ? cons(coll.next(), () -> of(coll)) : of();
     }
 
     T first();
