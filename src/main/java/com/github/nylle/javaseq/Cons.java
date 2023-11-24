@@ -63,6 +63,11 @@ public class Cons<T> extends AbstractList<T> implements Seq<T> {
     }
 
     @Override
+    public <R> Seq<R> mapcat(Function<? super T, ? extends Iterable<? extends R>> f) {
+        return Seq.concat(Seq.of(f.apply(first)).map(x -> x), () -> rest().mapcat(f));
+    }
+
+    @Override
     public int size() {
         return 1 + rest().size();
     }

@@ -18,6 +18,10 @@ public interface Seq<T> extends List<T> {
         return of(Arrays.asList(xs).iterator());
     }
 
+    static <T> Seq<T> of(Iterable<T> coll) {
+        return of(coll.iterator());
+    }
+
     static <T> Seq<T> of(Iterator<T> coll) {
         return coll.hasNext() ? cons(coll.next(), () -> of(coll)) : of();
     }
@@ -30,6 +34,18 @@ public interface Seq<T> extends List<T> {
         return cons(initial, () -> iterate(f.apply(initial), f));
     }
 
+    static <T> Seq<T> concat(Iterable<T> coll, Supplier<Seq<T>> f) {
+        return concat(coll.iterator(), f);
+    }
+
+    static <T> Seq<T> concat(Iterator<T> coll, Supplier<Seq<T>> f) {
+        if (coll.hasNext()) {
+            T next = coll.next();
+            return coll.hasNext() ? cons(next, () -> concat(coll, f)) : cons(next, f);
+        }
+        return f.get();
+    }
+
     T first();
 
     Seq<T> rest();
@@ -39,4 +55,6 @@ public interface Seq<T> extends List<T> {
     Seq<T> filter(Predicate<? super T> pred);
 
     <R> Seq<R> map(Function<? super T, ? extends R> f);
+
+    <R> Seq<R> mapcat(Function<? super T, ? extends Iterable<? extends R>> f);
 }

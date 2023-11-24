@@ -43,6 +43,11 @@ public class Nil<T> extends AbstractList<T> implements Seq<T> {
     }
 
     @Override
+    public <R> Seq<R> mapcat(Function<? super T, ? extends Iterable<? extends R>> f) {
+        return of();
+    }
+
+    @Override
     public int size() {
         return 0;
     }

@@ -3,6 +3,8 @@ package com.github.nylle.javaseq;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class NilTest {
@@ -71,5 +73,10 @@ class NilTest {
     @Test
     void mapReturnsNil() {
         assertThat(Nil.<Integer>of().map(x -> x * 100)).isEmpty();
+    }
+
+    @Test
+    void mapcatReturnsNil() {
+        assertThat(Nil.<Integer>of().mapcat(x -> List.of(x, x))).isEmpty();
     }
 }

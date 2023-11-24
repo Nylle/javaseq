@@ -3,6 +3,8 @@ package com.github.nylle.javaseq;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static com.github.nylle.javaseq.Seq.cons;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -135,6 +137,31 @@ class ConsTest {
             var sut = Seq.iterate(0, x -> x + 1);
 
             assertThat(sut.map(x -> x * 100).take(3)).containsExactly(0, 100, 200);
+        }
+    }
+
+    @Nested
+    class Mapcat {
+
+        @Test
+        void returnsFlattenedSeq() {
+            var sut = Seq.of(Seq.of(0, 1, 2), Seq.of(3, 4, 5));
+
+            assertThat(sut.mapcat(x -> x)).containsExactly(0, 1, 2, 3, 4, 5);
+        }
+
+        @Test
+        void isLazy() {
+            var sut = Seq.iterate(0, x -> x + 1);
+
+            assertThat(sut.mapcat(x -> List.of(x, x)).take(6)).containsExactly(0, 0, 1, 1, 2, 2);
+        }
+
+        @Test
+        void ignoresEmptyResults() {
+            var sut = Seq.iterate(0, x -> x + 1);
+
+            assertThat(sut.mapcat(x -> x == 0 ? List.of() : List.of(x, x)).take(6)).containsExactly(1, 1, 2, 2, 3, 3);
         }
     }
 }
