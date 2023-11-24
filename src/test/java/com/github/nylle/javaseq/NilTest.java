@@ -64,6 +64,11 @@ class NilTest {
     }
 
     @Test
+    void filterReturnsNil() {
+        assertThat(Nil.<Integer>of().filter(x -> x != null)).isEmpty();
+    }
+
+    @Test
     void mapReturnsNil() {
         assertThat(Nil.<Integer>of().map(x -> x * 100)).isEmpty();
     }

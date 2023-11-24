@@ -2,6 +2,7 @@ package com.github.nylle.javaseq;
 
 import java.util.AbstractList;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 public class Cons<T> extends AbstractList<T> implements Seq<T> {
@@ -32,12 +33,12 @@ public class Cons<T> extends AbstractList<T> implements Seq<T> {
     }
 
     @Override
-    public T get(final int i) {
-        if (i < 0) {
+    public T get(int index) {
+        if (index < 0) {
             return null;
         }
         Seq<T> current = this;
-        for (int x = i; x > 0; --x) {
+        for (int i = index; i > 0; --i) {
             if (current.rest().isEmpty()) {
                 return null;
             }
@@ -49,6 +50,11 @@ public class Cons<T> extends AbstractList<T> implements Seq<T> {
     @Override
     public Seq<T> take(long n) {
         return n <= 0 ? Nil.of() : Seq.cons(first, () -> rest().take(n - 1));
+    }
+
+    @Override
+    public Seq<T> filter(Predicate<? super T> pred) {
+        return pred.test(first) ? Seq.cons(first, () -> rest().filter(pred)) : rest().filter(pred);
     }
 
     @Override

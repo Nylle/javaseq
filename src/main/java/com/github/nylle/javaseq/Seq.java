@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 public interface Seq<T> extends List<T> {
@@ -34,6 +35,8 @@ public interface Seq<T> extends List<T> {
     Seq<T> rest();
 
     Seq<T> take(long n);
+
+    Seq<T> filter(Predicate<? super T> pred);
 
     <R> Seq<R> map(Function<? super T, ? extends R> f);
 }

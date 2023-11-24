@@ -2,6 +2,7 @@ package com.github.nylle.javaseq;
 
 import java.util.AbstractList;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class Nil<T> extends AbstractList<T> implements Seq<T> {
     private static final Nil<?> nil = new Nil<>();
@@ -28,6 +29,11 @@ public class Nil<T> extends AbstractList<T> implements Seq<T> {
 
     @Override
     public Seq<T> take(long n) {
+        return of();
+    }
+
+    @Override
+    public Seq<T> filter(Predicate<? super T> pred) {
         return of();
     }
 

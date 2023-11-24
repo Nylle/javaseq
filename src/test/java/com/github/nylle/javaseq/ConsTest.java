@@ -96,6 +96,24 @@ class ConsTest {
     }
 
     @Nested
+    class Filter {
+
+        @Test
+        void returnsNilWhenNoElementsMatch() {
+            var sut = Seq.iterate(0, x -> x + 1).take(10);
+
+            assertThat(sut.filter(x -> x < 0)).isEmpty();
+        }
+
+        @Test
+        void returnsMatchingElements() {
+            var sut = Seq.iterate(0, x -> x + 1);
+
+            assertThat(sut.filter(x -> x > 100).take(3)).containsExactly(101, 102, 103);
+        }
+    }
+
+    @Nested
     class Map {
 
         @Test
