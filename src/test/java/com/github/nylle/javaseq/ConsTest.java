@@ -98,6 +98,37 @@ class ConsTest {
     }
 
     @Nested
+    class Drop {
+
+        @Test
+        void returnsUnchangedSeqWithNegativeElementsToDrop() {
+            assertThat(Seq.of(1, 2, 3, 4).drop(-1)).containsExactly(1, 2, 3, 4);
+        }
+
+        @Test
+        void returnsUnchangedSeqWithZeroElementsToDrop() {
+            assertThat(Seq.of(1, 2, 3, 4).drop(0)).containsExactly(1, 2, 3, 4);
+        }
+
+        @Test
+        void returnsSeqOfAllButTheFirstNItems() {
+            assertThat(Seq.of(1, 2, 3, 4).drop(2)).containsExactly(3, 4);
+        }
+
+        @Test
+        void returnsEmptySeqIfMoreElementsAreDroppedThanPresent() {
+            assertThat(Seq.of(1, 2, 3, 4).drop(5)).isEmpty();
+        }
+
+        @Test
+        void isLazy() {
+            var sut = Seq.iterate(0, x -> x + 1);
+
+            assertThat(sut.drop(2).take(2)).containsExactly(2, 3);
+        }
+    }
+
+    @Nested
     class Filter {
 
         @Test

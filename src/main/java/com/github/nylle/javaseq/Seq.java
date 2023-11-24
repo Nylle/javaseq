@@ -52,6 +52,8 @@ public interface Seq<T> extends List<T> {
 
     Seq<T> take(long n);
 
+    Seq<T> drop(long n);
+
     Seq<T> filter(Predicate<? super T> pred);
 
     <R> Seq<R> map(Function<? super T, ? extends R> f);

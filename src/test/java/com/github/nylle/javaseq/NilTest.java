@@ -41,42 +41,55 @@ class NilTest {
         void returnsNilWithNegativeItems() {
             var sut = Nil.of();
 
-            assertThat(sut.take(-1))
-                    .isExactlyInstanceOf(Nil.class)
-                    .isEmpty();
+            assertThat(sut.take(-1)).isEqualTo(Nil.of());
         }
 
         @Test
         void returnsNilWithZeroItems() {
             var sut = Nil.of();
 
-            assertThat(sut.take(0))
-                    .isExactlyInstanceOf(Nil.class)
-                    .isEmpty();
+            assertThat(sut.take(0)).isEqualTo(Nil.of());
         }
 
         @Test
         void returnsNilForMoreThanZeroItems() {
             var sut = Nil.of();
 
-            assertThat(sut.take(3))
-                    .isExactlyInstanceOf(Nil.class)
-                    .isEmpty();
+            assertThat(sut.take(3)).isEqualTo(Nil.of());
+        }
+    }
+
+    @Nested
+    class Drop {
+
+        @Test
+        void returnsNilWithNegativeItems() {
+            assertThat(Nil.of().drop(-1)).isEqualTo(Nil.of());
+        }
+
+        @Test
+        void returnsNilWithZeroItems() {
+            assertThat(Nil.of().drop(0)).isEqualTo(Nil.of());
+        }
+
+        @Test
+        void returnsNilForMoreThanZeroItems() {
+            assertThat(Nil.of().drop(12)).isEqualTo(Nil.of());
         }
     }
 
     @Test
     void filterReturnsNil() {
-        assertThat(Nil.<Integer>of().filter(x -> x != null)).isEmpty();
+        assertThat(Nil.<Integer>of().filter(x -> x != null)).isEqualTo(Nil.of());
     }
 
     @Test
     void mapReturnsNil() {
-        assertThat(Nil.<Integer>of().map(x -> x * 100)).isEmpty();
+        assertThat(Nil.<Integer>of().map(x -> x * 100)).isEqualTo(Nil.of());
     }
 
     @Test
     void mapcatReturnsNil() {
-        assertThat(Nil.<Integer>of().mapcat(x -> List.of(x, x))).isEmpty();
+        assertThat(Nil.<Integer>of().mapcat(x -> List.of(x, x))).isEqualTo(Nil.of());
     }
 }

@@ -53,6 +53,11 @@ public class Cons<T> extends AbstractList<T> implements Seq<T> {
     }
 
     @Override
+    public Seq<T> drop(long n) {
+        return n > 0 ? rest().drop(n - 1) : this;
+    }
+
+    @Override
     public Seq<T> filter(Predicate<? super T> pred) {
         return pred.test(first) ? Seq.cons(first, () -> rest().filter(pred)) : rest().filter(pred);
     }

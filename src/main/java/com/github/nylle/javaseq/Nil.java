@@ -33,6 +33,11 @@ public class Nil<T> extends AbstractList<T> implements Seq<T> {
     }
 
     @Override
+    public Seq<T> drop(long n) {
+        return of();
+    }
+
+    @Override
     public Seq<T> filter(Predicate<? super T> pred) {
         return of();
     }
