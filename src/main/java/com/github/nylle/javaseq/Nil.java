@@ -1,7 +1,6 @@
 package com.github.nylle.javaseq;
 
 import java.util.AbstractList;
-import java.util.NoSuchElementException;
 
 public class Nil<T> extends AbstractList<T> implements Seq<T> {
     private static final Nil<?> nil = new Nil<>();
@@ -13,17 +12,17 @@ public class Nil<T> extends AbstractList<T> implements Seq<T> {
 
     @Override
     public T first() {
-        throw new NoSuchElementException("first");
+        return null;
     }
 
     @Override
     public Seq<T> rest() {
-        throw new NoSuchElementException("rest");
+        return of();
     }
 
     @Override
     public T get(int index) {
-        throw new IndexOutOfBoundsException(index);
+        return null;
     }
 
     @Override
@@ -39,5 +38,15 @@ public class Nil<T> extends AbstractList<T> implements Seq<T> {
     @Override
     public boolean isEmpty() {
         return true;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return o instanceof Nil;
+    }
+
+    @Override
+    public int hashCode() {
+        return 0;
     }
 }

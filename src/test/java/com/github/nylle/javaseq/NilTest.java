@@ -3,32 +3,23 @@ package com.github.nylle.javaseq;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.util.NoSuchElementException;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class NilTest {
 
     @Test
-    void firstThrows() {
-        assertThatExceptionOfType(NoSuchElementException.class)
-                .isThrownBy(() -> Nil.of().first())
-                .withMessage("first");
+    void firstReturnsNull() {
+        assertThat(Nil.of().first()).isNull();
     }
 
     @Test
-    void restThrows() {
-        assertThatExceptionOfType(NoSuchElementException.class)
-                .isThrownBy(() -> Nil.of().rest())
-                .withMessage("rest");
+    void restReturnsNil() {
+        assertThat(Nil.of().rest()).isEqualTo(Nil.of());
     }
 
     @Test
-    void getThrows() {
-        assertThatExceptionOfType(IndexOutOfBoundsException.class)
-                .isThrownBy(() -> Nil.of().get(0))
-                .withMessage("Index out of range: 0");
+    void getReturnsNull() {
+        assertThat(Nil.of().get(0)).isNull();
     }
 
     @Test
@@ -48,24 +39,27 @@ class NilTest {
         void returnsNilWithNegativeItems() {
             var sut = Nil.of();
 
-            assertThat(sut.take(-1)).isEmpty();
-            assertThat(sut.take(-1)).isExactlyInstanceOf(Nil.class);
+            assertThat(sut.take(-1))
+                    .isExactlyInstanceOf(Nil.class)
+                    .isEmpty();
         }
 
         @Test
         void returnsNilWithZeroItems() {
             var sut = Nil.of();
 
-            assertThat(sut.take(0)).isEmpty();
-            assertThat(sut.take(0)).isExactlyInstanceOf(Nil.class);
+            assertThat(sut.take(0))
+                    .isExactlyInstanceOf(Nil.class)
+                    .isEmpty();
         }
 
         @Test
         void returnsNilForMoreThanZeroItems() {
             var sut = Nil.of();
 
-            assertThat(sut.take(3)).isEmpty();
-            assertThat(sut.take(3)).isExactlyInstanceOf(Nil.class);
+            assertThat(sut.take(3))
+                    .isExactlyInstanceOf(Nil.class)
+                    .isEmpty();
         }
     }
 }

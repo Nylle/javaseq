@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 
 import static com.github.nylle.javaseq.Seq.cons;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class ConsTest {
 
@@ -41,17 +40,13 @@ class ConsTest {
         }
 
         @Test
-        void throwsForNegativeIndex() {
-            assertThatExceptionOfType(IndexOutOfBoundsException.class)
-                    .isThrownBy(() -> Seq.of(1).get(-1))
-                    .withMessage("Index out of range: -1");
+        void returnsNullForNegativeIndex() {
+            assertThat(Seq.of(1).get(-1)).isNull();
         }
 
         @Test
-        void throwsForIndexOutOfBound() {
-            assertThatExceptionOfType(IndexOutOfBoundsException.class)
-                    .isThrownBy(() -> Seq.of(1).get(1))
-                    .withMessage("Index out of range: 1");
+        void returnsNullIfIndexNotPresent() {
+            assertThat(Seq.of(1).get(1)).isNull();
         }
     }
 
@@ -76,24 +71,27 @@ class ConsTest {
         void returnsNilWithNegativeItems() {
             var sut = Seq.iterate(0, x -> x + 1);
 
-            assertThat(sut.take(-1)).isEmpty();
-            assertThat(sut.take(-1)).isExactlyInstanceOf(Nil.class);
+            assertThat(sut.take(-1))
+                    .isExactlyInstanceOf(Nil.class)
+                    .isEmpty();
         }
 
         @Test
         void returnsNilWithZeroItems() {
             var sut = Seq.iterate(0, x -> x + 1);
 
-            assertThat(sut.take(0)).isEmpty();
-            assertThat(sut.take(0)).isExactlyInstanceOf(Nil.class);
+            assertThat(sut.take(0))
+                    .isExactlyInstanceOf(Nil.class)
+                    .isEmpty();
         }
 
         @Test
         void returnsConsWithMoreThanZeroItems() {
             var sut = Seq.iterate(0, x -> x + 1);
 
-            assertThat(sut.take(3)).containsExactly(0, 1, 2);
-            assertThat(sut.take(3)).isExactlyInstanceOf(Cons.class);
+            assertThat(sut.take(3))
+                    .isExactlyInstanceOf(Cons.class)
+                    .containsExactly(0, 1, 2);
         }
     }
 }

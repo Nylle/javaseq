@@ -33,12 +33,12 @@ public class Cons<T> extends AbstractList<T> implements Seq<T> {
     @Override
     public T get(final int i) {
         if (i < 0) {
-            throw new IndexOutOfBoundsException(i);
+            return null;
         }
         Seq<T> current = this;
         for (int x = i; x > 0; --x) {
             if (current.rest().isEmpty()) {
-                throw new IndexOutOfBoundsException(i);
+                return null;
             }
             current = current.rest();
         }
@@ -48,7 +48,6 @@ public class Cons<T> extends AbstractList<T> implements Seq<T> {
     @Override
     public Seq<T> take(long n) {
         return n <= 0 ? Nil.of() : Seq.cons(first, () -> rest().take(n - 1));
-
     }
 
     @Override
@@ -59,5 +58,17 @@ public class Cons<T> extends AbstractList<T> implements Seq<T> {
     @Override
     public boolean isEmpty() {
         return false;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Seq other)) return false;
+        return !other.isEmpty() && first().equals(other.first()) && rest().equals(other.rest());
+    }
+
+    @Override
+    public int hashCode() {
+        return first().hashCode() + rest().hashCode() * 31;
     }
 }
