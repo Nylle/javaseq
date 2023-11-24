@@ -53,6 +53,11 @@ public class Nil<T> extends AbstractList<T> implements Seq<T> {
     }
 
     @Override
+    public Seq<T> takeWhile(Predicate<? super T> pred) {
+        return of();
+    }
+
+    @Override
     public int size() {
         return 0;
     }

@@ -92,4 +92,9 @@ class NilTest {
     void mapcatReturnsNil() {
         assertThat(Nil.<Integer>of().mapcat(x -> List.of(x, x))).isEqualTo(Nil.of());
     }
+
+    @Test
+    void takeWhileReturnsNil() {
+        assertThat(Nil.of().takeWhile(x -> true)).isEqualTo(Nil.of());
+    }
 }

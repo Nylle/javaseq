@@ -195,4 +195,31 @@ class ConsTest {
             assertThat(sut.mapcat(x -> x == 0 ? List.of() : List.of(x, x)).take(6)).containsExactly(1, 1, 2, 2, 3, 3);
         }
     }
+
+    @Nested
+    class TakeWhile {
+
+        @Test
+        void returnsEmptySeqWhenFirstItemDoesNotMatch() {
+            assertThat(Seq.of(1).takeWhile(x -> x > 1)).isEmpty();
+            assertThat(Seq.iterate(0, x -> x + 1).takeWhile(x -> x > 0)).isEmpty();
+        }
+
+        @Test
+        void returnsSeqWithSingleMatchingItem() {
+            assertThat(Seq.of(1).takeWhile(x -> x > 0)).containsExactly(1);
+            assertThat(Seq.iterate(0, x -> x + 1).takeWhile(x -> x < 1)).containsExactly(0);
+        }
+
+        @Test
+        void returnsSeqWithMatchingItems() {
+            assertThat(Seq.iterate(0, x -> x + 1).takeWhile(x -> x < 3)).containsExactly(0, 1, 2);
+        }
+
+        @Test
+        void returnsSeqWithAllMatchingItems() {
+            assertThat(Seq.of(1, 2, 3).takeWhile(x -> true)).containsExactly(1, 2, 3);
+            assertThat(Seq.iterate(0, x -> x + 1).takeWhile(x -> true).take(4)).containsExactly(0, 1, 2, 3);
+        }
+    }
 }

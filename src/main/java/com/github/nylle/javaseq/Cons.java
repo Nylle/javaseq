@@ -73,6 +73,11 @@ public class Cons<T> extends AbstractList<T> implements Seq<T> {
     }
 
     @Override
+    public Seq<T> takeWhile(Predicate<? super T> pred) {
+        return pred.test(first()) ? Seq.cons(first(), () -> rest().takeWhile(pred)) : Nil.of();
+    }
+
+    @Override
     public int size() {
         return 1 + rest().size();
     }

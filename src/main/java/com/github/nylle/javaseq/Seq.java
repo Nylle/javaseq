@@ -59,4 +59,6 @@ public interface Seq<T> extends List<T> {
     <R> Seq<R> map(Function<? super T, ? extends R> f);
 
     <R> Seq<R> mapcat(Function<? super T, ? extends Iterable<? extends R>> f);
+
+    Seq<T> takeWhile(Predicate<? super T> pred);
 }
