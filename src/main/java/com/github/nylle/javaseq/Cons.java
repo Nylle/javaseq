@@ -1,6 +1,7 @@
 package com.github.nylle.javaseq;
 
 import java.util.AbstractList;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class Cons<T> extends AbstractList<T> implements Seq<T> {
@@ -48,6 +49,11 @@ public class Cons<T> extends AbstractList<T> implements Seq<T> {
     @Override
     public Seq<T> take(long n) {
         return n <= 0 ? Nil.of() : Seq.cons(first, () -> rest().take(n - 1));
+    }
+
+    @Override
+    public <R> Seq<R> map(Function<? super T, ? extends R> f) {
+        return Seq.cons(f.apply(first()), () -> rest().map(f));
     }
 
     @Override

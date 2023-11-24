@@ -18,11 +18,6 @@ class NilTest {
     }
 
     @Test
-    void getReturnsNull() {
-        assertThat(Nil.of().get(0)).isNull();
-    }
-
-    @Test
     void sizeReturnsZero() {
         assertThat(Nil.of().size()).isZero();
     }
@@ -30,6 +25,11 @@ class NilTest {
     @Test
     void isEmptyReturnsTrue() {
         assertThat(Nil.of().isEmpty()).isTrue();
+    }
+
+    @Test
+    void getReturnsNull() {
+        assertThat(Nil.of().get(0)).isNull();
     }
 
     @Nested
@@ -61,5 +61,10 @@ class NilTest {
                     .isExactlyInstanceOf(Nil.class)
                     .isEmpty();
         }
+    }
+
+    @Test
+    void mapReturnsNil() {
+        assertThat(Nil.<Integer>of().map(x -> x * 100)).isEmpty();
     }
 }

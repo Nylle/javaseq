@@ -35,4 +35,5 @@ public interface Seq<T> extends List<T> {
 
     Seq<T> take(long n);
 
+    <R> Seq<R> map(Function<? super T, ? extends R> f);
 }

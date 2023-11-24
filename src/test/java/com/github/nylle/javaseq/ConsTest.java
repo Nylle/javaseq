@@ -26,6 +26,20 @@ class ConsTest {
         assertThat(rest.rest().rest().first()).isEqualTo(3);
     }
 
+    @Test
+    void sizeReturnsSizeOfFiniteSeqOrRunsForever() {
+        var sut = cons(3, () -> cons(-2, () -> cons(8, () -> Seq.of(1))));
+
+        assertThat(sut.size()).isEqualTo(4);
+    }
+
+    @Test
+    void isEmptyReturnsFalse() {
+        var sut = Seq.iterate("", x -> x + x.length());
+
+        assertThat(sut.isEmpty()).isFalse();
+    }
+
     @Nested
     class Get {
 
@@ -48,20 +62,6 @@ class ConsTest {
         void returnsNullIfIndexNotPresent() {
             assertThat(Seq.of(1).get(1)).isNull();
         }
-    }
-
-    @Test
-    void sizeReturnsSizeOfFiniteSeqOrRunsForever() {
-        var sut = cons(3, () -> cons(-2, () -> cons(8, () -> Seq.of(1))));
-
-        assertThat(sut.size()).isEqualTo(4);
-    }
-
-    @Test
-    void isEmptyReturnsFalse() {
-        var sut = Seq.iterate("", x -> x + x.length());
-
-        assertThat(sut.isEmpty()).isFalse();
     }
 
     @Nested
@@ -92,6 +92,31 @@ class ConsTest {
             assertThat(sut.take(3))
                     .isExactlyInstanceOf(Cons.class)
                     .containsExactly(0, 1, 2);
+        }
+    }
+
+    @Nested
+    class Map {
+
+        @Test
+        void returnsSingleMapResult() {
+            var sut = Seq.of("xxx");
+
+            assertThat(sut.map(x -> x.length())).isEqualTo(Seq.of(3));
+        }
+
+        @Test
+        void returnsAllMapResults() {
+            var sut = Seq.of("xxx", "ab", "baz", "foobar");
+
+            assertThat(sut.map(x -> x.length())).isEqualTo(Seq.of(3, 2, 3, 6));
+        }
+
+        @Test
+        void returnsInfiniteMapResults() {
+            var sut = Seq.iterate(0, x -> x + 1);
+
+            assertThat(sut.map(x -> x * 100).take(3)).containsExactly(0, 100, 200);
         }
     }
 }
