@@ -102,4 +102,36 @@ class NilTest {
     void dropWhileReturnsNil() {
         assertThat(Nil.of().dropWhile(x -> true)).isEqualTo(Nil.of());
     }
+
+    @Nested
+    class Partition {
+
+        @Test
+        void returnsNilForZeroSizeN() {
+            assertThat(Nil.of().partition(0)).isEqualTo(Nil.of());
+            assertThat(Nil.of().partition(0, 2)).isEqualTo(Nil.of());
+            assertThat(Nil.of().partition(0, 2, List.of(1))).isEqualTo(Nil.of());
+        }
+
+        @Test
+        void returnsNilForNegativeSizeN() {
+            assertThat(Nil.of().partition(-1)).isEqualTo(Nil.of());
+            assertThat(Nil.of().partition(-1, 2)).isEqualTo(Nil.of());
+            assertThat(Nil.of().partition(-1, 2, List.of(1))).isEqualTo(Nil.of());
+        }
+
+        @Test
+        void returnsNil() {
+            assertThat(Nil.of().partition(3)).isEqualTo(Nil.of());
+            assertThat(Nil.of().partition(3, 2)).isEqualTo(Nil.of());
+            assertThat(Nil.of().partition(3, 3, List.of(1, 2, 3))).isEqualTo(Nil.of());
+        }
+    }
+
+    @Test
+    void toListReturnsEmptyList() {
+        assertThat(Nil.of().toList())
+                .isInstanceOf(List.class)
+                .isEmpty();
+    }
 }

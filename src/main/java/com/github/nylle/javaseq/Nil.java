@@ -1,6 +1,7 @@
 package com.github.nylle.javaseq;
 
 import java.util.AbstractList;
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -60,6 +61,26 @@ public class Nil<T> extends AbstractList<T> implements Seq<T> {
     @Override
     public Seq<T> dropWhile(Predicate<? super T> pred) {
         return of();
+    }
+
+    @Override
+    public Seq<List<T>> partition(int n) {
+        return partition(n, n);
+    }
+
+    @Override
+    public Seq<List<T>> partition(int n, int step) {
+        return of();
+    }
+
+    @Override
+    public Seq<List<T>> partition(int n, int step, Iterable<T> pad) {
+        return of();
+    }
+
+    @Override
+    public List<T> toList() {
+        return List.of();
     }
 
     @Override

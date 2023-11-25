@@ -63,4 +63,12 @@ public interface Seq<T> extends List<T> {
     Seq<T> takeWhile(Predicate<? super T> pred);
 
     Seq<T> dropWhile(Predicate<? super T> pred);
+
+    Seq<List<T>> partition(int n);
+
+    Seq<List<T>> partition(int n, int step);
+
+    Seq<List<T>> partition(int n, int step, Iterable<T> pad);
+
+    List<T> toList();
 }

@@ -1,6 +1,7 @@
 package com.github.nylle.javaseq;
 
 import java.util.AbstractList;
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -83,6 +84,36 @@ public class Cons<T> extends AbstractList<T> implements Seq<T> {
     }
 
     @Override
+    public Seq<List<T>> partition(int n) {
+        return partition(n, n);
+    }
+
+    @Override
+    public Seq<List<T>> partition(int n, int step) {
+        return partition(n, step, null);
+    }
+
+    @Override
+    public Seq<List<T>> partition(int n, int step, Iterable<T> pad) {
+        if (n < 0) {
+            return Nil.of();
+        }
+        var partition = take(n).toList();
+        if (partition.size() < n) {
+            return pad == null
+                    ? Nil.of()
+                    : Seq.cons(pad(partition, pad, n), () -> drop(step).partition(n, step, pad));
+        }
+        return Seq.cons(partition, () -> drop(step).partition(n, step, pad));
+    }
+
+    @Override
+    public List<T> toList() {
+        rest().toList();
+        return List.copyOf(this);
+    }
+
+    @Override
     public int size() {
         return 1 + rest().size();
     }
@@ -102,5 +133,9 @@ public class Cons<T> extends AbstractList<T> implements Seq<T> {
     @Override
     public int hashCode() {
         return first().hashCode() + rest().hashCode() * 31;
+    }
+
+    private static <T> List<T> pad(List<T> partition, Iterable<T> pad, int n) {
+        return Seq.concat(partition, () -> Seq.of(pad).take(n - partition.size())).toList();
     }
 }
