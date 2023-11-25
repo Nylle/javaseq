@@ -222,4 +222,27 @@ class ConsTest {
             assertThat(Seq.iterate(0, x -> x + 1).takeWhile(x -> true).take(4)).containsExactly(0, 1, 2, 3);
         }
     }
+
+    @Nested
+    class DropWhile {
+
+        @Test
+        void returnsEmptySeqWhenAllItemsMatch() {
+            assertThat(Seq.of(1).dropWhile(x -> x > 0)).isEmpty();
+            assertThat(Seq.of(1, 2, 3, 4).dropWhile(x -> x > 0)).isEmpty();
+        }
+
+        @Test
+        void returnsSeqWithItemsThatDoNotMatch() {
+            assertThat(Seq.of(1).dropWhile(x -> x > 1)).containsExactly(1);
+            assertThat(Seq.of(1, 2, 3, 4).dropWhile(x -> x < 3)).containsExactly(3, 4);
+            assertThat(Seq.iterate(0, x -> x + 1).dropWhile(x -> x < 2).take(4)).containsExactly(2, 3, 4, 5);
+        }
+
+        @Test
+        void returnsEntireSeqWhenFirstItemDoesNotMatch() {
+            assertThat(Seq.of(1, 2, 3, 4).dropWhile(x -> x > 2)).containsExactly(1, 2, 3, 4);
+            assertThat(Seq.iterate(0, x -> x + 1).dropWhile(x -> x > 2).take(4)).containsExactly(0, 1, 2, 3);
+        }
+    }
 }

@@ -97,4 +97,9 @@ class NilTest {
     void takeWhileReturnsNil() {
         assertThat(Nil.of().takeWhile(x -> true)).isEqualTo(Nil.of());
     }
+
+    @Test
+    void dropWhileReturnsNil() {
+        assertThat(Nil.of().dropWhile(x -> true)).isEqualTo(Nil.of());
+    }
 }

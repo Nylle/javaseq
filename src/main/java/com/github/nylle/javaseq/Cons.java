@@ -78,6 +78,11 @@ public class Cons<T> extends AbstractList<T> implements Seq<T> {
     }
 
     @Override
+    public Seq<T> dropWhile(Predicate<? super T> pred) {
+        return pred.test(first()) ? rest().dropWhile(pred) : this;
+    }
+
+    @Override
     public int size() {
         return 1 + rest().size();
     }
