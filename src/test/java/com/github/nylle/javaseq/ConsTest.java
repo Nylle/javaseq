@@ -402,6 +402,121 @@ class ConsTest {
         }
     }
 
+    @Nested
+    class PartitionAll {
+
+        @Test
+        void returnsEmptySeqForNegativeSizeN() {
+            var sut = Seq.of(1, 2, 3);
+
+            assertThat(sut.partitionAll(-1)).isEmpty();
+            assertThat(sut.partitionAll(-1, 10)).isEmpty();
+            assertThat(sut.partitionAll(-1, 3)).isEmpty();
+            assertThat(sut.partitionAll(-1, 1)).isEmpty();
+            assertThat(sut.partitionAll(-1, 0)).isEmpty();
+            assertThat(sut.partitionAll(-1, -1)).isEmpty();
+        }
+
+        @Test
+        void returnsInfiniteSeqOfEmptyListsForZeroSizeN() {
+            var sut = Seq.of(1, 2, 3);
+
+            assertThat(sut.partitionAll(0).take(2)).containsExactly(
+                    List.of(),
+                    List.of());
+
+            assertThat(sut.partitionAll(0, 1).take(2)).containsExactly(
+                    List.of(),
+                    List.of());
+
+            assertThat(sut.partitionAll(0, 0).take(2)).containsExactly(
+                    List.of(),
+                    List.of());
+
+            assertThat(sut.partitionAll(0, -1).take(2)).containsExactly(
+                    List.of(),
+                    List.of());
+        }
+
+        @Test
+        void returnsSeqOfListsOf1ItemEachAtOffsetsStepApart() {
+            var sut = Seq.iterate(0, x -> x + 1);
+
+            assertThat(sut.partitionAll(1).take(3)).containsExactly(
+                    List.of(0),
+                    List.of(1),
+                    List.of(2));
+
+            assertThat(sut.partitionAll(1, 1).take(3)).containsExactly(
+                    List.of(0),
+                    List.of(1),
+                    List.of(2));
+
+            assertThat(sut.partitionAll(1, 2).take(3)).containsExactly(
+                    List.of(0),
+                    List.of(2),
+                    List.of(4));
+        }
+
+        @Test
+        void returnsSeqOfListsOfNItemsEachAtOffsetsStepApart() {
+            var sut = Seq.iterate(0, x -> x + 1);
+
+            assertThat(sut.partitionAll(3).take(3)).containsExactly(
+                    List.of(0, 1, 2),
+                    List.of(3, 4, 5),
+                    List.of(6, 7, 8));
+
+            assertThat(sut.partitionAll(3, 3).take(3)).containsExactly(
+                    List.of(0, 1, 2),
+                    List.of(3, 4, 5),
+                    List.of(6, 7, 8));
+
+            assertThat(sut.partitionAll(4, 6).take(3)).containsExactly(
+                    List.of(0, 1, 2, 3),
+                    List.of(6, 7, 8, 9),
+                    List.of(12, 13, 14, 15));
+        }
+
+        @Test
+        void returnsSeqOfOneEmptyListForStepGreaterThanOrEqualToSizeN() {
+            var sut = Seq.of(1, 2, 3);
+
+            assertThat(sut.partitionAll(0, 3)).containsExactly(
+                    List.of());
+
+            assertThat(sut.partitionAll(0, 4)).containsExactly(
+                    List.of());
+        }
+
+        @Test
+        void returnsASlidingWindowIfStepIsLowerThanSizeN() {
+            var sut = Seq.iterate(0, x -> x + 1);
+
+            assertThat(sut.partitionAll(3, 2).take(3)).containsExactly(
+                    List.of(0, 1, 2),
+                    List.of(2, 3, 4),
+                    List.of(4, 5, 6));
+        }
+
+        @Test
+        void returnsAnIncompleteLastPartition() {
+            var sut = Seq.iterate(0, x -> x + 1).take(14);
+
+            assertThat(sut.partitionAll(4, 4)).containsExactly(
+                    List.of(0, 1, 2, 3),
+                    List.of(4, 5, 6, 7),
+                    List.of(8, 9, 10, 11),
+                    List.of(12, 13));
+
+            assertThat(sut.partitionAll(3, 4)).containsExactly(
+                    List.of(0, 1, 2),
+                    List.of(4, 5, 6),
+                    List.of(8, 9, 10),
+                    List.of(12, 13));
+        }
+    }
+
     @Test
     void toListReturnsFullyRealizedList() {
         assertThat(Seq.iterate(0, x -> x + 1).take(4).toList())

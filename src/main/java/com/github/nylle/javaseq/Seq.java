@@ -70,5 +70,9 @@ public interface Seq<T> extends List<T> {
 
     Seq<List<T>> partition(int n, int step, Iterable<T> pad);
 
+    Seq<List<T>> partitionAll(int n);
+
+    Seq<List<T>> partitionAll(int n, int step);
+
     List<T> toList();
 }

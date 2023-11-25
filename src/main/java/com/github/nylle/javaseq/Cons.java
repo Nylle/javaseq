@@ -108,6 +108,16 @@ public class Cons<T> extends AbstractList<T> implements Seq<T> {
     }
 
     @Override
+    public Seq<List<T>> partitionAll(int n) {
+        return partition(n, n, List.of());
+    }
+
+    @Override
+    public Seq<List<T>> partitionAll(int n, int step) {
+        return partition(n, step, List.of());
+    }
+
+    @Override
     public List<T> toList() {
         rest().toList();
         return List.copyOf(this);

@@ -79,6 +79,16 @@ public class Nil<T> extends AbstractList<T> implements Seq<T> {
     }
 
     @Override
+    public Seq<List<T>> partitionAll(int n) {
+        return of();
+    }
+
+    @Override
+    public Seq<List<T>> partitionAll(int n, int step) {
+        return of();
+    }
+
+    @Override
     public List<T> toList() {
         return List.of();
     }

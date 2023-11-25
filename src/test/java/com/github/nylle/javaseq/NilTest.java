@@ -128,6 +128,28 @@ class NilTest {
         }
     }
 
+    @Nested
+    class PartitionAll {
+
+        @Test
+        void returnsNilForZeroSizeN() {
+            assertThat(Nil.of().partitionAll(0)).isEqualTo(Nil.of());
+            assertThat(Nil.of().partitionAll(0, 2)).isEqualTo(Nil.of());
+        }
+
+        @Test
+        void returnsNilForNegativeSizeN() {
+            assertThat(Nil.of().partitionAll(-1)).isEqualTo(Nil.of());
+            assertThat(Nil.of().partitionAll(-1, 2)).isEqualTo(Nil.of());
+        }
+
+        @Test
+        void returnsNil() {
+            assertThat(Nil.of().partitionAll(3)).isEqualTo(Nil.of());
+            assertThat(Nil.of().partitionAll(3, 2)).isEqualTo(Nil.of());
+        }
+    }
+
     @Test
     void toListReturnsEmptyList() {
         assertThat(Nil.of().toList())
