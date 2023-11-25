@@ -3,6 +3,7 @@ package com.github.nylle.javaseq;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -57,6 +58,8 @@ public interface Seq<T> extends List<T> {
     Seq<T> filter(Predicate<? super T> pred);
 
     <R> Seq<R> map(Function<? super T, ? extends R> f);
+
+    <S, R> Seq<R> map(Seq<? extends S> other, BiFunction<? super T, ? super S, ? extends R> f);
 
     <R> Seq<R> mapcat(Function<? super T, ? extends Iterable<? extends R>> f);
 

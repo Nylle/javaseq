@@ -2,6 +2,7 @@ package com.github.nylle.javaseq;
 
 import java.util.AbstractList;
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -66,6 +67,13 @@ public class Cons<T> extends AbstractList<T> implements Seq<T> {
     @Override
     public <R> Seq<R> map(Function<? super T, ? extends R> f) {
         return Seq.cons(f.apply(first()), () -> rest().map(f));
+    }
+
+    @Override
+    public <S, R> Seq<R> map(Seq<? extends S> other, BiFunction<? super T, ? super S, ? extends R> f) {
+        return other.isEmpty()
+                ? Nil.of()
+                : Seq.cons(f.apply(first(), other.first()), () -> rest().map(other.rest(), f));
     }
 
     @Override

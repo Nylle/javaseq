@@ -83,9 +83,19 @@ class NilTest {
         assertThat(Nil.<Integer>of().filter(x -> x != null)).isEqualTo(Nil.of());
     }
 
-    @Test
-    void mapReturnsNil() {
-        assertThat(Nil.<Integer>of().map(x -> x * 100)).isEqualTo(Nil.of());
+    @Nested
+    class Map {
+
+        @Test
+        void returnsNil() {
+            assertThat(Nil.<Integer>of().map(x -> x * 100)).isEqualTo(Nil.of());
+        }
+
+        @Test
+        void returnsNilWhenMappingWithOtherSeq() {
+            assertThat(Nil.<Integer>of().map(Nil.<Integer>of(), (a, b) -> a + b)).isEqualTo(Nil.of());
+            assertThat(Nil.<Integer>of().map(Seq.of(1, 2), (a, b) -> a + b)).isEqualTo(Nil.of());
+        }
     }
 
     @Test

@@ -169,6 +169,38 @@ class ConsTest {
 
             assertThat(sut.map(x -> x * 100).take(3)).containsExactly(0, 100, 200);
         }
+
+        @Nested
+        class WithOtherSeq {
+
+            @Test
+            void returnsEmptySeqWhenProvidingEmptyOther() {
+                assertThat(Seq.of(1, 2, 3).map(Seq.<Integer>of(), (a, b) -> a + b)).isEmpty();
+            }
+
+            @Test
+            void returnsANewSeqWithTheItemsOfBothInitialSeqsAreCombinedUsingF() {
+                var sut = Seq.of(1, 2, 3);
+
+                assertThat(sut.map(Seq.of("a", "b", "c"), (a, b) -> a + b)).containsExactly("1a", "2b", "3c");
+            }
+
+            @Test
+            void ignoresRemainingItemsIfOneOfTheSeqsIsExhausted() {
+                var sut = Seq.of(1, 2, 3);
+
+                assertThat(sut.map(Seq.of("a", "b"), (a, b) -> a + b)).containsExactly("1a", "2b");
+                assertThat(sut.map(Seq.of("a", "b", "c", "d"), (a, b) -> a + b)).containsExactly("1a", "2b", "3c");
+            }
+
+            @Test
+            void isLazy() {
+                var sut = Seq.iterate(0, x -> x + 1);
+                var other = Seq.iterate(0, x -> x + 1);
+
+                assertThat(sut.map(other, (a, b) -> a + b).take(4)).containsExactly(0, 2, 4, 6);
+            }
+        }
     }
 
     @Nested
