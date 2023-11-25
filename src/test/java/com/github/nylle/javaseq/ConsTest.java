@@ -549,6 +549,24 @@ class ConsTest {
         }
     }
 
+    @Nested
+    class Reductions {
+
+        @Test
+        void returnsASeqWithTheIntermediateValuesOfTheReduction() {
+            var sut = Seq.iterate(1, x -> x + 1);
+
+            assertThat(sut.reductions((a, b) -> a + b).take(3)).containsExactly(1, 3, 6);
+        }
+
+        @Test
+        void returnsASeqWithTheIntermediateValuesOfTheReductionStartingWithInit() {
+            var sut = Seq.iterate(1, x -> x + 1);
+
+            assertThat(sut.reductions(0, (a, b) -> a + b).take(4)).containsExactly(0, 1, 3, 6);
+        }
+    }
+
     @Test
     void toListReturnsFullyRealizedList() {
         assertThat(Seq.iterate(0, x -> x + 1).take(4).toList())

@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.BiFunction;
+import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -76,6 +77,10 @@ public interface Seq<T> extends List<T> {
     Seq<List<T>> partitionAll(int n);
 
     Seq<List<T>> partitionAll(int n, int step);
+
+    Seq<T> reductions(BinaryOperator<T> f);
+
+    Seq<T> reductions(T init, BinaryOperator<T> f);
 
     List<T> toList();
 }

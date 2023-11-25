@@ -3,6 +3,7 @@ package com.github.nylle.javaseq;
 import java.util.AbstractList;
 import java.util.List;
 import java.util.function.BiFunction;
+import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -123,6 +124,16 @@ public class Cons<T> extends AbstractList<T> implements Seq<T> {
     @Override
     public Seq<List<T>> partitionAll(int n, int step) {
         return partition(n, step, List.of());
+    }
+
+    @Override
+    public Seq<T> reductions(BinaryOperator<T> f) {
+        return rest().reductions(first(), f);
+    }
+
+    @Override
+    public Seq<T> reductions(T init, BinaryOperator<T> f) {
+        return Seq.cons(init, () -> rest().reductions(f.apply(init, first()), f));
     }
 
     @Override

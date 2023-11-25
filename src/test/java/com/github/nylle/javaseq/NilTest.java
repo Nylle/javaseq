@@ -161,6 +161,16 @@ class NilTest {
     }
 
     @Test
+    void reductionsReturnsNil() {
+        assertThat(Nil.<Integer>of().reductions((a, b) -> a + b)).isEqualTo(Nil.of());
+    }
+
+    @Test
+    void reductionsReturnsSeqOfInit() {
+        assertThat(Nil.<String>of().reductions("a", (a, b) -> a + b)).containsExactly("a");
+    }
+
+    @Test
     void toListReturnsEmptyList() {
         assertThat(Nil.of().toList())
                 .isInstanceOf(List.class)
