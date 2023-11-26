@@ -717,6 +717,38 @@ class ConsTest {
         }
     }
 
+    @Nested
+    class NotAny {
+
+        @Test
+        void returnsFalseIfFirstItemMatchesPred() {
+            var sut = Seq.iterate(0, x -> x + 1);
+
+            assertThat(sut.notAny(x -> x == 0)).isFalse();
+        }
+
+        @Test
+        void returnsFalseIfAnyItemMatchesPred() {
+            var sut = Seq.iterate(0, x -> x + 1);
+
+            assertThat(sut.notAny(x -> x == 100)).isFalse();
+        }
+
+        @Test
+        void returnsFalseIfAllItemsMatchPred() {
+            var sut = Seq.iterate(1, x -> x + 1);
+
+            assertThat(sut.notAny(x -> x > 0)).isFalse();
+        }
+
+        @Test
+        void returnsTrueIfNoItemMatchesPred() {
+            var sut = Seq.iterate(0, x -> x + 1);
+
+            assertThat(sut.take(100).notAny(x -> x < 0)).isTrue();
+        }
+    }
+
     @Test
     void toListReturnsFullyRealizedList() {
         assertThat(Seq.iterate(0, x -> x + 1).take(4).toList())
