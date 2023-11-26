@@ -592,6 +592,36 @@ class ConsTest {
         }
     }
 
+    @Nested
+    class Distinct {
+
+        @Test
+        void returnsSeqWithSingleItem() {
+            assertThat(Seq.of(1).distinct()).containsExactly(1);
+        }
+
+        @Test
+        void returnsSeqThatAlreadyIsDistinct() {
+            var sut = Seq.iterate(0, x -> x + 1);
+
+            assertThat(sut.distinct().take(4)).containsExactly(0, 1, 2, 3);
+        }
+
+        @Test
+        void returnsSeqWithSingleItemForSeqWithIdenticalItems() {
+            var sut = Seq.cons("a", () -> Seq.of("a"));
+
+            assertThat(sut.distinct().take(4)).containsExactly("a");
+        }
+
+        @Test
+        void returnsDistinctItemsInSameOrderAsEncounteredFirst() {
+            var sut = Seq.of("a", "c", "a", "b", "b", "d", "f", "e", "g", "e");
+
+            assertThat(sut.distinct()).containsExactly("a", "c", "b", "d", "f", "e", "g");
+        }
+    }
+
     @Test
     void toListReturnsFullyRealizedList() {
         assertThat(Seq.iterate(0, x -> x + 1).take(4).toList())

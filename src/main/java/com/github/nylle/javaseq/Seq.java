@@ -87,5 +87,7 @@ public interface Seq<T> extends List<T> {
 
     <R> R reduce(R val, BiFunction<R, ? super T, R> f);
 
+    Seq<T> distinct();
+
     List<T> toList();
 }

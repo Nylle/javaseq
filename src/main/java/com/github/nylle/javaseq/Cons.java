@@ -1,8 +1,10 @@
 package com.github.nylle.javaseq;
 
 import java.util.AbstractList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
@@ -154,6 +156,11 @@ public class Cons<T> extends AbstractList<T> implements Seq<T> {
     }
 
     @Override
+    public Seq<T> distinct() {
+        return distinct(this, new HashSet<>());
+    }
+
+    @Override
     public List<T> toList() {
         rest().toList();
         return List.copyOf(this);
@@ -183,5 +190,14 @@ public class Cons<T> extends AbstractList<T> implements Seq<T> {
 
     private static <T> List<T> pad(List<T> partition, Iterable<T> pad, int n) {
         return Seq.concat(partition, () -> Seq.of(pad).take(n - partition.size())).toList();
+    }
+
+    private static <T> Seq<T> distinct(Seq<T> seq, Set<T> exclude) {
+        var additionalItems = seq.filter(t -> !exclude.contains(t));
+        if (additionalItems.isEmpty()) {
+            return Seq.of();
+        }
+        exclude.add(additionalItems.first());
+        return Seq.cons(additionalItems.first(), () -> distinct(additionalItems.rest(), exclude));
     }
 }

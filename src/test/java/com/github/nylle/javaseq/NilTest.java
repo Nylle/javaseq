@@ -181,6 +181,11 @@ class NilTest {
     }
 
     @Test
+    void distinctReturnsNil() {
+        assertThat(Nil.of().distinct()).isEqualTo(Nil.of());
+    }
+
+    @Test
     void toListReturnsEmptyList() {
         assertThat(Nil.of().toList())
                 .isInstanceOf(List.class)
