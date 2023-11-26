@@ -1,6 +1,8 @@
 package com.github.nylle.javaseq;
 
 import java.util.AbstractList;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -158,6 +160,19 @@ public class Cons<T> extends AbstractList<T> implements Seq<T> {
     @Override
     public Seq<T> distinct() {
         return distinct(this, new HashSet<>());
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public Seq<T> sorted() {
+        return sorted((o1, o2) -> ((Comparable<T>) o1).compareTo(o2));
+    }
+
+    @Override
+    public Seq<T> sorted(Comparator<? super T> comparator) {
+        var list = new ArrayList<>(this);
+        list.sort(comparator);
+        return Seq.of(list);
     }
 
     @Override

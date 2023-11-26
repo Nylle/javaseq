@@ -3,6 +3,7 @@ package com.github.nylle.javaseq;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.Comparator;
 import java.util.List;
 
 import static com.github.nylle.javaseq.Seq.cons;
@@ -619,6 +620,29 @@ class ConsTest {
             var sut = Seq.of("a", "c", "a", "b", "b", "d", "f", "e", "g", "e");
 
             assertThat(sut.distinct()).containsExactly("a", "c", "b", "d", "f", "e", "g");
+        }
+    }
+
+    @Nested
+    class Sorted {
+
+        @Test
+        void returnsSeqWithSingleItem() {
+            assertThat(Seq.of(1).sorted()).isEqualTo(Seq.of(1));
+        }
+
+        @Test
+        void returnsSeqWithAllItemsSortedUsingDefaultComparator() {
+            var sut = Seq.iterate(10, x -> x - 1);
+
+            assertThat(sut.take(4).sorted()).containsExactly(7, 8, 9, 10);
+        }
+
+        @Test
+        void returnsSeqWithAllItemsSortedUsingSuppliedComparator() {
+            var sut = Seq.iterate(0, x -> x + 1);
+
+            assertThat(sut.take(4).sorted(Comparator.reverseOrder())).containsExactly(3, 2, 1, 0);
         }
     }
 

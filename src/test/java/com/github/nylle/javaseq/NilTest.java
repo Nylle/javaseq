@@ -3,6 +3,7 @@ package com.github.nylle.javaseq;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.Comparator;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -183,6 +184,12 @@ class NilTest {
     @Test
     void distinctReturnsNil() {
         assertThat(Nil.of().distinct()).isEqualTo(Nil.of());
+    }
+
+    @Test
+    void sortedReturnsNil() {
+        assertThat(Nil.of().sorted()).isEqualTo(Nil.of());
+        assertThat(Nil.<Integer>of().sorted(Comparator.naturalOrder())).isEqualTo(Nil.of());
     }
 
     @Test

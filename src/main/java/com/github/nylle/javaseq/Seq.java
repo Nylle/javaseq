@@ -1,6 +1,7 @@
 package com.github.nylle.javaseq;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -88,6 +89,11 @@ public interface Seq<T> extends List<T> {
     <R> R reduce(R val, BiFunction<R, ? super T, R> f);
 
     Seq<T> distinct();
+
+    @SuppressWarnings("unchecked")
+    Seq<T> sorted();
+
+    Seq<T> sorted(Comparator<? super T> comparator);
 
     List<T> toList();
 }

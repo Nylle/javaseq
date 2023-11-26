@@ -1,6 +1,7 @@
 package com.github.nylle.javaseq;
 
 import java.util.AbstractList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
@@ -118,6 +119,16 @@ public class Nil<T> extends AbstractList<T> implements Seq<T> {
 
     @Override
     public Seq<T> distinct() {
+        return of();
+    }
+
+    @Override
+    public Seq<T> sorted() {
+        return of();
+    }
+
+    @Override
+    public Seq<T> sorted(Comparator<? super T> comparator) {
         return of();
     }
 
