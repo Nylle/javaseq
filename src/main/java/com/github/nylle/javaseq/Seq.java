@@ -97,5 +97,7 @@ public interface Seq<T> extends List<T> {
 
     boolean some(Predicate<? super T> pred);
 
+    boolean every(Predicate<? super T> pred);
+
     List<T> toList();
 }

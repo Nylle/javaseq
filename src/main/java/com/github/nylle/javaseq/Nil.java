@@ -138,6 +138,11 @@ public class Nil<T> extends AbstractList<T> implements Seq<T> {
     }
 
     @Override
+    public boolean every(Predicate<? super T> pred) {
+        return true;
+    }
+
+    @Override
     public List<T> toList() {
         return List.of();
     }

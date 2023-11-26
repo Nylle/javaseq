@@ -685,6 +685,38 @@ class ConsTest {
         }
     }
 
+    @Nested
+    class Every {
+
+        @Test
+        void returnsTrueIfAllItemsInSeqMatchPred() {
+            var sut = Seq.iterate(1, x -> x + 1);
+
+            assertThat(sut.take(100).every(x -> x > 0)).isTrue();
+        }
+
+        @Test
+        void returnsFalseIfFirstItemInInfiniteSeqDoesNotMatchPred() {
+            var sut = Seq.iterate(0, x -> x + 1);
+
+            assertThat(sut.every(x -> x > 0)).isFalse();
+        }
+
+        @Test
+        void returnsFalseIfAnyItemInInfiniteSeqDoesNotMatchPred() {
+            var sut = Seq.iterate(0, x -> x + 1);
+
+            assertThat(sut.every(x -> x < 100)).isFalse();
+        }
+
+        @Test
+        void returnsFalseIfLastItemInInfiniteSeqDoesNotMatchPred() {
+            var sut = Seq.iterate(1, x -> x + 1);
+
+            assertThat(sut.take(100).every(x -> x < 100)).isFalse();
+        }
+    }
+
     @Test
     void toListReturnsFullyRealizedList() {
         assertThat(Seq.iterate(0, x -> x + 1).take(4).toList())
