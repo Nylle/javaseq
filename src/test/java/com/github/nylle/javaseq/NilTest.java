@@ -193,6 +193,11 @@ class NilTest {
     }
 
     @Test
+    void someReturnsFalse() {
+        assertThat(Nil.<Integer>of().some(x -> true)).isFalse();
+    }
+
+    @Test
     void toListReturnsEmptyList() {
         assertThat(Nil.of().toList())
                 .isInstanceOf(List.class)

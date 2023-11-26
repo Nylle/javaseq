@@ -95,5 +95,7 @@ public interface Seq<T> extends List<T> {
 
     Seq<T> sorted(Comparator<? super T> comparator);
 
+    boolean some(Predicate<? super T> pred);
+
     List<T> toList();
 }

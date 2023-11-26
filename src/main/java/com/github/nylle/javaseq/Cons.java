@@ -176,6 +176,11 @@ public class Cons<T> extends AbstractList<T> implements Seq<T> {
     }
 
     @Override
+    public boolean some(Predicate<? super T> pred) {
+        return pred.test(first()) || rest().some(pred);
+    }
+
+    @Override
     public List<T> toList() {
         rest().toList();
         return List.copyOf(this);
