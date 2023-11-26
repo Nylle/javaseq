@@ -171,6 +171,16 @@ class NilTest {
     }
 
     @Test
+    void reduceReturnsEmptyOptional() {
+        assertThat(Nil.<Integer>of().reduce((a, b) -> a + b)).isEmpty();
+    }
+
+    @Test
+    void reduceReturnsVal() {
+        assertThat(Nil.<Integer>of().reduce(0, (a, b) -> a + b)).isEqualTo(0);
+    }
+
+    @Test
     void toListReturnsEmptyList() {
         assertThat(Nil.of().toList())
                 .isInstanceOf(List.class)

@@ -2,6 +2,7 @@ package com.github.nylle.javaseq;
 
 import java.util.AbstractList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
@@ -103,6 +104,16 @@ public class Nil<T> extends AbstractList<T> implements Seq<T> {
     @Override
     public Seq<T> reductions(T init, BinaryOperator<T> f) {
         return Seq.of(init);
+    }
+
+    @Override
+    public Optional<T> reduce(BinaryOperator<T> f) {
+        return Optional.empty();
+    }
+
+    @Override
+    public <R> R reduce(R val, BiFunction<R, ? super T, R> f) {
+        return val;
     }
 
     @Override

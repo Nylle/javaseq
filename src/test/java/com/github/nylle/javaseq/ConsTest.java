@@ -567,6 +567,31 @@ class ConsTest {
         }
     }
 
+    @Nested
+    class Reduce {
+
+        @Test
+        void returnsOptionalResultWhenValIsNotSupplied() {
+            var sut = Seq.iterate(0, x -> x + 1).take(4);
+
+            assertThat(sut.reduce((a, b) -> a + b)).hasValue(6);
+        }
+
+        @Test
+        void returnsResultWhenValIsSupplied() {
+            var sut = Seq.iterate(1, x -> x + 1).take(3);
+
+            assertThat(sut.reduce(0, (a, b) -> a + b)).isEqualTo(6);
+        }
+
+        @Test
+        void returnsResultOfDifferentTypeThanSeq() {
+            var sut = Seq.of("a", "bb", "ccc", "dddd");
+
+            assertThat(sut.reduce(0, (acc, x) -> acc + x.length())).isEqualTo(10);
+        }
+    }
+
     @Test
     void toListReturnsFullyRealizedList() {
         assertThat(Seq.iterate(0, x -> x + 1).take(4).toList())

@@ -3,6 +3,7 @@ package com.github.nylle.javaseq;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
@@ -81,6 +82,10 @@ public interface Seq<T> extends List<T> {
     Seq<T> reductions(BinaryOperator<T> f);
 
     Seq<T> reductions(T init, BinaryOperator<T> f);
+
+    Optional<T> reduce(BinaryOperator<T> f);
+
+    <R> R reduce(R val, BiFunction<R, ? super T, R> f);
 
     List<T> toList();
 }

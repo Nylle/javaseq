@@ -2,6 +2,7 @@ package com.github.nylle.javaseq;
 
 import java.util.AbstractList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
@@ -134,6 +135,22 @@ public class Cons<T> extends AbstractList<T> implements Seq<T> {
     @Override
     public Seq<T> reductions(T init, BinaryOperator<T> f) {
         return Seq.cons(init, () -> rest().reductions(f.apply(init, first()), f));
+    }
+
+    @Override
+    public Optional<T> reduce(BinaryOperator<T> f) {
+        return Optional.of(rest().reduce(first(), f));
+    }
+
+    @Override
+    public <R> R reduce(R val, BiFunction<R, ? super T, R> f) {
+        var acc = val;
+        Seq<T> seq = this;
+        while (!seq.isEmpty()) {
+            acc = f.apply(acc, seq.first());
+            seq = seq.rest();
+        }
+        return acc;
     }
 
     @Override
