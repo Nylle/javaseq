@@ -213,6 +213,11 @@ class NilTest {
     }
 
     @Test
+    void minReturnsEmptyOptional() {
+        assertThat(Nil.<Integer>of().min(Comparator.naturalOrder())).isEmpty();
+    }
+
+    @Test
     void toListReturnsEmptyList() {
         assertThat(Nil.of().toList())
                 .isInstanceOf(List.class)

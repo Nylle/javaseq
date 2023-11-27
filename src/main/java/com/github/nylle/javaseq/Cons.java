@@ -206,6 +206,11 @@ public class Cons<T> extends AbstractList<T> implements Seq<T> {
     }
 
     @Override
+    public Optional<T> min(Comparator<? super T> comparator) {
+        return max(comparator.reversed());
+    }
+
+    @Override
     public List<T> toList() {
         rest().toList();
         return List.copyOf(this);

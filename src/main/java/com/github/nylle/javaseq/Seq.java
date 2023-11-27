@@ -103,5 +103,7 @@ public interface Seq<T> extends List<T> {
 
     Optional<T> max(Comparator<? super T> comparator);
 
+    Optional<T> min(Comparator<? super T> comparator);
+
     List<T> toList();
 }

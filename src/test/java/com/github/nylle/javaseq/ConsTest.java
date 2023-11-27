@@ -753,7 +753,7 @@ class ConsTest {
     class Max {
 
         @Test
-        void returnsSingleElement() {
+        void returnsSingleItem() {
             assertThat(Seq.of(1).max(Comparator.naturalOrder())).hasValue(1);
         }
 
@@ -769,6 +769,29 @@ class ConsTest {
             var sut = Seq.iterate("x", x -> x + "x");
 
             assertThat(sut.take(6).max(Comparator.comparingInt(x -> x.length()))).hasValue("xxxxxx");
+        }
+    }
+
+    @Nested
+    class Min {
+
+        @Test
+        void returnsSingleItem() {
+            assertThat(Seq.of(1).min(Comparator.naturalOrder())).hasValue(1);
+        }
+
+        @Test
+        void returnsHighestNumber() {
+            var sut = Seq.iterate(-1, x -> x - 1);
+
+            assertThat(sut.take(100).min(Comparator.naturalOrder())).hasValue(-100);
+        }
+
+        @Test
+        void returnsLongestString() {
+            var sut = Seq.of("xxxxxx", "xxxxx", "xxxx", "x", "xx", "xxx");
+
+            assertThat(sut.take(6).min(Comparator.comparingInt(x -> x.length()))).hasValue("x");
         }
     }
 

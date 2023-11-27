@@ -153,6 +153,11 @@ public class Nil<T> extends AbstractList<T> implements Seq<T> {
     }
 
     @Override
+    public Optional<T> min(Comparator<? super T> comparator) {
+        return Optional.empty();
+    }
+
+    @Override
     public List<T> toList() {
         return List.of();
     }
