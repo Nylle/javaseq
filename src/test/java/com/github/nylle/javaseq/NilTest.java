@@ -231,6 +231,19 @@ class NilTest {
     }
 
     @Test
+    void findReturnsEmptyOptional() {
+        assertThat(Nil.of().find(-1)).isEmpty();
+        assertThat(Nil.of().find(0)).isEmpty();
+        assertThat(Nil.of().find(1)).isEmpty();
+    }
+
+    @Test
+    void findFirstReturnsEmptyOptional() {
+        assertThat(Nil.of().findFirst()).isEmpty();
+        assertThat(Nil.of().findFirst(x -> true)).isEmpty();
+    }
+
+    @Test
     void forEachDoesNothing() {
         var consumer = Mockito.<Consumer<Integer>>mock();
 

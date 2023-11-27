@@ -109,5 +109,11 @@ public interface Seq<T> extends List<T> {
 
     <C extends Comparable<? super C>> Optional<T> minKey(Function<T, C> f);
 
+    Optional<T> find(int i);
+
+    Optional<T> findFirst();
+
+    Optional<T> findFirst(Predicate<? super T> pred);
+
     List<T> toList();
 }

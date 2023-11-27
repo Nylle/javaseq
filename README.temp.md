@@ -140,6 +140,15 @@ to f and the items in this Seq. Function f should return a collection. _(This is
 #### minKey(f)
 - //TODO
 
+#### find()
+- //TODO
+
+#### findFirst()
+- //TODO
+
+#### findFirst(pred)
+- //TODO
+
 #### toList()
 - //TODO
 

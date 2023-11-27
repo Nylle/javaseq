@@ -106,12 +106,12 @@ class ConsTest {
     class Drop {
 
         @Test
-        void returnsUnchangedSeqWithNegativeElementsToDrop() {
+        void returnsUnchangedSeqWithNegativeItemsToDrop() {
             assertThat(Seq.of(1, 2, 3, 4).drop(-1)).containsExactly(1, 2, 3, 4);
         }
 
         @Test
-        void returnsUnchangedSeqWithZeroElementsToDrop() {
+        void returnsUnchangedSeqWithZeroItemsToDrop() {
             assertThat(Seq.of(1, 2, 3, 4).drop(0)).containsExactly(1, 2, 3, 4);
         }
 
@@ -121,7 +121,7 @@ class ConsTest {
         }
 
         @Test
-        void returnsEmptySeqIfMoreElementsAreDroppedThanPresent() {
+        void returnsEmptySeqIfMoreItemsAreDroppedThanPresent() {
             assertThat(Seq.of(1, 2, 3, 4).drop(5)).isEmpty();
         }
 
@@ -137,14 +137,14 @@ class ConsTest {
     class Filter {
 
         @Test
-        void returnsNilWhenNoElementsMatch() {
+        void returnsNilWhenNoItemsMatch() {
             var sut = Seq.iterate(0, x -> x + 1).take(10);
 
             assertThat(sut.filter(x -> x < 0)).isEmpty();
         }
 
         @Test
-        void returnsMatchingElements() {
+        void returnsMatchingItems() {
             var sut = Seq.iterate(0, x -> x + 1);
 
             assertThat(sut.filter(x -> x > 100).take(3)).containsExactly(101, 102, 103);
@@ -842,6 +842,55 @@ class ConsTest {
             var sut = Seq.of("xxxxxx", "xxxxx", "xxxx", "x", "xx", "xxx");
 
             assertThat(sut.take(6).minKey(x -> x.length())).hasValue("x");
+        }
+    }
+
+    @Nested
+    class Find {
+
+        @Test
+        void returnsOptionalOfValueAtIndex() {
+            var sut = Seq.iterate("", x -> x + x.length());
+
+            assertThat(sut.find(0)).hasValue("");
+            assertThat(sut.find(1)).hasValue("0");
+            assertThat(sut.find(2)).hasValue("01");
+            assertThat(sut.find(3)).hasValue("012");
+        }
+
+        @Test
+        void returnsEmptyOptionalForNegativeIndex() {
+            assertThat(Seq.of(1).find(-1)).isEmpty();
+        }
+
+        @Test
+        void returnsEmptyOptionalIfIndexNotPresent() {
+            assertThat(Seq.of(1).find(1)).isEmpty();
+        }
+    }
+
+    @Nested
+    class FindFirst {
+
+        @Test
+        void returnsOptionalOfHead() {
+            var sut = Seq.iterate(0, x -> x + 1);
+
+            assertThat(sut.findFirst()).hasValue(0);
+        }
+
+        @Test
+        void returnsEmptyOptionalWhenNoItemsMatchPred() {
+            var sut = Seq.iterate(0, x -> x + 1).take(10);
+
+            assertThat(sut.findFirst(x -> x < 0)).isEmpty();
+        }
+
+        @Test
+        void returnsOptionalOfFirstMatchingItem() {
+            var sut = Seq.iterate(0, x -> x + 1);
+
+            assertThat(sut.findFirst(x -> x > 100)).hasValue(101);
         }
     }
 

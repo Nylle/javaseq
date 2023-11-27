@@ -225,6 +225,21 @@ public class Cons<T> extends AbstractList<T> implements Seq<T> {
     }
 
     @Override
+    public Optional<T> find(int i) {
+        return Optional.ofNullable(get(i));
+    }
+
+    @Override
+    public Optional<T> findFirst() {
+        return Optional.ofNullable(first());
+    }
+
+    @Override
+    public Optional<T> findFirst(Predicate<? super T> pred) {
+        return filter(pred).findFirst();
+    }
+
+    @Override
     public void forEach(Consumer<? super T> f) {
         f.accept(first());
         rest().forEach(f);
