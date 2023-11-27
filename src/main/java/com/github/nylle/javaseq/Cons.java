@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -218,6 +219,12 @@ public class Cons<T> extends AbstractList<T> implements Seq<T> {
     @Override
     public <C extends Comparable<? super C>> Optional<T> minKey(Function<T, C> f) {
         return min(Comparator.comparing(t -> f.apply(t)));
+    }
+
+    @Override
+    public void forEach(Consumer<? super T> f) {
+        f.accept(first());
+        rest().forEach(f);
     }
 
     @Override

@@ -2,12 +2,16 @@ package com.github.nylle.javaseq;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static com.github.nylle.javaseq.Seq.cons;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 class ConsTest {
 
@@ -839,6 +843,22 @@ class ConsTest {
 
             assertThat(sut.take(6).minKey(x -> x.length())).hasValue("x");
         }
+    }
+
+    @Test
+    void forEachCallsConsumerForEveryItemPresent() {
+        var consumer = Mockito.<Consumer<Integer>>mock();
+
+        var sut = Seq.iterate(0, x -> x + 1);
+
+        sut.take(5).forEach(consumer);
+
+        verify(consumer).accept(0);
+        verify(consumer).accept(1);
+        verify(consumer).accept(2);
+        verify(consumer).accept(3);
+        verify(consumer).accept(4);
+        verifyNoMoreInteractions(consumer);
     }
 
     @Test

@@ -2,11 +2,14 @@ package com.github.nylle.javaseq;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 class NilTest {
 
@@ -226,6 +229,16 @@ class NilTest {
     void minKeyReturnsEmptyOptional() {
         assertThat(Nil.<Integer>of().minKey(x -> Math.abs(x))).isEmpty();
     }
+
+    @Test
+    void forEachDoesNothing() {
+        var consumer = Mockito.<Consumer<Integer>>mock();
+
+        Nil.<Integer>of().forEach(consumer);
+
+        verifyNoInteractions(consumer);
+    }
+
 
     @Test
     void toListReturnsEmptyList() {
