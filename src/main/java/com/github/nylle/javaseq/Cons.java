@@ -34,9 +34,9 @@ public class Cons<T> extends AbstractList<T> implements Seq<T> {
 
     @Override
     public Seq<T> rest() {
-        if (rest == null) {
+        if (!isRealized()) {
             synchronized (this) {
-                if (rest == null) {
+                if (!isRealized()) {
                     rest = f.get();
                 }
             }
@@ -195,6 +195,11 @@ public class Cons<T> extends AbstractList<T> implements Seq<T> {
     }
 
     @Override
+    public boolean isRealized() {
+        return rest != null;
+    }
+
+    @Override
     public Optional<T> max(Comparator<? super T> comp) {
         if (rest().isEmpty()) {
             return Optional.of(first());
@@ -316,6 +321,24 @@ public class Cons<T> extends AbstractList<T> implements Seq<T> {
     @Override
     public int hashCode() {
         return first().hashCode() + rest().hashCode() * 31;
+    }
+
+    public String toString() {
+        StringBuilder s = new StringBuilder("[");
+        Seq<T> seq = this;
+        while (!seq.isEmpty()) {
+            s.append(seq.first());
+            if (seq.isRealized()) {
+                if (!seq.rest().isEmpty()) {
+                    s.append(", ");
+                }
+                seq = seq.rest();
+            } else {
+                s.append(", ").append("?");
+                break;
+            }
+        }
+        return s.append("]").toString();
     }
 
     private static <T> List<T> pad(List<T> partition, Iterable<T> pad, int n) {

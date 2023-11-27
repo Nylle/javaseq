@@ -754,6 +754,35 @@ class ConsTest {
     }
 
     @Nested
+    class IsRealized {
+
+        @Test
+        void returnsFalseForUnrealisedLazySeq() {
+            var sut = Seq.iterate(0, x -> x + 1);
+
+            assertThat(sut.isRealized()).isFalse();
+        }
+
+        @Test
+        void returnsFalseForPartiallyRealisedLazySeq() {
+            var sut = Seq.iterate(0, x -> x + 1);
+
+            sut.get(2);
+
+            assertThat(sut.isRealized()).isTrue();
+        }
+
+        @Test
+        void returnsTrueForFullyRealisedSeq() {
+            var sut = Seq.of(1, 2, 3);
+
+            sut.forEach(x -> {});
+
+            assertThat(sut.isRealized()).isTrue();
+        }
+    }
+
+    @Nested
     class Max {
 
         @Test
@@ -986,6 +1015,35 @@ class ConsTest {
             var sut = Seq.iterate(0, x -> x + 1);
 
             assertThat(sut.take(3).subList(1, 10)).containsExactly(1, 2);
+        }
+    }
+
+    @Nested
+    class ToString {
+
+        @Test
+        void returnsFirstItemOnlyInSeq() {
+            var sut = Seq.iterate(0, x -> x + 1);
+
+            assertThat(sut.toString()).isEqualTo("[0, ?]");
+        }
+
+        @Test
+        void returnsRealisedItemsInSeq() {
+            var sut = Seq.iterate(0, x -> x + 1);
+
+            sut.get(2);
+
+            assertThat(sut.toString()).isEqualTo("[0, 1, 2, ?]");
+        }
+
+        @Test
+        void returnsAllItemsInFullyRealisedSeq() {
+            var sut = Seq.iterate(0, x -> x + 1).take(4);
+
+            sut.forEach(x -> {});
+
+            assertThat(sut.toString()).isEqualTo("[0, 1, 2, 3]");
         }
     }
 }

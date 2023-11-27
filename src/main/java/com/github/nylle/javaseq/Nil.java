@@ -148,6 +148,11 @@ public class Nil<T> extends AbstractList<T> implements Seq<T> {
     }
 
     @Override
+    public boolean isRealized() {
+        return true;
+    }
+
+    @Override
     public Optional<T> max(Comparator<? super T> comparator) {
         return Optional.empty();
     }
@@ -209,5 +214,10 @@ public class Nil<T> extends AbstractList<T> implements Seq<T> {
     @Override
     public int hashCode() {
         return 0;
+    }
+
+    @Override
+    public String toString() {
+        return "[]";
     }
 }

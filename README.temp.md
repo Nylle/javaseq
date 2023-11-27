@@ -128,6 +128,9 @@ to f and the items in this Seq. Function f should return a collection. _(This is
 - Returns false if (pred x) is true for any x in this Seq. _(This is similar to Stream::noneMatch.)_
 - Returns true if none of the items in this Seq return true for pred(item). **Caution:** If the Seq is lazy, it will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
 
+#### isRealized()
+- //TODO
+
 #### max(comp)
 - //TODO
 
@@ -154,6 +157,9 @@ to f and the items in this Seq. Function f should return a collection. _(This is
 
 ### Interoperability
 
+#### Object::toString()
+- //TODO
+
 #### Iterable::forEach(f)
 - //TODO
 
@@ -177,3 +183,5 @@ to f and the items in this Seq. Function f should return a collection. _(This is
 
 #### List::subList(fromIndex, toIndex)
 - //TODO
+
+### Extensions

@@ -211,6 +211,11 @@ class NilTest {
     }
 
     @Test
+    void isRealizedReturnsTrue() {
+        assertThat(Nil.of().isRealized()).isTrue();
+    }
+
+    @Test
     void maxReturnsEmptyOptional() {
         assertThat(Nil.<Integer>of().max(Comparator.naturalOrder())).isEmpty();
     }
@@ -280,5 +285,10 @@ class NilTest {
         assertThat(Nil.of().toList())
                 .isInstanceOf(List.class)
                 .isEmpty();
+    }
+
+    @Test
+    void toStringReturnsEmptyBrackets() {
+        assertThat(Nil.of().toString()).isEqualTo("[]");
     }
 }

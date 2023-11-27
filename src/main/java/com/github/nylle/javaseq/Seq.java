@@ -101,6 +101,8 @@ public interface Seq<T> extends List<T> {
 
     boolean notAny(Predicate<? super T> pred);
 
+    boolean isRealized();
+
     Optional<T> max(Comparator<? super T> comparator);
 
     Optional<T> min(Comparator<? super T> comparator);
