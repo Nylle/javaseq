@@ -218,6 +218,11 @@ class NilTest {
     }
 
     @Test
+    void maxKeyReturnsEmptyOptional() {
+        assertThat(Nil.<Integer>of().maxKey(x -> Math.abs(x))).isEmpty();
+    }
+
+    @Test
     void toListReturnsEmptyList() {
         assertThat(Nil.of().toList())
                 .isInstanceOf(List.class)

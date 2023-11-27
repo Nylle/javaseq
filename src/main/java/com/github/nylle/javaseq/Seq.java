@@ -105,5 +105,7 @@ public interface Seq<T> extends List<T> {
 
     Optional<T> min(Comparator<? super T> comparator);
 
+    <C extends Comparable<? super C>> Optional<T> maxKey(Function<T, C> f);
+
     List<T> toList();
 }

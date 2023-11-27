@@ -158,6 +158,11 @@ public class Nil<T> extends AbstractList<T> implements Seq<T> {
     }
 
     @Override
+    public <C extends Comparable<? super C>> Optional<T> maxKey(Function<T, C> f) {
+        return Optional.empty();
+    }
+
+    @Override
     public List<T> toList() {
         return List.of();
     }
