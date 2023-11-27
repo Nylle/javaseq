@@ -93,13 +93,15 @@ public interface Seq<T> extends List<T> {
     @SuppressWarnings("unchecked")
     Seq<T> sorted();
 
-    Seq<T> sorted(Comparator<? super T> comparator);
+    Seq<T> sorted(Comparator<? super T> comp);
 
     boolean some(Predicate<? super T> pred);
 
     boolean every(Predicate<? super T> pred);
 
     boolean notAny(Predicate<? super T> pred);
+
+    Optional<T> max(Comparator<? super T> comparator);
 
     List<T> toList();
 }

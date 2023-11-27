@@ -169,9 +169,9 @@ public class Cons<T> extends AbstractList<T> implements Seq<T> {
     }
 
     @Override
-    public Seq<T> sorted(Comparator<? super T> comparator) {
+    public Seq<T> sorted(Comparator<? super T> comp) {
         var list = new ArrayList<>(this);
-        list.sort(comparator);
+        list.sort(comp);
         return Seq.of(list);
     }
 
@@ -188,6 +188,21 @@ public class Cons<T> extends AbstractList<T> implements Seq<T> {
     @Override
     public boolean notAny(Predicate<? super T> pred) {
         return every(pred.negate());
+    }
+
+    @Override
+    public Optional<T> max(Comparator<? super T> comp) {
+        if (rest().isEmpty()) {
+            return Optional.of(first());
+        }
+        var result = first();
+        var current = this.rest();
+        while (!current.isEmpty()) {
+            var next = current.first();
+            result = comp.compare(result, next) >= 0 ? result : next;
+            current = current.rest();
+        }
+        return Optional.of(result);
     }
 
     @Override
@@ -230,4 +245,5 @@ public class Cons<T> extends AbstractList<T> implements Seq<T> {
         exclude.add(additionalItems.first());
         return Seq.cons(additionalItems.first(), () -> distinct(additionalItems.rest(), exclude));
     }
+
 }

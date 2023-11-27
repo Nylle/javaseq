@@ -128,7 +128,7 @@ public class Nil<T> extends AbstractList<T> implements Seq<T> {
     }
 
     @Override
-    public Seq<T> sorted(Comparator<? super T> comparator) {
+    public Seq<T> sorted(Comparator<? super T> comp) {
         return of();
     }
 
@@ -145,6 +145,11 @@ public class Nil<T> extends AbstractList<T> implements Seq<T> {
     @Override
     public boolean notAny(Predicate<? super T> pred) {
         return true;
+    }
+
+    @Override
+    public Optional<T> max(Comparator<? super T> comparator) {
+        return Optional.empty();
     }
 
     @Override

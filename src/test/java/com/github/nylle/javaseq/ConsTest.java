@@ -749,6 +749,29 @@ class ConsTest {
         }
     }
 
+    @Nested
+    class Max {
+
+        @Test
+        void returnsSingleElement() {
+            assertThat(Seq.of(1).max(Comparator.naturalOrder())).hasValue(1);
+        }
+
+        @Test
+        void returnsHighestNumber() {
+            var sut = Seq.iterate(1, x -> x + 1);
+
+            assertThat(sut.take(100).max(Comparator.naturalOrder())).hasValue(100);
+        }
+
+        @Test
+        void returnsLongestString() {
+            var sut = Seq.iterate("x", x -> x + "x");
+
+            assertThat(sut.take(6).max(Comparator.comparingInt(x -> x.length()))).hasValue("xxxxxx");
+        }
+    }
+
     @Test
     void toListReturnsFullyRealizedList() {
         assertThat(Seq.iterate(0, x -> x + 1).take(4).toList())

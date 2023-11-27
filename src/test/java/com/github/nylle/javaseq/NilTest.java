@@ -208,6 +208,11 @@ class NilTest {
     }
 
     @Test
+    void maxReturnsEmptyOptional() {
+        assertThat(Nil.<Integer>of().max(Comparator.naturalOrder())).isEmpty();
+    }
+
+    @Test
     void toListReturnsEmptyList() {
         assertThat(Nil.of().toList())
                 .isInstanceOf(List.class)
