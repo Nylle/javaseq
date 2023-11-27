@@ -781,14 +781,14 @@ class ConsTest {
         }
 
         @Test
-        void returnsHighestNumber() {
+        void returnsLowestNumber() {
             var sut = Seq.iterate(-1, x -> x - 1);
 
             assertThat(sut.take(100).min(Comparator.naturalOrder())).hasValue(-100);
         }
 
         @Test
-        void returnsLongestString() {
+        void returnsShortestString() {
             var sut = Seq.of("xxxxxx", "xxxxx", "xxxx", "x", "xx", "xxx");
 
             assertThat(sut.take(6).min(Comparator.comparingInt(x -> x.length()))).hasValue("x");
@@ -815,6 +815,29 @@ class ConsTest {
             var sut = Seq.iterate("x", x -> x + "x");
 
             assertThat(sut.take(6).maxKey(x -> x.length())).hasValue("xxxxxx");
+        }
+    }
+
+    @Nested
+    class MinKey {
+
+        @Test
+        void returnsSingleItem() {
+            assertThat(Seq.of(1).minKey(x -> Math.abs(x))).hasValue(1);
+        }
+
+        @Test
+        void returnsLowestNumber() {
+            var sut = Seq.iterate(-1, x -> x - 1);
+
+            assertThat(sut.take(100).minKey(x -> x)).hasValue(-100);
+        }
+
+        @Test
+        void returnsShortestString() {
+            var sut = Seq.of("xxxxxx", "xxxxx", "xxxx", "x", "xx", "xxx");
+
+            assertThat(sut.take(6).minKey(x -> x.length())).hasValue("x");
         }
     }
 

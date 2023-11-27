@@ -216,6 +216,11 @@ public class Cons<T> extends AbstractList<T> implements Seq<T> {
     }
 
     @Override
+    public <C extends Comparable<? super C>> Optional<T> minKey(Function<T, C> f) {
+        return min(Comparator.comparing(t -> f.apply(t)));
+    }
+
+    @Override
     public List<T> toList() {
         rest().toList();
         return List.copyOf(this);

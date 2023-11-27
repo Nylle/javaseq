@@ -223,6 +223,11 @@ class NilTest {
     }
 
     @Test
+    void minKeyReturnsEmptyOptional() {
+        assertThat(Nil.<Integer>of().minKey(x -> Math.abs(x))).isEmpty();
+    }
+
+    @Test
     void toListReturnsEmptyList() {
         assertThat(Nil.of().toList())
                 .isInstanceOf(List.class)
