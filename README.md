@@ -1,1 +1,1 @@
-# java-seq
+# Seq is in development

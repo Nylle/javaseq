@@ -291,8 +291,6 @@ public class Cons<T> extends AbstractList<T> implements Seq<T> {
         return drop(fromIndex).take(toIndex - fromIndex);
     }
 
-
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
