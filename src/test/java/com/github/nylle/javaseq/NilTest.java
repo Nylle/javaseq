@@ -239,6 +239,28 @@ class NilTest {
         verifyNoInteractions(consumer);
     }
 
+    @Test
+    void iteratorReturnsEmptyIterator() {
+        assertThat(Nil.of().iterator().hasNext()).isFalse();
+    }
+
+    @Test
+    void streamReturnsEmptyStream() {
+        assertThat(Nil.of().stream()).isEmpty();
+    }
+
+    @Test
+    void parallelStreamReturnsEmptyStream() {
+        assertThat(Nil.of().parallelStream()).isEmpty();
+    }
+
+    @Test
+    void subListReturnsEmptyList() {
+        assertThat(Nil.of().subList(0, 0)).isEmpty();
+        assertThat(Nil.of().subList(-1, -1)).isEmpty();
+        assertThat(Nil.of().subList(1, 5)).isEmpty();
+        assertThat(Nil.of().subList(2, 1)).isEmpty();
+    }
 
     @Test
     void toListReturnsEmptyList() {

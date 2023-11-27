@@ -4,6 +4,7 @@ import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -13,6 +14,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public class Cons<T> extends AbstractList<T> implements Seq<T> {
     private final T first;
@@ -244,6 +247,53 @@ public class Cons<T> extends AbstractList<T> implements Seq<T> {
     }
 
     @Override
+    public Iterator<T> iterator() {
+        var seq = this;
+        return new Iterator<>() {
+            private Seq<T> source = seq;
+
+            @Override
+            public boolean hasNext() {
+                return !source.isEmpty();
+            }
+
+            @Override
+            public T next() {
+                var next = source.first();
+                source = source.rest();
+                return next;
+            }
+
+            @Override
+            public void remove() {
+                throw new UnsupportedOperationException("remove");
+            }
+
+            @Override
+            public void forEachRemaining(Consumer<? super T> f) {
+                source.forEach(f);
+            }
+        };
+    }
+
+    @Override
+    public Stream<T> stream() {
+        return StreamSupport.stream(((Iterable<T>) () -> iterator()).spliterator(), false);
+    }
+
+    @Override
+    public Stream<T> parallelStream() {
+        return stream();
+    }
+
+    @Override
+    public List<T> subList(int fromIndex, int toIndex) {
+        return drop(fromIndex).take(toIndex - fromIndex);
+    }
+
+
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Seq other)) return false;
@@ -267,5 +317,4 @@ public class Cons<T> extends AbstractList<T> implements Seq<T> {
         exclude.add(additionalItems.first());
         return Seq.cons(additionalItems.first(), () -> distinct(additionalItems.rest(), exclude));
     }
-
 }

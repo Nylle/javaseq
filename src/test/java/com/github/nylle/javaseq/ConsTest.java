@@ -867,4 +867,76 @@ class ConsTest {
                 .isInstanceOf(List.class)
                 .containsExactly(0, 1, 2, 3);
     }
+
+    @Nested
+    class Iterator {
+
+        @Test
+        void returnsIterator() {
+            var sut = Seq.iterate(0, x -> x + 1);
+
+            var actual = sut.take(2).iterator();
+
+            assertThat(actual.hasNext()).isTrue();
+            assertThat(actual.next()).isEqualTo(0);
+            assertThat(actual.hasNext()).isTrue();
+            assertThat(actual.next()).isEqualTo(1);
+            assertThat(actual.hasNext()).isFalse();
+        }
+
+        @Test
+        void returnsInfiniteIterator() {
+            var sut = Seq.iterate(0, x -> x + 1);
+
+            var actual = sut.iterator();
+
+            assertThat(actual.hasNext()).isTrue();
+            assertThat(actual.next()).isEqualTo(0);
+            assertThat(actual.hasNext()).isTrue();
+            assertThat(actual.next()).isEqualTo(1);
+            assertThat(actual.hasNext()).isTrue();
+        }
+    }
+
+    @Test
+    void streamReturnsStream() {
+        var sut = Seq.iterate(0, x -> x + 1);
+
+        assertThat(sut.stream().limit(3).toList()).containsExactly(0, 1, 2);
+    }
+
+    @Test
+    void parallelStreamReturnsStream() {
+        var sut = Seq.iterate(0, x -> x + 1);
+
+        assertThat(sut.parallelStream().limit(3).toList()).containsExactly(0, 1, 2);
+    }
+
+    @Nested
+    class SubList {
+
+        @Test
+        void returnsListWithItemsBetweenFromIndexInclusiveAndToIndexExclusive() {
+            var sut = Seq.iterate(0, x -> x + 1);
+
+            assertThat(sut.subList(1, 4)).containsExactly(1, 2, 3);
+        }
+
+        @Test
+        void returnsEmptyListForIndexOutOfBounds() {
+            var sut = Seq.iterate(0, x -> x + 1);
+
+            assertThat(sut.take(3).subList(-1, -1)).isEmpty();
+            assertThat(sut.take(3).subList(0, -1)).isEmpty();
+            assertThat(sut.take(3).subList(1, 0)).isEmpty();
+            assertThat(sut.take(3).subList(3, 10)).isEmpty();
+        }
+
+        @Test
+        void returnsListWithAsManyItemsPresentForIndexOutOfBounds() {
+            var sut = Seq.iterate(0, x -> x + 1);
+
+            assertThat(sut.take(3).subList(1, 10)).containsExactly(1, 2);
+        }
+    }
 }

@@ -167,6 +167,10 @@ public class Nil<T> extends AbstractList<T> implements Seq<T> {
         return Optional.empty();
     }
 
+    public List<T> subList(int fromIndex, int toIndex) {
+        return List.of();
+    }
+
     @Override
     public List<T> toList() {
         return List.of();
