@@ -68,16 +68,20 @@ While it's entirely possible (and no rocket science) to get those features using
 - //TODO
 
 #### Seq.range()
-- //TODO
+- Returns a new Seq of nums from 0 (inclusive) to infinity, by 1.
 
 #### Seq.range(end)
-- //TODO
+- Returns a new Seq of nums from 0 (inclusive) to end (exclusive), by 1.
+- Returns empty Seq when end is equal to 0.
 
 #### Seq.range(start, end)
-- //TODO
+- Returns a new Seq of nums from start (inclusive) to end (exclusive), by 1. 
+- Returns empty Seq when start is equal to end.
 
 #### Seq.range(start, end, step)
-- //TODO
+- Returns a new Seq of nums from start (inclusive) to end (exclusive), by step. 
+- Returns infinite Seq of start when step is equal to 0.
+- Returns empty Seq when start is equal to end.
 
 ### Operations
 

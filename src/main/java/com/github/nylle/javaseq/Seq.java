@@ -61,6 +61,22 @@ public interface Seq<T> extends List<T> {
         return f.get();
     }
 
+    static Seq<Integer> range() {
+        return Seq.iterate(0, x -> x + 1);
+    }
+
+    static Seq<Integer> range(int end) {
+        return Seq.range(0, end);
+    }
+
+    static Seq<Integer> range(int start, int end) {
+        return Seq.range(start, end, 1);
+    }
+
+    static Seq<Integer> range(int start, int end, int step) {
+        return Seq.iterate(start, x -> x + step).takeWhile(x -> step >= 0 ? (x < end) : (x > end));
+    }
+
     T first();
 
     Seq<T> rest();

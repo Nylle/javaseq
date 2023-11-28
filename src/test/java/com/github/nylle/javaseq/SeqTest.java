@@ -120,6 +120,46 @@ class SeqTest {
 
             }
         }
+
+        @Nested
+        class Range {
+
+            @Test
+            void returnsInfiniteSeqOfIntegersStartingWithZero() {
+                assertThat(Seq.range().take(3)).containsExactly(0, 1, 2);
+            }
+
+            @Test
+            void returnsSeqOfIntegersStartingWithZeroUntilEnd() {
+                assertThat(Seq.range(3)).containsExactly(0, 1, 2);
+            }
+
+            @Test
+            void returnsSeqOfIntegersFromStartInclusiveUntilEndExclusive() {
+                assertThat(Seq.range(1, 5)).containsExactly(1, 2, 3, 4);
+                assertThat(Seq.range(-5, 5)).containsExactly(-5, -4, -3, -2, -1, 0, 1, 2, 3, 4);
+            }
+
+            @Test
+            void returnsSeqOfIntegersFromStartInclusiveUntilEndExclusiveByStep() {
+                assertThat(Seq.range(10, 25, 5)).containsExactly(10, 15, 20);
+                assertThat(Seq.range(10, -25, -5)).containsExactly(10, 5, 0, -5, -10, -15, -20);
+                assertThat(Seq.range(-10, 25, 5)).containsExactly(-10, -5, 0, 5, 10, 15, 20);
+            }
+
+            @Test
+            void returnsInfiniteSeqOfStartWhenStepIsZero() {
+                assertThat(Seq.range(10, 25, 0).take(10)).containsExactly(10, 10, 10, 10, 10, 10, 10, 10, 10, 10);
+            }
+
+            @Test
+            void returnsEmptySeqWhenStartIsEqualToEnd() {
+                assertThat(Seq.range(10, 10)).isEmpty();
+                assertThat(Seq.range(-10, -10)).isEmpty();
+                assertThat(Seq.range(1, 1, 1)).isEmpty();
+                assertThat(Seq.range(-1, -1, 1)).isEmpty();
+            }
+        }
     }
 
     @Nested
