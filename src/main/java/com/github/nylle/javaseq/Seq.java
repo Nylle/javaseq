@@ -33,6 +33,14 @@ public interface Seq<T> extends List<T> {
         return coll.hasNext() ? cons(coll.next(), () -> of(coll)) : of();
     }
 
+    static <T> Seq<T> of(Stream<T> coll) {
+        return of(coll.iterator());
+    }
+
+    static <K, V> Seq<Map.Entry<K, V>> of(Map<K, V> coll) {
+        return of(coll.entrySet().iterator());
+    }
+
     static <T> Seq<T> cons(T first, Supplier<Seq<T>> f) {
         return new Cons<>(first, f);
     }
@@ -124,4 +132,26 @@ public interface Seq<T> extends List<T> {
     <K, V> Map<K, V> toMap();
 
     List<T> toList();
+
+    class Extensions {
+
+        private Extensions() {
+        }
+
+        public static <T> Seq<T> toSeq(Stream<T> stream) {
+            return of(stream);
+        }
+
+        public static <K, V> Seq<Map.Entry<K, V>> toSeq(Map<K, V> map) {
+            return of(map);
+        }
+
+        public static <T> Seq<T> toSeq(Iterable<T> coll) {
+            return of(coll);
+        }
+
+        public static <T> Seq<T> toSeq(Iterator<T> coll) {
+            return of(coll);
+        }
+    }
 }
