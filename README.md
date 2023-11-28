@@ -50,7 +50,7 @@ While it's entirely possible (and no rocket science) to get those features using
 ### Creation
 
 #### Seq.of()
-- Returns a new empty Seq.
+- Returns an empty Seq.
 
 #### Seq.of(x1, x2, x3, ...)
 - Returns a Seq of all supplied xs.
@@ -87,7 +87,7 @@ While it's entirely possible (and no rocket science) to get those features using
 
 #### first()
 - Returns the first item in this Seq.
-- Returns null if this Seq is empty.
+- Returns null if this Seq is empty. _(See [findFirst()](#findfirst).)_
 
 #### rest()
 - Returns a Seq of the items in this Seq after the first.
@@ -109,8 +109,7 @@ While it's entirely possible (and no rocket science) to get those features using
 _(This is similar to zipping two collections.)_
 
 #### mapcat(f)
-- Returns a Seq of the result of applying concat to the result of applying map
-to f and the items in this Seq. Function f should return a collection. _(This is similar to Stream::flatMap.)_
+- Returns a Seq of the result of applying concat to the result of applying map to f and the items in this Seq. Function f should return a collection. _(This is similar to Stream::flatMap.)_
 
 #### takeWhile(pred)
 - Returns a Seq of successive items from this Seq while pred(item) returns true.
@@ -128,16 +127,16 @@ to f and the items in this Seq. Function f should return a collection. _(This is
 - Returns a Seq of lists of n items each, at offsets step apart. The items in pad are used as necessary to complete the last partition up to n items. In case there are not enough padding items, returns a partition with less than n items.
 
 #### partitionAll(n)
-- Returns a Seq of lists of n items each, like partition, but may include partitions with fewer than n items at the end.
+- Returns a Seq of lists of n items each, like [partition](#partitionn), but may include partitions with fewer than n items at the end.
 
 #### partitionAll(n, step)
-- Returns a Seq of lists of n items each, at offsets step apart, like partition, but may include partitions with fewer than n items at the end.
+- Returns a Seq of lists of n items each, at offsets step apart, like [partition](#partitionn-step), but may include partitions with fewer than n items at the end.
 
 #### reductions(f)
-- Returns a Seq of the intermediate values of the reduction (as per reduce) of this Seq by f.
+- Returns a Seq of the intermediate values of the reduction (as per [reduce](#reducef)) of this Seq by f.
 
 #### reductions(init, f)
-- Returns a Seq of the intermediate values of the reduction (as per reduce) of this Seq by f, starting with init.
+- Returns a Seq of the intermediate values of the reduction (as per [reduce](#reduceval-f)) of this Seq by f, starting with init.
 
 #### distinct()
 - Returns a Seq of the items of this Seq with duplicates removed.
@@ -150,59 +149,59 @@ to f and the items in this Seq. Function f should return a collection. _(This is
 
 #### reduce(f)
 - Returns an empty Optional if this Seq contains no items.
-- Returns an Optional of the result of applying f to the first 2 items in this Seq, then applying f to that result and the 3rd item, etc. If this Seq has only 1 item, it is returned and f is not called. **Caution:** If the Seq is lazy, it will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
+- Returns an Optional of the result of applying f to the first 2 items in this Seq, then applying f to that result and the 3rd item, etc. If this Seq has only 1 item, it is returned and f is not called. **Caution:** The Seq will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
 
 #### reduce(val, f)
 - Returns val if this Seq is empty. f is not called.
-- Returns the result of applying f to val and the first item in this Seq, then applying f to that result and the 2nd item, etc. **Caution:** If the Seq is lazy, it will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
+- Returns the result of applying f to val and the first item in this Seq, then applying f to that result and the 2nd item, etc. **Caution:** The Seq will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
 
 #### some(pred)
 - Returns the first true value of pred(x) for any x in this Seq. _(This is similar to Stream::anyMatch.)_
-- Returns false if none of the items in this Seq return true for pred(item). **Caution:** If the Seq is lazy, it will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
+- Returns false if none of the items in this Seq return true for pred(item). **Caution:** The Seq will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
 
 #### every(pred)
 - Returns the first false value of pred(x) for any x in this Seq. _(This is similar to Stream::allMatch.)_
-- Returns true if all the items in this Seq return true for pred(item). **Caution:** If the Seq is lazy, it will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted. 
+- Returns true if all the items in this Seq return true for pred(item). **Caution:** The Seq will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted. 
 
 #### notAny(pred)
 - Returns false if (pred x) is true for any x in this Seq. _(This is similar to Stream::noneMatch.)_
-- Returns true if none of the items in this Seq return true for pred(item). **Caution:** If the Seq is lazy, it will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
+- Returns true if none of the items in this Seq return true for pred(item). **Caution:** The Seq will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
 
 #### isRealized()
 - Returns true if a value has been produced for this Seq.
 
 #### max(comp)
-- Returns the item in this Seq for which comp determines is greatest. If there are multiple such items, the last one is returned. **Caution:** If the Seq is lazy, it will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
+- Returns the item in this Seq for which comp determines is greatest. If there are multiple such items, the last one is returned. **Caution:** The Seq will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
 
 #### min(comp)
-- Returns the item in this Seq for which comp determines is least. If there are multiple such items, the last one is returned. **Caution:** If the Seq is lazy, it will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
+- Returns the item in this Seq for which comp determines is least. If there are multiple such items, the last one is returned. **Caution:** The Seq will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
 
 #### maxKey(f)
-- Returns the item x in this Seq for which f(x), a number, is greatest. If there are multiple such xs, the last one is returned. **Caution:** If the Seq is lazy, it will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
+- Returns the item x in this Seq for which f(x), a number, is greatest. If there are multiple such xs, the last one is returned. **Caution:** The Seq will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
 
 #### minKey(f)
-- Returns the item x in this Seq for which f(x), a number, is least. If there are multiple such xs, the last one is returned. **Caution:** If the Seq is lazy, it will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
+- Returns the item x in this Seq for which f(x), a number, is least. If there are multiple such xs, the last one is returned. **Caution:** The Seq will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
 
 #### find(i)
-- Returns an empty Optional if this Seq does not contain any item at index i.
-- Returns an Optional of the item at index i in this Seq.
+- Returns an Optional of the item at index i in this Seq. All items up to that point will be realised. _(See [get(index)](#listgetindex).)_
+- Returns an empty Optional if this Seq does not contain any item at index i. **Caution:** The Seq will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
 
 #### findFirst()
 - Returns an empty Optional if this Seq contains no items.
-- Returns an Optional of the first item in this Seq. _(See first().)_
+- Returns an Optional of the first item in this Seq. _(See [first()](#first).)_
 
 #### findFirst(pred)
 - Returns an Optional of the first item in this Seq for which pred(item) returns true.
-- Returns an empty Optional if pred(item) returns false for all items in this Seq. **Caution:** If the Seq is lazy, it will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
+- Returns an empty Optional if pred(item) returns false for all items in this Seq. **Caution:** The Seq will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
 
 #### toMap()
-- Returns a new Map with the keys and values of the items in this Seq<Map.Entry>. If the Seq is of any other type, an exception is thrown. **Caution:** If the Seq is lazy, it will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
+- Returns a new Map with the keys and values of the items in this Seq<Map.Entry>. If the Seq is of any other type, an exception is thrown. **Caution:** The Seq will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
 
 #### toMap(k, v)
-- Returns a new Map with keys as a result of k(item) and values as a result of v(item) of all items in this Seq. **Caution:** If the Seq is lazy, it will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
+- Returns a new Map with keys as a result of k(item) and values as a result of v(item) of all items in this Seq. **Caution:** The Seq will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
 
 #### toList()
-- Returns a List with all items in this Seq. **Caution:** If the Seq is lazy, it will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
+- Returns a List with all items in this Seq. **Caution:** The Seq will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
 
 ### Interoperability
 
@@ -210,7 +209,7 @@ to f and the items in this Seq. Function f should return a collection. _(This is
 - Returns the string representation of this Seq, e.g. "[1, 2, 3]". Only the first and any other realised item will be included. Unrealized remaining items will be depicted with a single question mark, e.g. "[1, 2, ?]". If this Seq is empty, only brackets will be returned, e.g. "[]".
 
 #### Iterable::forEach(f)
-- Calls f(x) for each x in this Seq, f being a consumer function taking one argument and returning void. **Caution:** If the Seq is lazy, it will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
+- Calls f(x) for each x in this Seq, f being a consumer function taking one argument and returning void. **Caution:** The Seq will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
 
 #### Collection::stream()
 - Returns a Stream of the items in this Seq.
@@ -219,8 +218,8 @@ to f and the items in this Seq. Function f should return a collection. _(This is
 - Returns a Stream of the items in this Seq.
 
 #### List::get(index)
-- Returns the item at index in this Seq. All items up to that point will be realised.
-- Returns null if index is out of bounds. **Caution:** If the Seq is lazy, it will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
+- Returns the item at index in this Seq. All items up to that point will be realised. _(See [find(i)](#findi).)_
+- Returns null if index is out of bounds. **Caution:** The Seq will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
 
 #### List::iterator()
 - Returns an Iterator of the items in this Seq.
@@ -229,7 +228,7 @@ to f and the items in this Seq. Function f should return a collection. _(This is
 - Returns true if this Seq is empty, otherwise false.
 
 #### List::size()
-- Returns the number of items in this Seq. **Caution:** If the Seq is lazy, it will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
+- Returns the number of items in this Seq. **Caution:** The Seq will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
 
 #### List::subList(fromIndex, toIndex)
 - Returns a new List of items from this Seq between fromIndex (inclusive) and toIndex (exclusive).
