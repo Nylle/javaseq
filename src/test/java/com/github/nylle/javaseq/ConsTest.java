@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 
 import static com.github.nylle.javaseq.Seq.cons;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
@@ -941,9 +942,13 @@ class ConsTest {
 
     @Test
     void toListReturnsFullyRealizedList() {
-        assertThat(Seq.iterate(0, x -> x + 1).take(4).toList())
+        var sut = Seq.iterate(0, x -> x + 1);
+
+        assertThat(sut.isRealized()).isFalse();
+        assertThat(sut.take(4).toList())
                 .isInstanceOf(List.class)
                 .containsExactly(0, 1, 2, 3);
+        assertThat(sut.isRealized()).isTrue();
     }
 
     @Nested
@@ -1019,13 +1024,50 @@ class ConsTest {
     }
 
     @Nested
+    class ToMap {
+
+        @Test
+        void returnsMapForSeqOfEntries() {
+            var sut = Seq.iterate("x", x -> x + "x").map(x -> java.util.Map.entry(x.length(), x)).take(3);
+
+            var actual = sut.toMap();
+
+            assertThat(actual)
+                    .containsEntry(1, "x")
+                    .containsEntry(2, "xx")
+                    .containsEntry(3, "xxx");
+        }
+
+        @Test
+        void throwsIfSeqIsNotOfTypeEntry() {
+            var sut = Seq.iterate("x", x -> x + "x").take(3);
+
+            assertThatExceptionOfType(UnsupportedOperationException.class)
+                    .isThrownBy(() -> sut.toMap())
+                    .withMessage("Seq is not of type Map.Entry. Provide key- and value-mappers.");
+        }
+
+        @Test
+        void returnsMapBasedOnKeyAndValueMapper() {
+            var sut = Seq.iterate("x", x -> x + "x");
+
+            var actual = sut.take(3).toMap(k -> k.length(), v -> v);
+
+            assertThat(actual)
+                    .containsEntry(1, "x")
+                    .containsEntry(2, "xx")
+                    .containsEntry(3, "xxx");
+        }
+    }
+
+    @Nested
     class ToString {
 
         @Test
         void returnsFirstItemOnlyInSeq() {
             var sut = Seq.iterate(0, x -> x + 1);
 
-            assertThat(sut.toString()).isEqualTo("[0, ?]");
+            assertThat(sut).hasToString("[0, ?]");
         }
 
         @Test
@@ -1034,7 +1076,7 @@ class ConsTest {
 
             sut.get(2);
 
-            assertThat(sut.toString()).isEqualTo("[0, 1, 2, ?]");
+            assertThat(sut).hasToString("[0, 1, 2, ?]");
         }
 
         @Test
@@ -1043,7 +1085,7 @@ class ConsTest {
 
             sut.forEach(x -> {});
 
-            assertThat(sut.toString()).isEqualTo("[0, 1, 2, 3]");
+            assertThat(sut).hasToString("[0, 1, 2, 3]");
         }
     }
 }

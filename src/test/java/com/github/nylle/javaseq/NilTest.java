@@ -281,6 +281,12 @@ class NilTest {
     }
 
     @Test
+    void toMapReturnsEmptyMap() {
+        assertThat(Nil.of().toMap()).isEmpty();
+        assertThat(Nil.of().toMap(k -> k, v -> v)).isEmpty();
+    }
+
+    @Test
     void toListReturnsEmptyList() {
         assertThat(Nil.of().toList())
                 .isInstanceOf(List.class)
@@ -289,6 +295,6 @@ class NilTest {
 
     @Test
     void toStringReturnsEmptyBrackets() {
-        assertThat(Nil.of().toString()).isEqualTo("[]");
+        assertThat(Nil.of()).hasToString("[]");
     }
 }

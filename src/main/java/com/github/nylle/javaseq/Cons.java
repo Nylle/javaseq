@@ -6,6 +6,8 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
@@ -17,6 +19,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+@SuppressWarnings("java:S3077")
 public class Cons<T> extends AbstractList<T> implements Seq<T> {
     private final T first;
     private volatile Seq<T> rest;
@@ -215,8 +218,8 @@ public class Cons<T> extends AbstractList<T> implements Seq<T> {
     }
 
     @Override
-    public Optional<T> min(Comparator<? super T> comparator) {
-        return max(comparator.reversed());
+    public Optional<T> min(Comparator<? super T> comp) {
+        return max(comp.reversed());
     }
 
     @Override
@@ -242,6 +245,19 @@ public class Cons<T> extends AbstractList<T> implements Seq<T> {
     @Override
     public Optional<T> findFirst(Predicate<? super T> pred) {
         return filter(pred).findFirst();
+    }
+
+    @Override
+    public <K, V> Map<K, V> toMap(Function<T, K> k, Function<T, V> v) {
+        return Map.ofEntries(map(x -> Map.entry(k.apply(x), v.apply(x))).toArray(new Map.Entry[0]));
+    }
+
+    @Override
+    public <K, V> Map<K, V> toMap() {
+        if(first instanceof Map.Entry<?,?>) {
+            return Map.ofEntries(this.toArray(new Map.Entry[0]));
+        }
+        throw new UnsupportedOperationException("Seq is not of type Map.Entry. Provide key- and value-mappers.");
     }
 
     @Override
@@ -308,10 +324,11 @@ public class Cons<T> extends AbstractList<T> implements Seq<T> {
 
     @Override
     public List<T> subList(int fromIndex, int toIndex) {
-        return drop(fromIndex).take(toIndex - fromIndex);
+        return drop(fromIndex).take((long)toIndex - fromIndex);
     }
 
     @Override
+    @SuppressWarnings("java:S3740")
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Seq other)) return false;
@@ -323,6 +340,7 @@ public class Cons<T> extends AbstractList<T> implements Seq<T> {
         return first().hashCode() + rest().hashCode() * 31;
     }
 
+    @Override
     public String toString() {
         StringBuilder s = new StringBuilder("[");
         Seq<T> seq = this;
@@ -342,7 +360,7 @@ public class Cons<T> extends AbstractList<T> implements Seq<T> {
     }
 
     private static <T> List<T> pad(List<T> partition, Iterable<T> pad, int n) {
-        return Seq.concat(partition, () -> Seq.of(pad).take(n - partition.size())).toList();
+        return Seq.concat(partition, () -> Seq.of(pad).take(n - (long)partition.size())).toList();
     }
 
     private static <T> Seq<T> distinct(Seq<T> seq, Set<T> exclude) {

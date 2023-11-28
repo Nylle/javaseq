@@ -3,12 +3,14 @@ package com.github.nylle.javaseq;
 import java.util.AbstractList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+@SuppressWarnings("java:S1700")
 public class Nil<T> extends AbstractList<T> implements Seq<T> {
     private static final Nil<?> nil = new Nil<>();
 
@@ -153,12 +155,12 @@ public class Nil<T> extends AbstractList<T> implements Seq<T> {
     }
 
     @Override
-    public Optional<T> max(Comparator<? super T> comparator) {
+    public Optional<T> max(Comparator<? super T> comp) {
         return Optional.empty();
     }
 
     @Override
-    public Optional<T> min(Comparator<? super T> comparator) {
+    public Optional<T> min(Comparator<? super T> comp) {
         return Optional.empty();
     }
 
@@ -187,6 +189,17 @@ public class Nil<T> extends AbstractList<T> implements Seq<T> {
         return Optional.empty();
     }
 
+    @Override
+    public <K, V> Map<K, V> toMap(Function<T, K> k, Function<T, V> v) {
+        return Map.of();
+    }
+
+    @Override
+    public <K, V> Map<K, V> toMap() {
+        return Map.of();
+    }
+
+    @Override
     public List<T> subList(int fromIndex, int toIndex) {
         return List.of();
     }
