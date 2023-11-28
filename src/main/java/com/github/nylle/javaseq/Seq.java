@@ -156,28 +156,6 @@ public interface Seq<T> extends List<T> {
 
     List<T> toList();
 
-    class Extensions {
-
-        private Extensions() {
-        }
-
-        public static <T> Seq<T> toSeq(Stream<T> stream) {
-            return of(stream);
-        }
-
-        public static <K, V> Seq<Map.Entry<K, V>> toSeq(Map<K, V> map) {
-            return of(map);
-        }
-
-        public static <T> Seq<T> toSeq(Iterable<T> coll) {
-            return of(coll);
-        }
-
-        public static <T> Seq<T> toSeq(Iterator<T> coll) {
-            return of(coll);
-        }
-    }
-
     @SuppressWarnings("java:S1700")
     class Nil<T> extends AbstractList<T> implements Seq<T> {
         private static final Nil<?> nil = new Nil<>();
@@ -757,6 +735,28 @@ public interface Seq<T> extends List<T> {
             }
             exclude.add(additionalItems.first());
             return Seq.cons(additionalItems.first(), () -> distinct(additionalItems.rest(), exclude));
+        }
+    }
+
+    class Extensions {
+
+        private Extensions() {
+        }
+
+        public static <T> Seq<T> toSeq(Stream<T> stream) {
+            return of(stream);
+        }
+
+        public static <K, V> Seq<Map.Entry<K, V>> toSeq(Map<K, V> map) {
+            return of(map);
+        }
+
+        public static <T> Seq<T> toSeq(Iterable<T> coll) {
+            return of(coll);
+        }
+
+        public static <T> Seq<T> toSeq(Iterator<T> coll) {
+            return of(coll);
         }
     }
 }
