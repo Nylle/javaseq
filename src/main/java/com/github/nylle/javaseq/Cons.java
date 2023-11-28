@@ -211,7 +211,7 @@ public class Cons<T> extends AbstractList<T> implements Seq<T> {
         var current = this.rest();
         while (!current.isEmpty()) {
             var next = current.first();
-            result = comp.compare(result, next) >= 0 ? result : next;
+            result = comp.compare(result, next) > 0 ? result : next;
             current = current.rest();
         }
         return Optional.of(result);

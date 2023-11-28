@@ -804,6 +804,13 @@ class ConsTest {
 
             assertThat(sut.take(6).max(Comparator.comparingInt(x -> x.length()))).hasValue("xxxxxx");
         }
+
+        @Test
+        void returnsTheLastOccurrenceOfLongestStringIfMoreThanOneItemFound() {
+            var sut = Seq.of("x", "xx", "aaa", "x", "bbb");
+
+            assertThat(sut.take(6).max(Comparator.comparingInt(x -> x.length()))).hasValue("bbb");
+        }
     }
 
     @Nested
@@ -826,6 +833,13 @@ class ConsTest {
             var sut = Seq.of("xxxxxx", "xxxxx", "xxxx", "x", "xx", "xxx");
 
             assertThat(sut.take(6).min(Comparator.comparingInt(x -> x.length()))).hasValue("x");
+        }
+
+        @Test
+        void returnsTheLastOccurrenceOfShortestStringIfMoreThanOneItemFound() {
+            var sut = Seq.of("a", "xx", "aaa", "x", "bbb", "b");
+
+            assertThat(sut.take(6).min(Comparator.comparingInt(x -> x.length()))).hasValue("b");
         }
     }
 
@@ -850,6 +864,13 @@ class ConsTest {
 
             assertThat(sut.take(6).maxKey(x -> x.length())).hasValue("xxxxxx");
         }
+
+        @Test
+        void returnsTheLastOccurrenceOfLongestStringIfMoreThanOneItemFound() {
+            var sut = Seq.of("x", "xx", "aaa", "x", "bbb");
+
+            assertThat(sut.take(6).maxKey(x -> x.length())).hasValue("bbb");
+        }
     }
 
     @Nested
@@ -870,6 +891,13 @@ class ConsTest {
         @Test
         void returnsShortestString() {
             var sut = Seq.of("xxxxxx", "xxxxx", "xxxx", "x", "xx", "xxx");
+
+            assertThat(sut.take(6).minKey(x -> x.length())).hasValue("x");
+        }
+
+        @Test
+        void returnsTheLastOccurrenceOfShortestStringIfMoreThanOneItemFound() {
+            var sut = Seq.of("x", "xx", "aaa", "x", "bbb");
 
             assertThat(sut.take(6).minKey(x -> x.length())).hasValue("x");
         }

@@ -4,12 +4,15 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
+import java.util.stream.Stream;
 
 public interface Seq<T> extends List<T> {
 
@@ -34,8 +37,8 @@ public interface Seq<T> extends List<T> {
         return new Cons<>(first, f);
     }
 
-    static <T> Seq<T> iterate(T initial, Function<T, T> f) {
-        return cons(initial, () -> iterate(f.apply(initial), f));
+    static <T> Seq<T> iterate(T init, UnaryOperator<T> f) {
+        return cons(init, () -> iterate(f.apply(init), f));
     }
 
     static <T> Seq<T> concat(Iterable<T> coll, Supplier<Seq<T>> f) {
@@ -90,7 +93,6 @@ public interface Seq<T> extends List<T> {
 
     Seq<T> distinct();
 
-    @SuppressWarnings("unchecked")
     Seq<T> sorted();
 
     Seq<T> sorted(Comparator<? super T> comp);
@@ -103,9 +105,9 @@ public interface Seq<T> extends List<T> {
 
     boolean isRealized();
 
-    Optional<T> max(Comparator<? super T> comparator);
+    Optional<T> max(Comparator<? super T> comp);
 
-    Optional<T> min(Comparator<? super T> comparator);
+    Optional<T> min(Comparator<? super T> comp);
 
     <C extends Comparable<? super C>> Optional<T> maxKey(Function<T, C> f);
 
