@@ -87,7 +87,7 @@ While it's entirely possible (and no rocket science) to get those features using
 
 #### first()
 - Returns the first item in this Seq.
-- Returns null if this Seq is empty. _(See [findFirst()](#findfirst).)_
+- Returns null if this Seq is empty. _(See [findFirst](#findfirst).)_
 
 #### rest()
 - Returns a Seq of the items in this Seq after the first.
@@ -183,12 +183,12 @@ _(This is similar to zipping two collections.)_
 - Returns the item x in this Seq for which f(x), a number, is least. If there are multiple such xs, the last one is returned. **Caution:** The Seq will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
 
 #### find(i)
-- Returns an Optional of the item at index i in this Seq. All items up to that point will be realised. _(See [get(index)](#listgetindex).)_
+- Returns an Optional of the item at index i in this Seq. All items up to that point will be realised. _(See [get](#listgetindex).)_
 - Returns an empty Optional if this Seq does not contain any item at index i. **Caution:** The Seq will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
 
 #### findFirst()
 - Returns an empty Optional if this Seq contains no items.
-- Returns an Optional of the first item in this Seq. _(See [first()](#first).)_
+- Returns an Optional of the first item in this Seq. _(See [first](#first).)_
 
 #### findFirst(pred)
 - Returns an Optional of the first item in this Seq for which pred(item) returns true.
@@ -218,7 +218,7 @@ _(This is similar to zipping two collections.)_
 - Returns a Stream of the items in this Seq.
 
 #### List::get(index)
-- Returns the item at index in this Seq. All items up to that point will be realised. _(See [find(i)](#findi).)_
+- Returns the item at index in this Seq. All items up to that point will be realised. _(See [find](#findi).)_
 - Returns null if index is out of bounds. **Caution:** The Seq will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
 
 #### List::iterator()
@@ -238,13 +238,13 @@ _(This is similar to zipping two collections.)_
 If you're using [Lombok](https://projectlombok.org/) you can add `@ExtensionMethods({Seq.Extensions.class})` to your class in order to access the following extension methods.
 
 #### Iterable::toSeq()
-- Returns a Seq with the items in extended Iterable.
+- Returns a Seq of the items in extended Iterable.
 
 #### Iterator::toSeq()
-- Returns a Seq with the items in extended Iterator.
+- Returns a Seq of the items in extended Iterator.
 
 #### Stream::toSeq()
-- Returns a Seq with the items in extended Stream.
+- Returns a Seq of the items in extended Stream.
 
 #### Map::toSeq()
-- Returns a Seq<Map.Entry> with the items in extended Map.
+- Returns a Seq<Map.Entry> of the items in extended Map.
