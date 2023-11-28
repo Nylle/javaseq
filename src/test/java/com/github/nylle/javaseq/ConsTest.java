@@ -6,6 +6,7 @@ import org.mockito.Mockito;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 
 import static com.github.nylle.javaseq.Seq.cons;
@@ -1006,6 +1007,17 @@ class ConsTest {
             assertThat(actual.hasNext()).isTrue();
             assertThat(actual.next()).isEqualTo(1);
             assertThat(actual.hasNext()).isTrue();
+        }
+
+        @Test
+        void iteratorThrowsWhenTryingToAccessNextWhenThereIsNone() {
+            var actual = Seq.iterate(0, x -> x + 1).take(2).iterator();
+
+            assertThat(actual.next()).isEqualTo(0);
+            assertThat(actual.next()).isEqualTo(1);
+            assertThat(actual.hasNext()).isFalse();
+            assertThatExceptionOfType(NoSuchElementException.class)
+                    .isThrownBy(() -> actual.next());
         }
     }
 

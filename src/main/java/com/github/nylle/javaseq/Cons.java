@@ -297,6 +297,9 @@ public class Cons<T> extends AbstractList<T> implements Seq<T> {
             public T next() {
                 var next = source.first();
                 source = source.rest();
+                if(next == null) {
+                    throw new NoSuchElementException();
+                }
                 return next;
             }
 
