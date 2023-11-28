@@ -6,7 +6,15 @@ The goal of this exercise was to build an alternative to Java's Stream API, heav
 
 I do not claim this to be enterprise-ready in any way, shape, or form, but I believe it is production-ready. I've made no measurements in regard to its performance.
 
-Feel free to copy any of this code if it is of any help to you. If you find yourself using this class in your Java-code chances are, you're working with the wrong programming-language. Take a look at [C#](https://en.wikipedia.org/wiki/C_Sharp_(programming_language)), [Kotlin](https://kotlinlang.org/) or [Clojure](https://clojure.org/).
+Feel free to copy any of this code if it is of any help to you. If you find yourself using this class in your Java-code, chances are you're using the wrong programming-language. Take a look at [C#](https://en.wikipedia.org/wiki/C_Sharp_(programming_language)), [Kotlin](https://kotlinlang.org/) or [Clojure](https://clojure.org/).
+
+## Contents
+- [Background](#background)
+- [Usage](#usage)
+  - [Creation](#creation)
+  - [Operations](#operations)
+  - [Interoperability](#interoperability)
+  - [Extensions](#extensions)
 
 
 ## Background
@@ -41,7 +49,35 @@ While it's entirely possible (and no rocket science) to get those features using
 
 ### Creation
 
-//TODO
+#### Seq.of()
+- Returns a new empty Seq.
+
+#### Seq.of(x1, x2, x3, ...)
+- Returns a new Seq of all supplied xs.
+
+#### Seq.of(coll)
+- Returns a new Seq of all items in coll which can be a Stream, Iterable, Iterator, Array, or Map. If coll is a Stream it will be consumed lazily. If coll is a Map<K, V> the returned Seq will contain items of type Map.Entry<K, V>.
+
+#### Seq.cons(first, f)
+- //TODO
+
+#### Seq.concat(coll, f)
+- //TODO
+
+#### Seq.iterate(init, f)
+- //TODO
+
+#### Seq.range()
+- //TODO
+
+#### Seq.range(end)
+- //TODO
+
+#### Seq.range(start, end)
+- //TODO
+
+#### Seq.range(start, end, step)
+- //TODO
 
 ### Operations
 
@@ -129,59 +165,83 @@ to f and the items in this Seq. Function f should return a collection. _(This is
 - Returns true if none of the items in this Seq return true for pred(item). **Caution:** If the Seq is lazy, it will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
 
 #### isRealized()
-- //TODO
+- Returns true if a value has been produced for this Seq.
 
 #### max(comp)
-- //TODO
+- Returns the item in this Seq for which comp determines is greatest. If there are multiple such items, the last one is returned. **Caution:** If the Seq is lazy, it will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
 
 #### min(comp)
-- //TODO
+- Returns the item in this Seq for which comp determines is least. If there are multiple such items, the last one is returned. **Caution:** If the Seq is lazy, it will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
 
 #### maxKey(f)
-- //TODO
+- Returns the item x in this Seq for which f(x), a number, is greatest. If there are multiple such xs, the last one is returned. **Caution:** If the Seq is lazy, it will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
 
 #### minKey(f)
-- //TODO
+- Returns the item x in this Seq for which f(x), a number, is least. If there are multiple such xs, the last one is returned. **Caution:** If the Seq is lazy, it will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
 
-#### find()
-- //TODO
+#### find(i)
+- Returns an empty Optional if this Seq does not contain any item at index i.
+- Returns an Optional of the item at index i in this Seq.
 
 #### findFirst()
-- //TODO
+- Returns an empty Optional if this Seq contains no items.
+- Returns an Optional of the first item in this Seq. _(See first().)_
 
 #### findFirst(pred)
-- //TODO
+- Returns an Optional of the first item in this Seq for which pred(item) returns true.
+- Returns an empty Optional if pred(item) returns false for all items in this Seq. **Caution:** If the Seq is lazy, it will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
+
+#### toMap()
+- Returns a new Map with the keys and values of the items in this Seq<Map.Entry>. If the Seq is of any other type, an exception is thrown. **Caution:** If the Seq is lazy, it will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
+
+#### toMap(k, v)
+- Returns a new Map with keys as a result of k(item) and values as a result of v(item) of all items in this Seq. **Caution:** If the Seq is lazy, it will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
 
 #### toList()
-- //TODO
+- Returns a List with all items in this Seq. **Caution:** If the Seq is lazy, it will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
 
 ### Interoperability
 
 #### Object::toString()
-- //TODO
+- Returns the string representation of this Seq, e.g. "[1, 2, 3]". Only the first and any other realised item will be included. Unrealized remaining items will be depicted with a single question mark, e.g. "[1, 2, ?]". If this Seq is empty, only brackets will be returned, e.g. "[]".
 
 #### Iterable::forEach(f)
-- //TODO
+- Calls f(x) for each x in this Seq, f being a consumer function taking one argument and returning void. **Caution:** If the Seq is lazy, it will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
 
 #### Collection::stream()
-- //TODO
+- Returns a Stream of the items in this Seq.
 
 #### Collection::parallelStream()
-- //TODO
+- Returns a Stream of the items in this Seq.
 
 #### List::get(index)
-- //TODO
+- Returns the item at index in this Seq. All items up to that point will be realised.
+- Returns null if index is out of bounds. **Caution:** If the Seq is lazy, it will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
 
 #### List::iterator()
-- //TODO
+- Returns an Iterator of the items in this Seq.
 
 #### List::isEmpty()
-- //TODO
+- Returns true if this Seq is empty, otherwise false.
 
 #### List::size()
-- //TODO
+- Returns the number of items in this Seq. **Caution:** If the Seq is lazy, it will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
 
 #### List::subList(fromIndex, toIndex)
-- //TODO
+- Returns a new List of items from this Seq between fromIndex (inclusive) and toIndex (exclusive).
 
-### Extensions
+### Lombok Extensions
+
+If you're using [Lombok](https://projectlombok.org/) you can add `@ExtensionMethods({Seq.Extensions.class})` to your class in order to access the following extension methods.
+
+#### Iterable::toSeq()
+- Returns a new Seq with the items in extended Iterable.
+
+#### Iterator::toSeq()
+- Returns a new Seq with the items in extended Iterator.
+
+#### Stream::toSeq()
+- Returns a new Seq with the items in extended Stream.
+
+#### Map::toSeq()
+- Returns a new Seq<Map.Entry> with the items in extended Map.
