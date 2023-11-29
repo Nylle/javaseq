@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -1494,38 +1495,10 @@ class SeqTest {
             }
 
             @Test
-            void returnsSeqOfItemsInIterable() {
-                var list = List.of(1, 2, 3);
-
-                assertThat(Seq.of(list)).containsExactly(1, 2, 3);
-            }
-
-            @Test
             void returnsSeqOfItemsInArray() {
                 var array = new Integer[] {1, 2, 3};
 
                 assertThat(Seq.of(array)).containsExactly(1, 2, 3);
-            }
-
-            @Test
-            void returnsSeqOfItemsOfIterator() {
-                var infiniteIterator = Stream.iterate(0, x -> x + 1).iterator();
-
-                assertThat(Seq.of(infiniteIterator).take(4)).containsExactly(0, 1, 2, 3);
-            }
-
-            @Test
-            void returnsSeqOfItemsInStream() {
-                var infiniteStream = Stream.iterate(0, x -> x + 1);
-
-                assertThat(Seq.of(infiniteStream).take(4)).containsExactly(0, 1, 2, 3);
-            }
-
-            @Test
-            void returnsSeqOfKeyValuePairsInMap() {
-                var map = Map.of("a", 1, "b", 2, "c", 3);
-
-                assertThat(Seq.of(map)).containsExactlyInAnyOrder(entry("a", 1), entry("b", 2), entry("c", 3));
             }
 
             @Test
@@ -1546,6 +1519,57 @@ class SeqTest {
                 var actual = Seq.of(iterator, supplier);
 
                 assertThat(actual).containsExactly("a", "b", "c", "d", "e");
+            }
+        }
+
+        @Nested
+        class Sequence {
+
+            @Test
+            void returnsSeqOfItemsInIterable() {
+                var list = List.of(1, 2, 3);
+
+                assertThat(Seq.sequence(list)).containsExactly(1, 2, 3);
+            }
+
+            @Test
+            void returnsSeqOfItemsOfIterator() {
+                var infiniteIterator = Stream.iterate(0, x -> x + 1).iterator();
+
+                assertThat(Seq.sequence(infiniteIterator).take(4)).containsExactly(0, 1, 2, 3);
+            }
+
+            @Test
+            void returnsSeqOfItemsInStream() {
+                var infiniteStream = Stream.iterate(0, x -> x + 1);
+
+                assertThat(Seq.sequence(infiniteStream).take(4)).containsExactly(0, 1, 2, 3);
+            }
+
+            @Test
+            void returnsSeqOfKeyValuePairsInMap() {
+                var map = Map.of("a", 1, "b", 2, "c", 3);
+
+                assertThat(Seq.sequence(map)).containsExactlyInAnyOrder(entry("a", 1), entry("b", 2), entry("c", 3));
+            }
+
+            @Test
+            void returnsEmptySeqIfCollIsNull() {
+                assertThat(Seq.sequence((Iterable<Integer>) null)).isEmpty();
+                assertThat(Seq.sequence((Stream<Integer>) null)).isEmpty();
+                assertThat(Seq.sequence((Iterator<Integer>) null)).isEmpty();
+            }
+
+            @Test
+            void returnsCollIfAlreadyASeq() {
+                var coll = Seq.of(1, 2, 3);
+                assertThat(Seq.sequence(coll)).isSameAs(coll);
+            }
+
+            @Test
+            void doesNotForceLazyColl() {
+                assertThat(Seq.sequence(Stream.iterate(0, x -> x + 1)).take(3)).containsExactly(0, 1, 2);
+                assertThat(Seq.sequence(Stream.iterate(0, x -> x + 1).iterator()).take(3)).containsExactly(0, 1, 2);
             }
         }
 

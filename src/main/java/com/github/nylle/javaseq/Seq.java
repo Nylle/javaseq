@@ -29,23 +29,35 @@ public interface Seq<T> extends List<T> {
 
     @SafeVarargs
     static <T> Seq<T> of(T... xs) {
-        return Seq.of(Arrays.asList(xs).iterator());
+        return Seq.sequence(Arrays.asList(xs).iterator());
     }
 
-    static <T> Seq<T> of(Iterable<T> coll) {
-        return Seq.of(coll.iterator());
+    static <T> Seq<T> sequence(Iterable<T> coll) {
+        if(coll == null) {
+            return Nil.of();
+        }
+        if(coll instanceof Seq<T>) {
+            return (Seq<T>)coll;
+        }
+        return Seq.sequence(coll.iterator());
     }
 
-    static <T> Seq<T> of(Iterator<T> coll) {
-        return coll.hasNext() ? Cons.of(coll.next(), () -> Seq.of(coll)) : Seq.of();
+    static <T> Seq<T> sequence(Stream<T> coll) {
+        if(coll == null) {
+            return Nil.of();
+        }
+        return Seq.sequence(coll.iterator());
     }
 
-    static <T> Seq<T> of(Stream<T> coll) {
-        return Seq.of(coll.iterator());
+    static <T> Seq<T> sequence(Iterator<T> coll) {
+        if(coll == null) {
+            return Nil.of();
+        }
+        return coll.hasNext() ? Cons.of(coll.next(), () -> Seq.sequence(coll)) : Seq.of();
     }
 
-    static <K, V> Seq<Map.Entry<K, V>> of(Map<K, V> coll) {
-        return Seq.of(coll.entrySet().iterator());
+    static <K, V> Seq<Map.Entry<K, V>> sequence(Map<K, V> coll) {
+        return Seq.sequence(coll.entrySet().iterator());
     }
 
     static <T> Seq<T> of(Iterable<T> coll, Supplier<Seq<T>> f) {
@@ -65,7 +77,7 @@ public interface Seq<T> extends List<T> {
     }
 
     static <T> Seq<T> concat(Iterable<T> coll1, Iterable<T> coll2) {
-        return Seq.of(coll1, () -> Seq.of(coll2));
+        return Seq.of(coll1, () -> Seq.sequence(coll2));
     }
 
     static Seq<Integer> range() {
@@ -464,7 +476,7 @@ public interface Seq<T> extends List<T> {
 
         @Override
         public <R> Seq<R> mapcat(Function<? super T, ? extends Iterable<? extends R>> f) {
-            return Seq.of(Seq.of(f.apply(first)).map(x -> x), () -> rest().mapcat(f));
+            return Seq.of(Seq.sequence(f.apply(first)).map(x -> x), () -> rest().mapcat(f));
         }
 
         @Override
@@ -557,7 +569,7 @@ public interface Seq<T> extends List<T> {
         public Seq<T> sorted(Comparator<? super T> comp) {
             var list = new ArrayList<>(this);
             list.sort(comp);
-            return Seq.of(list);
+            return Seq.sequence(list);
         }
 
         @Override
@@ -741,7 +753,7 @@ public interface Seq<T> extends List<T> {
         }
 
         private static <T> List<T> pad(List<T> partition, Iterable<T> pad, int n) {
-            return Seq.of(partition, () -> Seq.of(pad).take(n - (long)partition.size())).toList();
+            return Seq.of(partition, () -> Seq.sequence(pad).take(n - (long)partition.size())).toList();
         }
 
         private static <T> Seq<T> distinct(Seq<T> seq, Set<T> exclude) {
@@ -760,19 +772,19 @@ public interface Seq<T> extends List<T> {
         }
 
         public static <T> Seq<T> toSeq(Stream<T> stream) {
-            return Seq.of(stream);
+            return Seq.sequence(stream);
         }
 
         public static <K, V> Seq<Map.Entry<K, V>> toSeq(Map<K, V> map) {
-            return Seq.of(map);
+            return Seq.sequence(map);
         }
 
         public static <T> Seq<T> toSeq(Iterable<T> coll) {
-            return Seq.of(coll);
+            return Seq.sequence(coll);
         }
 
         public static <T> Seq<T> toSeq(Iterator<T> coll) {
-            return Seq.of(coll);
+            return Seq.sequence(coll);
         }
     }
 }

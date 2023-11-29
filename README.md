@@ -51,8 +51,8 @@ While Streams help to work with lazy collections by providing the aforementioned
 #### Seq.of(xs...)
 - Returns a Seq of all supplied xs.
 
-#### Seq.of(coll)
-- Returns a Seq of all items in coll which can be a Stream, Iterable, Iterator, Array, or Map. If coll is a Stream it will be consumed lazily. If coll is a Map<K, V> the returned Seq will contain items of type Map.Entry<K, V> (see [toMap](#tomap--)).
+#### Seq.sequence(coll)
+- Coerces coll to a (possibly empty) Seq, if it is not already one. Will not force a lazy Stream or Iterator. If coll is a Map<K, V> the returned Seq will contain items of type Map.Entry<K, V> (see [toMap](#tomap)). Yields empty Seq if coll is null.
 
 #### Seq.of(coll, f)
 - //TODO
