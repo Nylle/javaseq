@@ -32,6 +32,13 @@ public interface Seq<T> extends List<T> {
         return Seq.sequence(Arrays.asList(xs).iterator());
     }
 
+    static <T> Seq<T> sequence(T[] coll) {
+        if(coll == null) {
+            return Nil.of();
+        }
+        return Seq.sequence(Arrays.asList(coll).iterator());
+    }
+
     static <T> Seq<T> sequence(Iterable<T> coll) {
         if(coll == null) {
             return Nil.of();
@@ -60,24 +67,13 @@ public interface Seq<T> extends List<T> {
         return Seq.sequence(coll.entrySet().iterator());
     }
 
-    static <T> Seq<T> of(Iterable<T> coll, Supplier<Seq<T>> f) {
-        return Seq.of(coll.iterator(), f);
-    }
-
-    static <T> Seq<T> of(Iterator<T> coll, Supplier<Seq<T>> f) {
-        if (coll.hasNext()) {
-            T next = coll.next();
-            return coll.hasNext() ? Cons.of(next, () -> Seq.of(coll, f)) : Cons.of(next, f);
-        }
-        return f.get();
-    }
-
     static <T> Seq<T> iterate(T init, UnaryOperator<T> f) {
         return Cons.of(init, () -> iterate(f.apply(init), f));
     }
 
-    static <T> Seq<T> concat(Iterable<T> coll1, Iterable<T> coll2) {
-        return Seq.of(coll1, () -> Seq.sequence(coll2));
+    @SafeVarargs
+    static <T> Seq<T> concat(Iterable<T>... colls) {
+        return Seq.of(colls).mapcat(x -> x);
     }
 
     static Seq<Integer> range() {
@@ -476,7 +472,7 @@ public interface Seq<T> extends List<T> {
 
         @Override
         public <R> Seq<R> mapcat(Function<? super T, ? extends Iterable<? extends R>> f) {
-            return Seq.of(Seq.sequence(f.apply(first)).map(x -> x), () -> rest().mapcat(f));
+            return concat(Seq.sequence(f.apply(first)).map(x -> x), () -> rest().mapcat(f));
         }
 
         @Override
@@ -753,7 +749,7 @@ public interface Seq<T> extends List<T> {
         }
 
         private static <T> List<T> pad(List<T> partition, Iterable<T> pad, int n) {
-            return Seq.of(partition, () -> Seq.sequence(pad).take(n - (long)partition.size())).toList();
+            return concat(partition, () -> Seq.sequence(pad).take(n - (long)partition.size())).toList();
         }
 
         private static <T> Seq<T> distinct(Seq<T> seq, Set<T> exclude) {
@@ -763,6 +759,18 @@ public interface Seq<T> extends List<T> {
             }
             exclude.add(additionalItems.first());
             return Cons.of(additionalItems.first(), () -> distinct(additionalItems.rest(), exclude));
+        }
+
+        private static <T> Seq<T> concat(Iterable<T> coll, Supplier<Seq<T>> f) {
+            return Cons.concat(coll.iterator(), f);
+        }
+
+        private static <T> Seq<T> concat(Iterator<T> coll, Supplier<Seq<T>> f) {
+            if (coll.hasNext()) {
+                T next = coll.next();
+                return coll.hasNext() ? Cons.of(next, () -> Cons.concat(coll, f)) : Cons.of(next, f);
+            }
+            return f.get();
         }
     }
 
@@ -784,6 +792,10 @@ public interface Seq<T> extends List<T> {
         }
 
         public static <T> Seq<T> toSeq(Iterator<T> coll) {
+            return Seq.sequence(coll);
+        }
+
+        public static <T> Seq<T> toSeq(T[] coll) {
             return Seq.sequence(coll);
         }
     }

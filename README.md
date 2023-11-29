@@ -54,10 +54,7 @@ While Streams help to work with lazy collections by providing the aforementioned
 #### Seq.sequence(coll)
 - Coerces coll to a (possibly empty) Seq, if it is not already one. Will not force a lazy Stream or Iterator. If coll is a Map<K, V> the returned Seq will contain items of type Map.Entry<K, V> (see [toMap](#tomap)). Yields empty Seq if coll is null.
 
-#### Seq.of(coll, f)
-- //TODO
-
-#### Seq.concat(coll1, coll2)
+#### Seq.concat(colls...)
 - Returns a Seq representing the concatenation of the items in the supplied colls.
 
 #### Seq.iterate(init, f)

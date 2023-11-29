@@ -1495,30 +1495,9 @@ class SeqTest {
             }
 
             @Test
-            void returnsSeqOfItemsInArray() {
-                var array = new Integer[] {1, 2, 3};
-
-                assertThat(Seq.of(array)).containsExactly(1, 2, 3);
-            }
-
-            @Test
-            void returnsSeqFromConcatenatingIterableAndSupplier() {
-                var iterable = List.of("a", "b", "c");
-                Supplier<Seq<String>> supplier = () -> Seq.Cons.of("d", () -> Seq.Cons.of("e", () -> Seq.Nil.of()));
-
-                var actual = Seq.of(iterable, supplier);
-
-                assertThat(actual).containsExactly("a", "b", "c", "d", "e");
-            }
-
-            @Test
-            void returnsSeqFromConcatenatingIteratorAndSupplier() {
-                var iterator = List.of("a", "b", "c").iterator();
-                Supplier<Seq<String>> supplier = () -> Seq.Cons.of("d", () -> Seq.Cons.of("e", () -> Seq.Nil.of()));
-
-                var actual = Seq.of(iterator, supplier);
-
-                assertThat(actual).containsExactly("a", "b", "c", "d", "e");
+            void returnsSeqOfSuppliedLists() {
+                assertThat(Seq.of(List.of(1, 2), List.of("foo", "bar"), List.of(true, false)))
+                        .containsExactly(List.of(1, 2), List.of("foo", "bar"), List.of(true, false));
             }
         }
 
@@ -1544,6 +1523,13 @@ class SeqTest {
                 var infiniteStream = Stream.iterate(0, x -> x + 1);
 
                 assertThat(Seq.sequence(infiniteStream).take(4)).containsExactly(0, 1, 2, 3);
+            }
+
+            @Test
+            void returnsSeqOfItemsInArray() {
+                var array = new Integer[] {1, 2, 3};
+
+                assertThat(Seq.sequence(array)).containsExactly(1, 2, 3);
             }
 
             @Test
@@ -1591,17 +1577,17 @@ class SeqTest {
         class Concat {
 
             @Test
-            void returnsSeqFromConcatenatingTwoSeqs() {
-                var actual = Seq.concat(Seq.of("a", "b", "c"), Seq.of("d", "e"));
+            void returnsSeqFromConcatenatingMultipleSeqs() {
+                var actual = Seq.concat(Seq.of("a", "b"), Seq.of("c", "d"), Seq.of("e", "f"));
 
-                assertThat(actual).containsExactly("a", "b", "c", "d", "e");
+                assertThat(actual).containsExactly("a", "b", "c", "d", "e", "f");
             }
 
             @Test
-            void returnsSeqFromConcatenatingTwoIterables() {
-                var actual = Seq.concat(List.of("a", "b", "c"), List.of("d", "e"));
+            void returnsSeqFromConcatenatingMultipleIterables() {
+                var actual = Seq.concat(List.of("a", "b"), List.of("c", "d"), List.of("e", "f"));
 
-                assertThat(actual).containsExactly("a", "b", "c", "d", "e");
+                assertThat(actual).containsExactly("a", "b", "c", "d", "e", "f");
             }
         }
         
@@ -1673,6 +1659,20 @@ class SeqTest {
             @Test
             void returnsSeqOfItemsInStream() {
                 assertThat(Seq.Extensions.toSeq(Stream.of(1, 2, 3))).containsExactly(1, 2, 3);
+            }
+        }
+
+        @Nested
+        class FromArray {
+
+            @Test
+            void returnsEmptySeqIfArrayIsEmpty() {
+                assertThat(Seq.Extensions.toSeq(new String[0])).isEmpty();
+            }
+
+            @Test
+            void returnsSeqOfItemsInArray() {
+                assertThat(Seq.Extensions.toSeq("f o o".split(" "))).containsExactly("f", "o", "o");
             }
         }
 
