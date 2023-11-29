@@ -29,43 +29,43 @@ public interface Seq<T> extends List<T> {
 
     @SafeVarargs
     static <T> Seq<T> of(T... xs) {
-        return of(Arrays.asList(xs).iterator());
+        return Seq.of(Arrays.asList(xs).iterator());
     }
 
     static <T> Seq<T> of(Iterable<T> coll) {
-        return of(coll.iterator());
+        return Seq.of(coll.iterator());
     }
 
     static <T> Seq<T> of(Iterator<T> coll) {
-        return coll.hasNext() ? cons(coll.next(), () -> of(coll)) : of();
+        return coll.hasNext() ? Cons.of(coll.next(), () -> Seq.of(coll)) : Seq.of();
     }
 
     static <T> Seq<T> of(Stream<T> coll) {
-        return of(coll.iterator());
+        return Seq.of(coll.iterator());
     }
 
     static <K, V> Seq<Map.Entry<K, V>> of(Map<K, V> coll) {
-        return of(coll.entrySet().iterator());
+        return Seq.of(coll.entrySet().iterator());
     }
 
-    static <T> Seq<T> cons(T first, Supplier<Seq<T>> f) {
-        return new Cons<>(first, f);
+    static <T> Seq<T> of(Iterable<T> coll, Supplier<Seq<T>> f) {
+        return Seq.of(coll.iterator(), f);
+    }
+
+    static <T> Seq<T> of(Iterator<T> coll, Supplier<Seq<T>> f) {
+        if (coll.hasNext()) {
+            T next = coll.next();
+            return coll.hasNext() ? Cons.of(next, () -> Seq.of(coll, f)) : Cons.of(next, f);
+        }
+        return f.get();
     }
 
     static <T> Seq<T> iterate(T init, UnaryOperator<T> f) {
-        return cons(init, () -> iterate(f.apply(init), f));
+        return Cons.of(init, () -> iterate(f.apply(init), f));
     }
 
-    static <T> Seq<T> concat(Iterable<T> coll, Supplier<Seq<T>> f) {
-        return concat(coll.iterator(), f);
-    }
-
-    static <T> Seq<T> concat(Iterator<T> coll, Supplier<Seq<T>> f) {
-        if (coll.hasNext()) {
-            T next = coll.next();
-            return coll.hasNext() ? cons(next, () -> concat(coll, f)) : cons(next, f);
-        }
-        return f.get();
+    static <T> Seq<T> concat(Iterable<T> coll1, Iterable<T> coll2) {
+        return Seq.of(coll1, () -> Seq.of(coll2));
     }
 
     static Seq<Integer> range() {
@@ -117,6 +117,8 @@ public interface Seq<T> extends List<T> {
     Seq<T> reductions(BinaryOperator<T> f);
 
     Seq<T> reductions(T init, BinaryOperator<T> f);
+
+    Seq<T> cons(T x);
 
     Optional<T> reduce(BinaryOperator<T> f);
 
@@ -256,6 +258,11 @@ public interface Seq<T> extends List<T> {
         }
 
         @Override
+        public Seq<T> cons(T x) {
+            return Cons.of(x, () -> this);
+        }
+
+        @Override
         public Optional<T> reduce(BinaryOperator<T> f) {
             return Optional.empty();
         }
@@ -387,9 +394,13 @@ public interface Seq<T> extends List<T> {
         private volatile Seq<T> rest;
         private final Supplier<Seq<T>> f;
 
-        Cons(T first, Supplier<Seq<T>> f) {
+        private Cons(T first, Supplier<Seq<T>> f) {
             this.first = first;
             this.f = f;
+        }
+
+        public static <T> Cons<T> of(T first, Supplier<Seq<T>> f) {
+            return new Cons<>(first, f);
         }
 
         @Override
@@ -426,7 +437,7 @@ public interface Seq<T> extends List<T> {
 
         @Override
         public Seq<T> take(long n) {
-            return n <= 0 ? Nil.of() : Seq.cons(first, () -> rest().take(n - 1));
+            return n <= 0 ? Nil.of() : Cons.of(first, () -> rest().take(n - 1));
         }
 
         @Override
@@ -436,29 +447,29 @@ public interface Seq<T> extends List<T> {
 
         @Override
         public Seq<T> filter(Predicate<? super T> pred) {
-            return pred.test(first) ? Seq.cons(first, () -> rest().filter(pred)) : rest().filter(pred);
+            return pred.test(first) ? Cons.of(first, () -> rest().filter(pred)) : rest().filter(pred);
         }
 
         @Override
         public <R> Seq<R> map(Function<? super T, ? extends R> f) {
-            return Seq.cons(f.apply(first()), () -> rest().map(f));
+            return Cons.of(f.apply(first()), () -> rest().map(f));
         }
 
         @Override
         public <S, R> Seq<R> map(Seq<? extends S> other, BiFunction<? super T, ? super S, ? extends R> f) {
             return other.isEmpty()
                     ? Nil.of()
-                    : Seq.cons(f.apply(first(), other.first()), () -> rest().map(other.rest(), f));
+                    : Cons.of(f.apply(first(), other.first()), () -> rest().map(other.rest(), f));
         }
 
         @Override
         public <R> Seq<R> mapcat(Function<? super T, ? extends Iterable<? extends R>> f) {
-            return concat(of(f.apply(first)).map(x -> x), () -> rest().mapcat(f));
+            return Seq.of(Seq.of(f.apply(first)).map(x -> x), () -> rest().mapcat(f));
         }
 
         @Override
         public Seq<T> takeWhile(Predicate<? super T> pred) {
-            return pred.test(first()) ? Seq.cons(first(), () -> rest().takeWhile(pred)) : Nil.of();
+            return pred.test(first()) ? Cons.of(first(), () -> rest().takeWhile(pred)) : Nil.of();
         }
 
         @Override
@@ -485,9 +496,9 @@ public interface Seq<T> extends List<T> {
             if (partition.size() < n) {
                 return pad == null
                         ? Nil.of()
-                        : Seq.cons(pad(partition, pad, n), () -> drop(step).partition(n, step, pad));
+                        : Cons.of(pad(partition, pad, n), () -> drop(step).partition(n, step, pad));
             }
-            return Seq.cons(partition, () -> drop(step).partition(n, step, pad));
+            return Cons.of(partition, () -> drop(step).partition(n, step, pad));
         }
 
         @Override
@@ -507,7 +518,12 @@ public interface Seq<T> extends List<T> {
 
         @Override
         public Seq<T> reductions(T init, BinaryOperator<T> f) {
-            return Seq.cons(init, () -> rest().reductions(f.apply(init, first()), f));
+            return Cons.of(init, () -> rest().reductions(f.apply(init, first()), f));
+        }
+
+        @Override
+        public Seq<T> cons(T x) {
+            return Cons.of(x, () -> this);
         }
 
         @Override
@@ -541,7 +557,7 @@ public interface Seq<T> extends List<T> {
         public Seq<T> sorted(Comparator<? super T> comp) {
             var list = new ArrayList<>(this);
             list.sort(comp);
-            return of(list);
+            return Seq.of(list);
         }
 
         @Override
@@ -725,16 +741,16 @@ public interface Seq<T> extends List<T> {
         }
 
         private static <T> List<T> pad(List<T> partition, Iterable<T> pad, int n) {
-            return concat(partition, () -> of(pad).take(n - (long)partition.size())).toList();
+            return Seq.of(partition, () -> Seq.of(pad).take(n - (long)partition.size())).toList();
         }
 
         private static <T> Seq<T> distinct(Seq<T> seq, Set<T> exclude) {
             var additionalItems = seq.filter(t -> !exclude.contains(t));
             if (additionalItems.isEmpty()) {
-                return of();
+                return Seq.of();
             }
             exclude.add(additionalItems.first());
-            return Seq.cons(additionalItems.first(), () -> distinct(additionalItems.rest(), exclude));
+            return Cons.of(additionalItems.first(), () -> distinct(additionalItems.rest(), exclude));
         }
     }
 
@@ -744,19 +760,19 @@ public interface Seq<T> extends List<T> {
         }
 
         public static <T> Seq<T> toSeq(Stream<T> stream) {
-            return of(stream);
+            return Seq.of(stream);
         }
 
         public static <K, V> Seq<Map.Entry<K, V>> toSeq(Map<K, V> map) {
-            return of(map);
+            return Seq.of(map);
         }
 
         public static <T> Seq<T> toSeq(Iterable<T> coll) {
-            return of(coll);
+            return Seq.of(coll);
         }
 
         public static <T> Seq<T> toSeq(Iterator<T> coll) {
-            return of(coll);
+            return Seq.of(coll);
         }
     }
 }

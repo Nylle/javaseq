@@ -12,7 +12,6 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import static com.github.nylle.javaseq.Seq.cons;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.entry;
@@ -176,24 +175,42 @@ class SeqTest {
             }
         }
 
-        @Test
-        void reductionsReturnsNil() {
-            assertThat(Seq.Nil.<Integer>of().reductions((a, b) -> a + b)).isEqualTo(Seq.Nil.of());
+        @Nested
+        class Reductions {
+
+            @Test
+            void returnsNil() {
+                assertThat(Seq.Nil.<Integer>of().reductions((a, b) -> a + b)).isEqualTo(Seq.Nil.of());
+            }
+
+            @Test
+            void returnsSeqOfInit() {
+                assertThat(Seq.Nil.<String>of().reductions("a", (a, b) -> a + b)).containsExactly("a");
+            }
+
         }
 
         @Test
-        void reductionsReturnsSeqOfInit() {
-            assertThat(Seq.Nil.<String>of().reductions("a", (a, b) -> a + b)).containsExactly("a");
+        void consReturnsNewSeqWithItemPrepended() {
+            var actual = Seq.Nil.<String>of().cons("x");
+
+            assertThat(actual.isRealized()).isFalse();
+            assertThat(actual.first()).isEqualTo("x");
+            assertThat(actual.rest()).isEmpty();
         }
 
-        @Test
-        void reduceReturnsEmptyOptional() {
-            assertThat(Seq.Nil.<Integer>of().reduce((a, b) -> a + b)).isEmpty();
-        }
+        @Nested
+        class Reduce {
 
-        @Test
-        void reduceReturnsVal() {
-            assertThat(Seq.Nil.<Integer>of().reduce(0, (a, b) -> a + b)).isEqualTo(0);
+            @Test
+            void returnsEmptyOptional() {
+                assertThat(Seq.Nil.<Integer>of().reduce((a, b) -> a + b)).isEmpty();
+            }
+
+            @Test
+            void returnsVal() {
+                assertThat(Seq.Nil.<Integer>of().reduce(0, (a, b) -> a + b)).isEqualTo(0);
+            }
         }
 
         @Test
@@ -312,7 +329,7 @@ class SeqTest {
     }
 
     @Nested
-    class Cons {
+    class ConsTest {
 
         @Test
         void firstReturnsHead() {
@@ -334,7 +351,7 @@ class SeqTest {
 
         @Test
         void sizeReturnsSizeOfFiniteSeqOrRunsForever() {
-            var sut = cons(3, () -> cons(-2, () -> cons(8, () -> Seq.of(1))));
+            var sut = Seq.Cons.of(3, () -> Seq.Cons.of(-2, () -> Seq.Cons.of(8, () -> Seq.of(1))));
 
             assertThat(sut.size()).isEqualTo(4);
         }
@@ -872,6 +889,34 @@ class SeqTest {
         }
 
         @Nested
+        class Cons {
+
+            @Test
+            void returnsNewSeqWithItemPrepended() {
+                var sut = Seq.range();
+
+                var actual = sut.cons(-1);
+
+                assertThat(actual.isRealized()).isFalse();
+                assertThat(actual.first()).isEqualTo(-1);
+                assertThat(actual.rest().take(3)).containsExactly(0, 1, 2);
+                assertThat(actual.take(4)).containsExactly(-1, 0, 1, 2);
+            }
+
+            @Test
+            void acceptsNullAsItem() {
+                var sut = Seq.of("a", "b", "c");
+
+                var actual = sut.cons(null);
+
+                assertThat(actual.isRealized()).isFalse();
+                assertThat(actual.first()).isNull();
+                assertThat(actual.rest()).containsExactly("a", "b", "c");
+                assertThat(actual).containsExactly(null, "a", "b", "c");
+            }
+        }
+
+        @Nested
         class Reduce {
 
             @Test
@@ -913,7 +958,7 @@ class SeqTest {
 
             @Test
             void returnsSeqWithSingleItemForSeqWithIdenticalItems() {
-                var sut = Seq.cons("a", () -> Seq.of("a"));
+                var sut = Seq.Cons.of("a", () -> Seq.of("a"));
 
                 assertThat(sut.distinct().take(4)).containsExactly("a");
             }
@@ -1482,6 +1527,26 @@ class SeqTest {
 
                 assertThat(Seq.of(map)).containsExactlyInAnyOrder(entry("a", 1), entry("b", 2), entry("c", 3));
             }
+
+            @Test
+            void returnsSeqFromConcatenatingIterableAndSupplier() {
+                var iterable = List.of("a", "b", "c");
+                Supplier<Seq<String>> supplier = () -> Seq.Cons.of("d", () -> Seq.Cons.of("e", () -> Seq.Nil.of()));
+
+                var actual = Seq.of(iterable, supplier);
+
+                assertThat(actual).containsExactly("a", "b", "c", "d", "e");
+            }
+
+            @Test
+            void returnsSeqFromConcatenatingIteratorAndSupplier() {
+                var iterator = List.of("a", "b", "c").iterator();
+                Supplier<Seq<String>> supplier = () -> Seq.Cons.of("d", () -> Seq.Cons.of("e", () -> Seq.Nil.of()));
+
+                var actual = Seq.of(iterator, supplier);
+
+                assertThat(actual).containsExactly("a", "b", "c", "d", "e");
+            }
         }
 
         @Nested
@@ -1490,9 +1555,9 @@ class SeqTest {
             @Test
             void returnsSeqFromFirstElementAndSeqSupplier() {
                 var first = "a";
-                Supplier<Seq<String>> supplier = () -> Seq.cons("b", () -> Seq.cons("c", () -> Seq.Nil.of()));
+                Supplier<Seq<String>> supplier = () -> Seq.Cons.of("b", () -> Seq.Cons.of("c", () -> Seq.Nil.of()));
 
-                var actual = Seq.cons(first, supplier);
+                var actual = Seq.Cons.of(first, supplier);
 
                 assertThat(actual).containsExactly("a", "b", "c");
             }
@@ -1502,21 +1567,15 @@ class SeqTest {
         class Concat {
 
             @Test
-            void returnsSeqFromConcatenatingIterableAndSupplier() {
-                var iterable = List.of("a", "b", "c");
-                Supplier<Seq<String>> supplier = () -> Seq.cons("d", () -> Seq.cons("e", () -> Seq.Nil.of()));
-
-                var actual = Seq.concat(iterable, supplier);
+            void returnsSeqFromConcatenatingTwoSeqs() {
+                var actual = Seq.concat(Seq.of("a", "b", "c"), Seq.of("d", "e"));
 
                 assertThat(actual).containsExactly("a", "b", "c", "d", "e");
             }
 
             @Test
-            void returnsSeqFromConcatenatingIteratorAndSupplier() {
-                var iterator = List.of("a", "b", "c").iterator();
-                Supplier<Seq<String>> supplier = () -> Seq.cons("d", () -> Seq.cons("e", () -> Seq.Nil.of()));
-
-                var actual = Seq.concat(iterator, supplier);
+            void returnsSeqFromConcatenatingTwoIterables() {
+                var actual = Seq.concat(List.of("a", "b", "c"), List.of("d", "e"));
 
                 assertThat(actual).containsExactly("a", "b", "c", "d", "e");
             }

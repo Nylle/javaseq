@@ -2,24 +2,23 @@
 
 ## This Is An Exercise
 
-The goal of this exercise was to build an alternative to Java's Stream API, heavily influenced by Rich Hickey's [Clojure](https://clojure.org/), to introduce all the features Stream should have.
+The goal was to build an alternative to Java's Stream API and provide missing features. The API and usage are heavily influenced by Clojure. I've made no measurements in regard to its performance.
 
-I do not claim this to be enterprise-ready in any way, shape, or form, but I believe it is production-ready. I've made no measurements in regard to its performance.
+Feel free to copy any of this code. If you find yourself using this class in your Java-code a lot, chances are you're using the wrong programming-language. Take a look at [C#](https://en.wikipedia.org/wiki/C_Sharp_(programming_language)), [Kotlin](https://kotlinlang.org/) or [Clojure](https://clojure.org/).
 
-Feel free to copy any of this code if it is of any help to you. If you find yourself using this class in your Java-code, chances are you're using the wrong programming-language. Take a look at [C#](https://en.wikipedia.org/wiki/C_Sharp_(programming_language)), [Kotlin](https://kotlinlang.org/) or [Clojure](https://clojure.org/).
+<details>
+<summary>Usage</summary>
 
-## Contents
-- [Background](#background)
-- [Usage](#usage)
-  - [Creation](#creation)
-  - [Operations](#operations)
-  - [Interoperability](#interoperability)
-  - [Extensions](#extensions)
+- [Creation](#creation)
+- [Operations](#operations)
+- [Interoperability](#interoperability)
+- [Extensions](#extensions)
 
+</details>
 
 ## Background
 
-I've always had a difficult relationship with Java's Streams. After a decade working with C# (and [LINQ](https://en.wikipedia.org/wiki/Language_Integrated_Query)), Streams were the single feature that convinced me to try out Java -- and another decade later it's one of the features driving me away; towards languages like [Kotlin](https://kotlinlang.org/) or [Clojure](https://clojure.org/).
+I've always had a difficult relationship with Java's Streams. After a decade working with C# (and [LINQ](https://en.wikipedia.org/wiki/Language_Integrated_Query)), Streams were the single feature that convinced me to try out Java -- and another decade later it's one of the features driving me away; towards languages like Kotlin or Clojure.
 
 ### Streams Are Cumbersome
 
@@ -30,18 +29,15 @@ I've always had a difficult relationship with Java's Streams. After a decade wor
 
 ### Streams Are Not Re-usable
 
-- The Stream-API is just a thin wrapper around `Iterator`, which provides out-of-the-box laziness in Java, or any OOP language.
-- This means that once a Stream is "realized" (fully consumed) it cannot be consumed again.
+- The Stream-API is just a thin wrapper around `Iterator`, which provides out-of-the-box.
+- This means that once a Stream is "realized" (fully consumed) it cannot be consumed again, because the underlying iterator cannot be consumed again.
 
-### Basic Features Are Missing
+### Features Are Missing
 
-While it's entirely possible (and no rocket science) to get those features using your own `Iterator`-implementation, the lack of extension-methods in Java make it painful to use. Some of those features are:
-- **zip** -- Lazily mapping two (or more) potentially infinite collections by _"applying f to
-  the set of first items of each coll, followed by applying f to the
-  set of second items in each coll, until any one of the colls is
-  exhausted"_ ([Rich Hickey](https://clojuredocs.org/clojure.core/map))
-- **partition** -- Lazily partitioning a potentially infinite collection into a collection of collections. This allows for batching or creating a sliding window.
-- **head/tail** -- Lazily accessing the first and/or remaining items of a potentially infinite collection.
+While Streams help to work with lazy collections by providing the aforementioned filter-map-reduce interface, features beyond those are not to be found, including but not limited to: 
+- **zip** -- Map two potentially infinite collections by applying a bi-function f to the set of first items of each collection, followed by applying f to the set of second items in each collection and so forth, until any one of the collections is exhausted (see Clojure's [map](https://clojuredocs.org/clojure.core/map)-function).
+- **partition** -- Split a potentially infinite collection into a collection of collections of fixed size. This allows for batching or creating a sliding window.
+- **head/tail** -- Access the first and/or remaining items of a potentially infinite collection.
 
 ## Usage
 
@@ -52,17 +48,17 @@ While it's entirely possible (and no rocket science) to get those features using
 #### Seq.of()
 - Returns an empty Seq.
 
-#### Seq.of(x1, x2, x3, ...)
+#### Seq.of(xs...)
 - Returns a Seq of all supplied xs.
 
 #### Seq.of(coll)
-- Returns a Seq of all items in coll which can be a Stream, Iterable, Iterator, Array, or Map. If coll is a Stream it will be consumed lazily. If coll is a Map<K, V> the returned Seq will contain items of type Map.Entry<K, V>.
+- Returns a Seq of all items in coll which can be a Stream, Iterable, Iterator, Array, or Map. If coll is a Stream it will be consumed lazily. If coll is a Map<K, V> the returned Seq will contain items of type Map.Entry<K, V> (see [toMap](#tomap--)).
 
-#### Seq.cons(first, f)
+#### Seq.of(coll, f)
 - //TODO
 
-#### Seq.concat(coll, f)
-- //TODO
+#### Seq.concat(coll1, coll2)
+- Returns a Seq representing the concatenation of the items in the supplied colls.
 
 #### Seq.iterate(init, f)
 - //TODO
@@ -137,6 +133,9 @@ _(This is similar to zipping two collections.)_
 
 #### reductions(init, f)
 - Returns a Seq of the intermediate values of the reduction (as per [reduce](#reduceval-f)) of this Seq by f, starting with init.
+
+#### cons(x)
+- Returns a new Seq where x is the first item and this Seq is the rest.
 
 #### distinct()
 - Returns a Seq of the items of this Seq with duplicates removed.
