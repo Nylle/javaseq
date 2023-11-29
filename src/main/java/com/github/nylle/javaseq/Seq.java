@@ -67,8 +67,8 @@ public interface Seq<T> extends List<T> {
         return Seq.sequence(coll.entrySet().iterator());
     }
 
-    static <T> Seq<T> iterate(T init, UnaryOperator<T> f) {
-        return Cons.of(init, () -> iterate(f.apply(init), f));
+    static <T> Seq<T> iterate(T x, UnaryOperator<T> f) {
+        return Cons.of(x, () -> iterate(f.apply(x), f));
     }
 
     @SafeVarargs

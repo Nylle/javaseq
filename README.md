@@ -57,8 +57,8 @@ While Streams help to work with lazy collections by providing the aforementioned
 #### Seq.concat(colls...)
 - Returns a Seq representing the concatenation of the items in the supplied colls.
 
-#### Seq.iterate(init, f)
-- //TODO
+#### Seq.iterate(x, f)
+- Returns a Seq of x, f(x), f(f(x)) etc. f must be free of side-effects.
 
 #### Seq.range()
 - Returns a Seq of nums from 0 (inclusive) to infinity, by 1.
@@ -135,13 +135,13 @@ _(This is similar to zipping two collections.)_
 - Returns a new Seq where x is the first item and this Seq is the rest.
 
 #### distinct()
-- Returns a Seq of the items of this Seq with duplicates removed.
+- Returns a Seq of the items of this Seq with duplicates removed. **Caution:** The Seq will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
 
 #### sorted()
-- Returns a Seq of the items of this Seq sorted by using compare.
+- Returns a Seq of the items of this Seq sorted by using compare. **Caution:** The Seq will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
 
 #### sorted(comp)
-- Returns a Seq of the items of this Seq sorted by using supplied comparator comp.
+- Returns a Seq of the items of this Seq sorted by using supplied comparator comp. **Caution:** The Seq will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
 
 #### reduce(f)
 - Returns an empty Optional if this Seq contains no items.
@@ -238,6 +238,9 @@ If you're using [Lombok](https://projectlombok.org/) you can add `@ExtensionMeth
 
 #### Iterator::toSeq()
 - Returns a Seq of the items in extended Iterator.
+
+#### Object[]::toSeq()
+- Returns a Seq of the items in extended array.
 
 #### Stream::toSeq()
 - Returns a Seq of the items in extended Stream.
