@@ -41,7 +41,7 @@ While Streams help to work with lazy collections by providing the aforementioned
 
 ## Usage
 
-**Seq** is always being evaluated lazily. It can be re-used and operated on as often as needed. Some operations will cause it to be partly or fully realised into memory. Consuming an infinite Seq entirely will run infinitely or until system resources are exhausted. Operations that may lead to that behaviour are marked accordingly.
+**Seq** is always being evaluated lazily. Its content is being cached, hence it can be re-used and operated on as often as needed. Consuming an infinite Seq entirely will run infinitely or until system resources are exhausted.
 
 ### Creation
 
@@ -102,7 +102,7 @@ While Streams help to work with lazy collections by providing the aforementioned
 _(This is similar to zipping two collections.)_
 
 #### mapcat(f)
-- Returns a Seq of the result of applying concat to the result of applying map to f and the items in this Seq. Function f should return a collection. _(This is similar to Stream::flatMap.)_
+- Returns a Seq of the result of applying concat to the result of applying map to f and the items in this Seq. Function f should return a collection. _(This is similar to [Stream::flatMap](https://docs.oracle.com/javase/8/docs/api/java/util/stream/Stream.html#flatMap-java.util.function.Function-).)_
 
 #### takeWhile(pred)
 - Returns a Seq of successive items from this Seq while pred(item) returns true.
@@ -231,7 +231,7 @@ _(This is similar to zipping two collections.)_
 
 ### Lombok Extensions
 
-If you're using [Lombok](https://projectlombok.org/) you can add `@ExtensionMethods({Seq.Extensions.class})` to your class in order to access the following extension methods.
+If you're using [Lombok](https://projectlombok.org/) you can add `@ExtensionMethods({Seq.Extensions.class})` to your class in order to access the extension methods below.
 
 #### Iterable::toSeq()
 - Returns a Seq of the items in extended Iterable.
