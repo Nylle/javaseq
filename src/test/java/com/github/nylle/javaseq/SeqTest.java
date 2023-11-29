@@ -23,7 +23,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 class SeqTest {
 
     @Nested
-    class Nil {
+    class NilTest {
 
         @Test
         void firstReturnsNull() {
@@ -521,6 +521,54 @@ class SeqTest {
                     var other = Seq.iterate(0, x -> x + 1);
 
                     assertThat(sut.map(other, (a, b) -> a + b).take(4)).containsExactly(0, 2, 4, 6);
+                }
+            }
+
+            @Nested
+            class WithTwoOtherSeqs {
+
+                @Test
+                void returnsEmptySeqWhenProvidingEmptyOther1() {
+                    assertThat(Seq.of(1, 2, 3).map(Seq.<Integer>of(), Seq.of(1, 2, 3), (a, b, c) -> a + b + c))
+                            .isEmpty();
+                }
+
+                @Test
+                void returnsEmptySeqWhenProvidingEmptyOther2() {
+                    assertThat(Seq.of(1, 2, 3).map(Seq.of(1, 2, 3), Seq.<Integer>of(), (a, b, c) -> a + b + c))
+                            .isEmpty();
+                }
+
+                @Test
+                void returnsANewSeqWithTheItemsOfAllThreeSeqsCombinedUsingF() {
+                    var sut = Seq.of(1, 2, 3);
+
+                    assertThat(sut.map(Seq.of("a", "b", "c"), Seq.of("X", "Y", "Z"), (a, b, c) -> a + b + c))
+                            .containsExactly("1aX", "2bY", "3cZ");
+                }
+
+                @Test
+                void ignoresRemainingItemsIfOneOfTheSeqsIsExhausted() {
+                    var sut = Seq.of(1, 2, 3);
+
+                    Seq.TriFunction<Integer, String, String, String> f = (a, b, c) -> a + b + c;
+
+                    assertThat(sut.map(Seq.of("a", "b"), Seq.of("X", "Y"), f)).containsExactly("1aX", "2bY");
+                    assertThat(sut.map(Seq.of("a", "b"), Seq.of("X", "Y", "Z"), f)).containsExactly("1aX", "2bY");
+                    assertThat(sut.map(Seq.of("a", "b", "c"), Seq.of("X", "Y"), f)).containsExactly("1aX", "2bY");
+
+                    assertThat(sut.map(Seq.of("a", "b", "c", "d"), Seq.of("X", "Y", "Z", "0"), f)).containsExactly("1aX", "2bY", "3cZ");
+                    assertThat(sut.map(Seq.of("a", "b", "c", "d"), Seq.of("X", "Y", "Z"), f)).containsExactly("1aX", "2bY", "3cZ");
+                    assertThat(sut.map(Seq.of("a", "b", "c"), Seq.of("X", "Y", "Z", "0"), f)).containsExactly("1aX", "2bY", "3cZ");
+                }
+
+                @Test
+                void isLazy() {
+                    var sut = Seq.iterate(0, x -> x + 1);
+                    var other1 = Seq.iterate(0, x -> x + 1);
+                    var other2 = Seq.iterate(0, x -> x + 1);
+
+                    assertThat(sut.map(other1, other2, (a, b, c) -> a + b + c).take(4)).containsExactly(0, 3, 6, 9);
                 }
             }
         }

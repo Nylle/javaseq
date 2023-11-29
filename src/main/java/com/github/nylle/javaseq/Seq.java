@@ -106,6 +106,8 @@ public interface Seq<T> extends List<T> {
 
     <S, R> Seq<R> map(Seq<? extends S> other, BiFunction<? super T, ? super S, ? extends R> f);
 
+    <S, U, R> Seq<R> map(Seq<? extends S> other1, Seq<? extends U> other2, TriFunction<? super T, ? super S, ? super U, ? extends R> f);
+
     <R> Seq<R> mapcat(Function<? super T, ? extends Iterable<? extends R>> f);
 
     Seq<T> takeWhile(Predicate<? super T> pred);
@@ -211,7 +213,12 @@ public interface Seq<T> extends List<T> {
         }
 
         @Override
-        public <S, R> Seq<R> map(Seq<? extends S> other, BiFunction<? super T, ? super S, ? extends R> f) {
+        public <U, R> Seq<R> map(Seq<? extends U> other, BiFunction<? super T, ? super U, ? extends R> f) {
+            return of();
+        }
+
+        @Override
+        public <U, V, R> Seq<R> map(Seq<? extends U> other1, Seq<? extends V> other2, TriFunction<? super T, ? super U, ? super V, ? extends R> f) {
             return of();
         }
 
@@ -464,10 +471,17 @@ public interface Seq<T> extends List<T> {
         }
 
         @Override
-        public <S, R> Seq<R> map(Seq<? extends S> other, BiFunction<? super T, ? super S, ? extends R> f) {
+        public <U, R> Seq<R> map(Seq<? extends U> other, BiFunction<? super T, ? super U, ? extends R> f) {
             return other.isEmpty()
                     ? Nil.of()
                     : Cons.of(f.apply(first(), other.first()), () -> rest().map(other.rest(), f));
+        }
+
+        @Override
+        public <U, V, R> Seq<R> map(Seq<? extends U> other1, Seq<? extends V> other2, TriFunction<? super T, ? super U, ? super V, ? extends R> f) {
+            return other1.isEmpty() || other2.isEmpty()
+                    ? Nil.of()
+                    : Cons.of(f.apply(first(), other1.first(), other2.first()), () -> rest().map(other1.rest(), other2.rest(), f));
         }
 
         @Override
@@ -798,5 +812,10 @@ public interface Seq<T> extends List<T> {
         public static <T> Seq<T> toSeq(T[] coll) {
             return Seq.sequence(coll);
         }
+    }
+
+    @FunctionalInterface
+    interface TriFunction<A, B, C, R> {
+        R apply(A a, B b, C c);
     }
 }

@@ -98,11 +98,21 @@ While Streams help to work with lazy collections by providing the aforementioned
 - Returns a Seq of the result of applying f to each item in this Seq.
 
 #### map(other, f)
-- Returns a Seq of the result of applying f to the set of first items in both this Seq and other, followed by applying f to the set of second items in this Seq and other, until any one of the collections is exhausted. Any remaining items in either collection are ignored.
+- Returns a Seq of the result of applying f to the set of first items in both this Seq and other, followed by applying f to the set of second items in this Seq and other, until any one of the Seqs is exhausted. Any remaining items in either Seq are ignored.
 _(This is similar to zipping two collections.)_
+
+#### map(other1, other2, f)
+- Returns a Seq of the result of applying tri-function f to the set of first items in this Seq, other1, and other2, followed by applying f to the set of second items in this Seq, other1, and other2, until any one of the Seqs is exhausted. Any remaining items in either Seq are ignored.
+_(This is similar to zipping three collections.)_
 
 #### mapcat(f)
 - Returns a Seq of the result of applying concat to the result of applying map to f and the items in this Seq. Function f should return a collection. _(This is similar to [Stream::flatMap](https://docs.oracle.com/javase/8/docs/api/java/util/stream/Stream.html#flatMap-java.util.function.Function-).)_
+
+#### mapcat(other1, f)
+- //TODO
+
+#### mapcat(other1, other2, f)
+- //TODO
 
 #### takeWhile(pred)
 - Returns a Seq of successive items from this Seq while pred(item) returns true.
