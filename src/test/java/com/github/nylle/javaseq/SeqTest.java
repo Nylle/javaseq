@@ -1361,15 +1361,28 @@ class SeqTest {
             verifyNoMoreInteractions(consumer);
         }
 
-        @Test
-        void toListReturnsFullyRealizedList() {
-            var sut = Seq.iterate(0, x -> x + 1);
+        @Nested
+        class ToList {
 
-            assertThat(sut.isRealized()).isFalse();
-            assertThat(sut.take(4).toList())
-                    .isInstanceOf(List.class)
-                    .containsExactly(0, 1, 2, 3);
-            assertThat(sut.isRealized()).isTrue();
+            @Test
+            void toListReturnsFullyRealizedList() {
+                var sut = Seq.iterate(0, x -> x + 1);
+
+                assertThat(sut.isRealized()).isFalse();
+                assertThat(sut.take(4).toList())
+                        .isInstanceOf(List.class)
+                        .containsExactly(0, 1, 2, 3);
+                assertThat(sut.isRealized()).isTrue();
+            }
+
+            @Test
+            void canHandleLargeLists() {
+                var sut = Seq.iterate(0, x -> x + 1);
+
+                assertThat(sut.isRealized()).isFalse();
+                assertThat(sut.take(10000).toList()).hasSize(10000);
+                assertThat(sut.isRealized()).isTrue();
+            }
         }
 
         @Nested
