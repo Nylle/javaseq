@@ -33,31 +33,31 @@ public interface Seq<T> extends List<T> {
     }
 
     static <T> Seq<T> sequence(T[] coll) {
-        if(coll == null) {
+        if (coll == null) {
             return Nil.of();
         }
         return Seq.sequence(Arrays.asList(coll).iterator());
     }
 
     static <T> Seq<T> sequence(Iterable<T> coll) {
-        if(coll == null) {
+        if (coll == null) {
             return Nil.of();
         }
-        if(coll instanceof Seq<T>) {
-            return (Seq<T>)coll;
+        if (coll instanceof Seq<T>) {
+            return (Seq<T>) coll;
         }
         return Seq.sequence(coll.iterator());
     }
 
     static <T> Seq<T> sequence(Stream<T> coll) {
-        if(coll == null) {
+        if (coll == null) {
             return Nil.of();
         }
         return Seq.sequence(coll.iterator());
     }
 
     static <T> Seq<T> sequence(Iterator<T> coll) {
-        if(coll == null) {
+        if (coll == null) {
             return Nil.of();
         }
         return coll.hasNext() ? Cons.of(coll.next(), () -> Seq.sequence(coll)) : Seq.of();
@@ -163,6 +163,8 @@ public interface Seq<T> extends List<T> {
     Optional<T> findFirst(Predicate<? super T> pred);
 
     <K, V> Map<K, V> toMap(Function<T, K> k, Function<T, V> v);
+
+    <K, V> Map<K, V> toMap(Function<T, K> k, Function<T, V> v, BinaryOperator<V> m);
 
     <K, V> Map<K, V> toMap();
 
@@ -359,6 +361,11 @@ public interface Seq<T> extends List<T> {
 
         @Override
         public <K, V> Map<K, V> toMap(Function<T, K> k, Function<T, V> v) {
+            return Map.of();
+        }
+
+        @Override
+        public <K, V> Map<K, V> toMap(Function<T, K> k, Function<T, V> v, BinaryOperator<V> m) {
             return Map.of();
         }
 
@@ -653,9 +660,22 @@ public interface Seq<T> extends List<T> {
         }
 
         @Override
+        public <K, V> Map<K, V> toMap(Function<T, K> k, Function<T, V> v, BinaryOperator<V> m) {
+            var entries = this
+                    .map(x -> Map.entry(k.apply(x), v.apply(x)))
+                    .reduce(
+                            Seq.<Map.Entry<K, V>>of(),
+                            (acc, x) -> acc
+                                    .filter(y -> !x.getKey().equals(y.getKey()))
+                                    .cons(acc.findFirst(y -> y.getKey().equals(x.getKey())).map(y -> Map.entry(x.getKey(), m.apply(y.getValue(), x.getValue()))).orElse(x)));
+
+            return Map.ofEntries(entries.toArray(new Map.Entry[0]));
+        }
+
+        @Override
         public <K, V> Map<K, V> toMap() {
-            if(first instanceof Map.Entry<?,?>) {
-                return Map.ofEntries(this.toArray(new Map.Entry[0]));
+            if (first instanceof Map.Entry<?, ?>) {
+                return toMap(k -> ((Map.Entry<K, V>) k).getKey(), v -> ((Map.Entry<K, V>) v).getValue(), (a, b) -> b);
             }
             throw new UnsupportedOperationException("Seq is not of type Map.Entry. Provide key- and value-mappers.");
         }
@@ -697,7 +717,7 @@ public interface Seq<T> extends List<T> {
                 public T next() {
                     var next = source.first();
                     source = source.rest();
-                    if(next == null) {
+                    if (next == null) {
                         throw new NoSuchElementException();
                     }
                     return next;
@@ -727,7 +747,7 @@ public interface Seq<T> extends List<T> {
 
         @Override
         public List<T> subList(int fromIndex, int toIndex) {
-            return drop(fromIndex).take((long)toIndex - fromIndex);
+            return drop(fromIndex).take((long) toIndex - fromIndex);
         }
 
         @Override
@@ -763,7 +783,7 @@ public interface Seq<T> extends List<T> {
         }
 
         private static <T> List<T> pad(List<T> partition, Iterable<T> pad, int n) {
-            return concat(partition, () -> Seq.sequence(pad).take(n - (long)partition.size())).toList();
+            return concat(partition, () -> Seq.sequence(pad).take(n - (long) partition.size())).toList();
         }
 
         private static <T> Seq<T> distinct(Seq<T> seq, Set<T> exclude) {

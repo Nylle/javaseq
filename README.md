@@ -201,10 +201,13 @@ _(This is similar to zipping three collections.)_
 - Returns an empty Optional if pred(item) returns false for all items in this Seq. **Caution:** The Seq will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
 
 #### toMap()
-- Returns a new Map with the keys and values of the items in this Seq<Map.Entry>. If the Seq is of any other type, an exception is thrown. **Caution:** The Seq will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
+- Returns a new Map with the keys and values of the items in this Seq<Map.Entry>. Keeps last value on key-collision. If the Seq is of any other type, an exception is thrown. **Caution:** The Seq will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
 
 #### toMap(k, v)
-- Returns a new Map with keys as a result of k(item) and values as a result of v(item) of all items in this Seq. **Caution:** The Seq will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
+- Returns a new Map with keys as a result of k(x) and values as a result of v(x) of all xs in this Seq. Throws on key-collision. **Caution:** The Seq will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
+
+#### toMap(k, v, m)
+- Returns a new Map with keys as a result of k(x) and values as a result of v(x) of all xs in this Seq, using m(v(x1), v(x2)) to resolve key-collision. **Caution:** The Seq will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.
 
 #### toList()
 - Returns a List with all items in this Seq. **Caution:** The Seq will be fully realised. If this Seq is infinite, it will run infinitely or until system resources are exhausted.

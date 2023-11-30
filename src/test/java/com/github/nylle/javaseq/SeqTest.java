@@ -314,6 +314,7 @@ class SeqTest {
         void toMapReturnsEmptyMap() {
             assertThat(Seq.Nil.of().toMap()).isEmpty();
             assertThat(Seq.Nil.of().toMap(k -> k, v -> v)).isEmpty();
+            assertThat(Seq.Nil.of().toMap(k -> k, v -> v, (a, b) -> a)).isEmpty();
         }
 
         @Test
@@ -1470,6 +1471,17 @@ class SeqTest {
             }
 
             @Test
+            void returnsMapForSeqOfEntriesWithLastValueWinningOnCollision() {
+                var sut = Seq.of("a", "aa", "b", "bb").map(x -> java.util.Map.entry(x.length(), x));
+
+                var actual = sut.toMap();
+
+                assertThat(actual).hasSize(2)
+                        .containsEntry(1, "b")
+                        .containsEntry(2, "bb");
+            }
+
+            @Test
             void throwsIfSeqIsNotOfTypeEntry() {
                 var sut = Seq.iterate("x", x -> x + "x").take(3);
 
@@ -1488,6 +1500,26 @@ class SeqTest {
                         .containsEntry(1, "x")
                         .containsEntry(2, "xx")
                         .containsEntry(3, "xxx");
+            }
+
+            @Test
+            void throwsOnCollision() {
+                var sut = Seq.of("a", "b");
+
+                assertThatExceptionOfType(IllegalArgumentException.class)
+                        .isThrownBy(() -> sut.toMap(k -> k.length(), v -> v))
+                        .withMessage("duplicate key: 1");
+            }
+
+            @Test
+            void returnsMapBasedOnKeyAndValueMapperWithApplyingMergerOnCollision() {
+                var sut = Seq.of("a", "b", "aa", "bb");
+
+                var actual = sut.toMap(k -> k.length(), v -> v, (a, b) -> b);
+
+                assertThat(actual).hasSize(2)
+                        .containsEntry(1, "b")
+                        .containsEntry(2, "bb");
             }
         }
 
