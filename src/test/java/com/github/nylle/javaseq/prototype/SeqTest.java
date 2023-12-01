@@ -1,4 +1,4 @@
-package com.github.nylle.javaseq;
+package com.github.nylle.javaseq.prototype;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

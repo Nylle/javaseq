@@ -1,4 +1,4 @@
-package com.github.nylle.javaseq;
+package com.github.nylle.javaseq.prototype;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
@@ -96,6 +96,8 @@ public interface Seq<T> extends List<T> {
 
     Seq<T> rest();
 
+    boolean isRealized();
+
     Seq<T> take(long n);
 
     Seq<T> drop(long n);
@@ -146,8 +148,6 @@ public interface Seq<T> extends List<T> {
 
     boolean notAny(Predicate<? super T> pred);
 
-    boolean isRealized();
-
     Optional<T> max(Comparator<? super T> comp);
 
     Optional<T> min(Comparator<? super T> comp);
@@ -190,8 +190,8 @@ public interface Seq<T> extends List<T> {
         }
 
         @Override
-        public T get(int index) {
-            return null;
+        public boolean isRealized() {
+            return true;
         }
 
         @Override
@@ -320,11 +320,6 @@ public interface Seq<T> extends List<T> {
         }
 
         @Override
-        public boolean isRealized() {
-            return true;
-        }
-
-        @Override
         public Optional<T> max(Comparator<? super T> comp) {
             return Optional.empty();
         }
@@ -375,12 +370,17 @@ public interface Seq<T> extends List<T> {
         }
 
         @Override
-        public List<T> subList(int fromIndex, int toIndex) {
+        public List<T> toList() {
             return List.of();
         }
 
         @Override
-        public List<T> toList() {
+        public T get(int index) {
+            return null;
+        }
+
+        @Override
+        public List<T> subList(int fromIndex, int toIndex) {
             return List.of();
         }
 
@@ -443,18 +443,8 @@ public interface Seq<T> extends List<T> {
         }
 
         @Override
-        public T get(int index) {
-            if (index < 0) {
-                return null;
-            }
-            Seq<T> current = this;
-            for (int i = index; i > 0; --i) {
-                if (current.rest().isEmpty()) {
-                    return null;
-                }
-                current = current.rest();
-            }
-            return current.first();
+        public boolean isRealized() {
+            return rest != null;
         }
 
         @Override
@@ -605,11 +595,6 @@ public interface Seq<T> extends List<T> {
         }
 
         @Override
-        public boolean isRealized() {
-            return rest != null;
-        }
-
-        @Override
         public Optional<T> max(Comparator<? super T> comp) {
             if (rest().isEmpty()) {
                 return Optional.of(first());
@@ -690,6 +675,21 @@ public interface Seq<T> extends List<T> {
         public List<T> toList() {
             rest().toList();
             return List.copyOf(this);
+        }
+
+        @Override
+        public T get(int index) {
+            if (index < 0) {
+                return null;
+            }
+            Seq<T> current = this;
+            for (int i = index; i > 0; --i) {
+                if (current.rest().isEmpty()) {
+                    return null;
+                }
+                current = current.rest();
+            }
+            return current.first();
         }
 
         @Override
