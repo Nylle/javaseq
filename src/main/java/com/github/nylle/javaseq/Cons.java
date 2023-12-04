@@ -9,7 +9,7 @@ class Cons<T> extends ASeq<T> implements ISeq<T> {
 	private final T first;
 	private final ISeq<T> rest;
 
-	public Cons(T first, ISeq<T> rest) {
+	Cons(T first, ISeq<T> rest) {
 		this.first = first;
 		this.rest = rest;
 	}

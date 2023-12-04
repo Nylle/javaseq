@@ -173,6 +173,13 @@ class ConsTest {
     class Mapcat {
 
         @Test
+        void returnsFlattenedMapResult() {
+            var sut = ISeq.cons(0, ISeq.cons(1, ISeq.cons(2, ISeq.of())));
+
+            assertThat(sut.mapcat(x -> List.of(x, x))).containsExactly(0, 0, 1, 1, 2, 2);
+        }
+
+        @Test
         void returnsFlattenedSeq() {
             var sut = ISeq.of(
                     ISeq.cons(0, ISeq.cons(1, ISeq.cons(2, ISeq.of()))),

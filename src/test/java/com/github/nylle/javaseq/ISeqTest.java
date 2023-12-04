@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -125,11 +126,30 @@ class ISeqTest {
         }
 
         @Test
+        void returnsSeqOfCharactersInString() {
+            var actual = ISeq.sequence("foo");
+
+            assertThat(actual)
+                    .isInstanceOf(StringSeq.class)
+                    .containsExactly('f', 'o', 'o');
+        }
+
+        @Test
         void returnsEmptySeqIfCollIsNull() {
             assertThat(ISeq.sequence((Iterable<Integer>) null)).isInstanceOf(Nil.class).isEmpty();
             assertThat(ISeq.sequence((Stream<Integer>) null)).isInstanceOf(Nil.class).isEmpty();
             assertThat(ISeq.sequence((Iterator<Integer>) null)).isInstanceOf(Nil.class).isEmpty();
             assertThat(ISeq.sequence((Map<String, Integer>) null)).isInstanceOf(Nil.class).isEmpty();
+            assertThat(ISeq.sequence((String) null)).isInstanceOf(Nil.class).isEmpty();
+        }
+
+        @Test
+        void returnsEmptySeqIfCollIsEmpty() {
+            assertThat(ISeq.sequence(List.<Integer>of())).isInstanceOf(Nil.class).isEmpty();
+            assertThat(ISeq.sequence(Stream.<Integer>of())).isInstanceOf(Nil.class).isEmpty();
+            assertThat(ISeq.sequence(Collections.<Integer>emptyIterator())).isInstanceOf(Nil.class).isEmpty();
+            assertThat(ISeq.sequence(Map.<String, Integer>of())).isInstanceOf(Nil.class).isEmpty();
+            assertThat(ISeq.sequence("")).isInstanceOf(Nil.class).isEmpty();
         }
 
         @Test

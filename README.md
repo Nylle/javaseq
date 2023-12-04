@@ -58,7 +58,7 @@ While Streams help to work with lazy collections by providing the aforementioned
 - Returns a lazy seq of x and supplier f.
 
 #### ISeq.sequence(coll)
-- Coerces coll to a (possibly empty) seq, if it is not already one. Will not force a lazy Stream or Iterator. If coll is a Map<K, V> the returned seq will contain items of type Map.Entry<K, V> (see [toMap](#tomap)). Yields empty seq if coll is null.
+- Coerces coll to a (possibly empty) seq, if it is not already one. Will not force a lazy Stream or Iterator. If coll is a String, the returned seq will contain items of type Character. If coll is a Map<K, V> the returned seq will contain items of type Map.Entry<K, V> (see [toMap](#tomap)). Yields empty seq if coll is null or empty.
 
 #### ISeq.concat(colls...)
 - Returns a seq representing the concatenation of the items in the supplied colls.

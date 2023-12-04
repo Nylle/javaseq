@@ -61,6 +61,13 @@ public interface ISeq<T> extends List<T> {
         return coll == null ? ISeq.of() : ISeq.sequence(coll.entrySet().iterator());
     }
 
+    static ISeq<Character> sequence(CharSequence coll) {
+        if(coll == null || coll.isEmpty()) {
+            return ISeq.of();
+        }
+        return new StringSeq(coll, 0);
+    }
+
     static <T> ISeq<T> iterate(T x, Function<T, T> f) {
         return ISeq.lazySeq(x, () -> iterate(f.apply(x), f));
     }
