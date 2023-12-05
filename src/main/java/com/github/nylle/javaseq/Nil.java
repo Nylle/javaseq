@@ -64,6 +64,11 @@ class Nil<T> extends ASeq<T> implements ISeq<T> {
 	}
 
 	@Override
+	public <S, R> ISeq<R> mapcat(Iterable<? extends S> coll, BiFunction<? super T, ? super S, Iterable<? extends R>> f) {
+		return empty();
+	}
+
+	@Override
 	public Optional<T> min(Comparator<? super T> comp) {
 		return Optional.empty();
 	}
@@ -94,7 +99,7 @@ class Nil<T> extends ASeq<T> implements ISeq<T> {
 	}
 
 	@Override
-	public <S, R> ISeq<R> map(ISeq<? extends S> other, BiFunction<? super T, ? super S, ? extends R> f) {
+	public <S, R> ISeq<R> map(Iterable<? extends S> other, BiFunction<? super T, ? super S, ? extends R> f) {
 		return empty();
 	}
 

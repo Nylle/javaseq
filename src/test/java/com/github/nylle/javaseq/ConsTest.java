@@ -145,7 +145,7 @@ class ConsTest {
         }
 
         @Nested
-        class WithOtherSeq {
+        class WithOtherColl {
 
             @Test
             void returnsEmptySeqWhenProvidingEmptyOther() {
@@ -193,6 +193,33 @@ class ConsTest {
             var sut = ISeq.of(0, 1, 2, 3);
 
             assertThat(sut.mapcat(x -> x == 0 ? List.of() : List.of(x, x))).containsExactly(1, 1, 2, 2, 3, 3);
+        }
+
+        @Nested
+        class WithOtherColl {
+
+            @Test
+            void returnsEmptySeqWhenProvidingEmptyOther() {
+                assertThat(ISeq.of(1, 2, 3).mapcat(List.<Integer>of(), (a, b) -> List.of(a + b, a + b))).isEmpty();
+            }
+
+            @Test
+            void returnsANewSeqWithTheItemsOfBothInitialSeqsAreCombinedUsingF() {
+                var sut = ISeq.of(1, 2, 3);
+
+                assertThat(sut.mapcat(List.of("a", "b", "c"), (a, b) -> List.of(a + b, a + b)))
+                        .containsExactly("1a", "1a", "2b", "2b", "3c", "3c");
+            }
+
+            @Test
+            void ignoresRemainingItemsIfOneOfTheSeqsIsExhausted() {
+                var sut = ISeq.of(1, 2, 3);
+
+                assertThat(sut.mapcat(List.of("a", "b"), (a, b) -> List.of(a + b, a + b)))
+                        .containsExactly("1a", "1a", "2b", "2b");
+                assertThat(sut.mapcat(List.of("a", "b", "c", "d"), (a, b) -> List.of(a + b, a + b)))
+                        .containsExactly("1a", "1a", "2b", "2b", "3c", "3c");
+            }
         }
     }
 

@@ -1,7 +1,7 @@
 package com.github.nylle.javaseq;
 
-import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -53,9 +53,15 @@ class LazySeq<T> extends ASeq<T> implements ISeq<T> {
 
 	@Override
 	public <R> ISeq<R> mapcat(Function<? super T, ? extends Iterable<? extends R>> f) {
-		var result = new ArrayList<R>();
-		f.apply(first).forEach(x -> result.add(x));
-		return concat(result.iterator(), () -> rest().mapcat(f));
+		return concat(ASeq.<R>copy(f.apply(first)).iterator(), () -> rest().mapcat(f));
+	}
+
+	@Override
+	public <S, R> ISeq<R> mapcat(Iterable<? extends S> coll, BiFunction<? super T, ? super S, Iterable<? extends R>> f) {
+		var other = ISeq.sequence(coll);
+		return other.isEmpty()
+				? ISeq.of()
+				: concat(ASeq.<R>copy(f.apply(first(), other.first())).iterator(), () -> rest().mapcat(other.rest(), f));
 	}
 
 	@Override

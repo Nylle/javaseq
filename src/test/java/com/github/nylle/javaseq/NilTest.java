@@ -115,15 +115,25 @@ public class NilTest {
         }
 
         @Test
-        void returnsNilWhenMappingWithOtherSeq() {
+        void returnsNilWhenMappingWithOtherColl() {
             assertThat(Nil.<Integer>empty().map(Nil.<Integer>empty(), (a, b) -> a + b)).isEqualTo(Nil.empty());
-            assertThat(Nil.<Integer>empty().map(ISeq.of(1, 2), (a, b) -> a + b)).isEqualTo(Nil.empty());
+            assertThat(Nil.<Integer>empty().map(List.of(1, 2), (a, b) -> a + b)).isEqualTo(Nil.empty());
         }
     }
 
-    @Test
-    void mapcatReturnsNil() {
-        assertThat(Nil.<Integer>empty().mapcat(x -> List.of(x, x))).isEqualTo(Nil.empty());
+    @Nested
+    class MapCat {
+
+        @Test
+        void returnsNil() {
+            assertThat(Nil.<Integer>empty().mapcat(x -> List.of(x, x))).isEqualTo(Nil.empty());
+        }
+
+        @Test
+        void returnsNilWhenMappingWithOtherColl() {
+            assertThat(Nil.<Integer>empty().mapcat(Nil.<Integer>empty(), (a, b) -> List.of(a, b))).isEqualTo(Nil.empty());
+            assertThat(Nil.<Integer>empty().mapcat(List.of(1, 2), (a, b) -> List.of(a, b))).isEqualTo(Nil.empty());
+        }
     }
 
     @Test

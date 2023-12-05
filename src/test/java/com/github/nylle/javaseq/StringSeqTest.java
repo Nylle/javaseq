@@ -76,11 +76,11 @@ class StringSeqTest {
         }
 
         @Nested
-        class WithOtherSeq {
+        class WithOtherColl {
 
             @Test
             void returnsEmptySeqWhenProvidingEmptyOther() {
-                assertThat(ISeq.sequence("foo").map(ISeq.<Integer>of(), (a, b) -> a + b)).isEmpty();
+                assertThat(ISeq.sequence("foo").map(List.<Integer>of(), (a, b) -> a + b)).isEmpty();
             }
 
             @Test
@@ -88,7 +88,7 @@ class StringSeqTest {
                 var sut = ISeq.sequence("123");
 
                 assertThat(sut.map(ISeq.sequence("abc"), (a, b) -> "" + a + b)).containsExactly("1a", "2b", "3c");
-                assertThat(sut.map(ISeq.of("a", "b", "c"), (a, b) -> a + b)).containsExactly("1a", "2b", "3c");
+                assertThat(sut.map(List.of("a", "b", "c"), (a, b) -> a + b)).containsExactly("1a", "2b", "3c");
             }
 
             @Test
@@ -98,8 +98,8 @@ class StringSeqTest {
                 assertThat(sut.map(ISeq.sequence("ab"), (a, b) -> "" + a + b)).containsExactly("1a", "2b");
                 assertThat(sut.map(ISeq.sequence("abcd"), (a, b) -> "" + a + b)).containsExactly("1a", "2b", "3c");
 
-                assertThat(sut.map(ISeq.of("a", "b"), (a, b) -> a + b)).containsExactly("1a", "2b");
-                assertThat(sut.map(ISeq.of("a", "b", "c", "d"), (a, b) -> a + b)).containsExactly("1a", "2b", "3c");
+                assertThat(sut.map(List.of("a", "b"), (a, b) -> a + b)).containsExactly("1a", "2b");
+                assertThat(sut.map(List.of("a", "b", "c", "d"), (a, b) -> a + b)).containsExactly("1a", "2b", "3c");
             }
         }
     }
@@ -126,6 +126,40 @@ class StringSeqTest {
             var sut = ISeq.sequence("foo");
 
             assertThat(sut.mapcat(x -> x == 'f' ? List.of() : List.of(x, x))).containsExactly('o', 'o', 'o', 'o');
+        }
+
+        @Nested
+        class WithOtherColl {
+
+            @Test
+            void returnsEmptySeqWhenProvidingEmptyOther() {
+                assertThat(ISeq.sequence("foo").mapcat(List.<Integer>of(), (a, b) -> List.of(a, b))).isEmpty();
+            }
+
+            @Test
+            void returnsANewSeqWithTheItemsOfBothInitialCollsAreCombinedUsingF() {
+                var sut = ISeq.sequence("123");
+
+                assertThat(sut.mapcat(ISeq.sequence("abc"), (a, b) -> List.of("" + a + b, "" + a + b)))
+                        .containsExactly("1a", "1a", "2b", "2b", "3c", "3c");
+                assertThat(sut.mapcat(List.of("a", "b", "c"), (a, b) -> List.of(a + b, a + b)))
+                        .containsExactly("1a", "1a", "2b", "2b", "3c", "3c");
+            }
+
+            @Test
+            void ignoresRemainingItemsIfOneOfTheSeqsIsExhausted() {
+                var sut = ISeq.sequence("123");
+
+                assertThat(sut.mapcat(ISeq.sequence("ab"), (a, b) -> List.of("" + a + b, "" + a + b)))
+                        .containsExactly("1a", "1a", "2b", "2b");
+                assertThat(sut.mapcat(ISeq.sequence("abcd"), (a, b) -> List.of("" + a + b, "" + a + b)))
+                        .containsExactly("1a", "1a", "2b", "2b", "3c", "3c");
+
+                assertThat(sut.mapcat(List.of("a", "b"), (a, b) -> List.of(a + b, a + b)))
+                        .containsExactly("1a", "1a", "2b", "2b");
+                assertThat(sut.mapcat(List.of("a", "b", "c", "d"), (a, b) -> List.of(a + b, a + b)))
+                        .containsExactly("1a", "1a", "2b", "2b", "3c", "3c");
+            }
         }
     }
 

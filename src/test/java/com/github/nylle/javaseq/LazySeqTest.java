@@ -280,6 +280,42 @@ class LazySeqTest {
 
             assertThat(sut.mapcat(x -> x == 0 ? List.of() : List.of(x, x)).take(6)).containsExactly(1, 1, 2, 2, 3, 3);
         }
+
+        @Nested
+        class WithOtherColl {
+
+            @Test
+            void returnsEmptySeqWhenProvidingEmptyOther() {
+                assertThat(ISeq.range(1, 4).mapcat(List.<Integer>of(), (a, b) -> List.of(a + b, a + b))).isEmpty();
+            }
+
+            @Test
+            void returnsANewSeqWithTheItemsOfBothInitialSeqsAreCombinedUsingF() {
+                var sut = ISeq.range(1, 4);
+
+                assertThat(sut.mapcat(List.of("a", "b", "c"), (a, b) -> List.of(a + b, a + b)))
+                        .containsExactly("1a", "1a", "2b", "2b", "3c", "3c");
+            }
+
+            @Test
+            void ignoresRemainingItemsIfOneOfTheSeqsIsExhausted() {
+                var sut = ISeq.range(1, 4);
+
+                assertThat(sut.mapcat(List.of("a", "b"), (a, b) -> List.of(a + b, a + b)))
+                        .containsExactly("1a", "1a", "2b", "2b");
+                assertThat(sut.mapcat(List.of("a", "b", "c", "d"), (a, b) -> List.of(a + b, a + b)))
+                        .containsExactly("1a", "1a", "2b", "2b", "3c", "3c");
+            }
+
+            @Test
+            void isLazy() {
+                var sut = ISeq.iterate(0, x -> x + 1);
+                var other = ISeq.iterate(0, x -> x + 1);
+
+                assertThat(sut.mapcat(other, (a, b) -> List.of(a + b, a + b)).take(8))
+                        .containsExactly(0, 0, 2, 2, 4, 4, 6, 6);
+            }
+        }
     }
 
     @Nested

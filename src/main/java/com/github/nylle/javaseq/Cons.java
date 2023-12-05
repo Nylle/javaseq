@@ -1,6 +1,6 @@
 package com.github.nylle.javaseq;
 
-import java.util.ArrayList;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -45,9 +45,15 @@ class Cons<T> extends ASeq<T> implements ISeq<T> {
 
 	@Override
 	public <R> ISeq<R> mapcat(Function<? super T, ? extends Iterable<? extends R>> f) {
-		var result = new ArrayList<R>();
-		f.apply(first).forEach(x -> result.add(x));
-		return ISeq.concat(result, rest.mapcat(f));
+		return ISeq.concat(copy(f.apply(first)), rest.mapcat(f));
+	}
+
+	@Override
+	public <S, R> ISeq<R> mapcat(Iterable<? extends S> coll, BiFunction<? super T, ? super S, Iterable<? extends R>> f) {
+		var other = ISeq.sequence(coll);
+		return other.isEmpty()
+				? ISeq.of()
+				: ISeq.concat(copy(f.apply(first(), other.first())), rest.mapcat(other.rest(), f));
 	}
 
 	@Override

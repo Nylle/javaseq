@@ -35,12 +35,11 @@ public abstract class ASeq<T> extends AbstractList<T> implements ISeq<T> {
         return n > 0 ? rest().drop(n - 1) : this;
     }
 
-    public <S, R> ISeq<R> map(ISeq<? extends S> other, BiFunction<? super T, ? super S, ? extends R> f) {
-        if (other.isEmpty()) {
-            return ISeq.of();
-        } else {
-            return ISeq.lazySeq(f.apply(first(), other.first()), () -> rest().map(other.rest(), f));
-        }
+    public <S, R> ISeq<R> map(Iterable<? extends S> coll, BiFunction<? super T, ? super S, ? extends R> f) {
+        var other = ISeq.sequence(coll);
+        return other.isEmpty()
+                ? ISeq.of()
+                : ISeq.lazySeq(f.apply(first(), other.first()), () -> rest().map(other.rest(), f));
     }
 
     public ISeq<T> takeWhile(Predicate<? super T> pred) {
@@ -249,6 +248,12 @@ public abstract class ASeq<T> extends AbstractList<T> implements ISeq<T> {
         var next = result.first();
         exclude.add(next);
         return ISeq.lazySeq(next, () -> distinct(result.rest(), exclude));
+    }
+
+    protected static <R> ArrayList<R> copy(Iterable<? extends R> res) {
+        var result = new ArrayList<R>();
+        res.forEach(x -> result.add(x));
+        return result;
     }
 
     // Iterable
