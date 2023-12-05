@@ -254,7 +254,7 @@ _(This is similar to zipping two collections.)_
 
 ### Lombok Extensions
 
-If you're using [Lombok](https://projectlombok.org/) you can add `@ExtensionMethods({Seq.Extensions.class})` to your class in order to access the extension methods below.
+If you're using [Lombok](https://projectlombok.org/) you can add `@ExtensionMethods({SeqExtensions.class})` to your class in order to access the extension methods below.
 
 #### Iterable::toSeq()
 - Returns a seq of the items in extended Iterable.
