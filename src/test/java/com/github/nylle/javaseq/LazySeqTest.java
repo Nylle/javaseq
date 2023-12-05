@@ -19,14 +19,14 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 class LazySeqTest {
 
     @Test
-    void firstReturnsHead() {
+    void firstReturnsFirstItem() {
         var sut = ISeq.iterate(0, x -> x + 1);
 
         assertThat(sut.first()).isEqualTo(0);
     }
 
     @Test
-    void restReturnsTail() {
+    void restReturnsSeqWithItemsExceptFirst() {
         var sut = ISeq.iterate(0, x -> x + 1);
 
         var rest = sut.rest();
@@ -1021,7 +1021,7 @@ class LazySeqTest {
     }
 
     @Test
-    void forceRealizedThisSeqAndReturnsIt() {
+    void realizeRealizesThisSeqAndReturnsIt() {
         var sut = ISeq.range(4);
         assertThat(sut.isRealized()).isFalse();
 

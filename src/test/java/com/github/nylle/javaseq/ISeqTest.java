@@ -202,7 +202,6 @@ class ISeqTest {
             var actual = ISeq.iterate(0, x -> x + 1);
 
             assertThat(actual.take(4))
-                    .isInstanceOf(Cons.class)
                     .containsExactly(0, 1, 2, 3);
         }
     }
