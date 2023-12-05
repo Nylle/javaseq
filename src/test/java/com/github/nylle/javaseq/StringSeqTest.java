@@ -8,6 +8,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -80,7 +81,12 @@ class StringSeqTest {
 
             @Test
             void returnsEmptySeqWhenProvidingEmptyOther() {
+                assertThat(ISeq.sequence("foo").map(ISeq.sequence(""), (a, b) -> a + b)).isEmpty();
+                assertThat(ISeq.sequence("foo").map(ISeq.sequence("").iterator(), (a, b) -> a + b)).isEmpty();
                 assertThat(ISeq.sequence("foo").map(List.<Integer>of(), (a, b) -> a + b)).isEmpty();
+                assertThat(ISeq.sequence("foo").map(Stream.<Integer>of(), (a, b) -> a + b)).isEmpty();
+                assertThat(ISeq.sequence("foo").map(new Integer[0], (a, b) -> a + b)).isEmpty();
+                assertThat(ISeq.sequence("foo").map("", (a, b) -> "" + a + b)).isEmpty();
             }
 
             @Test
@@ -88,7 +94,11 @@ class StringSeqTest {
                 var sut = ISeq.sequence("123");
 
                 assertThat(sut.map(ISeq.sequence("abc"), (a, b) -> "" + a + b)).containsExactly("1a", "2b", "3c");
+                assertThat(sut.map(ISeq.sequence("abc").iterator(), (a, b) -> "" + a + b)).containsExactly("1a", "2b", "3c");
                 assertThat(sut.map(List.of("a", "b", "c"), (a, b) -> a + b)).containsExactly("1a", "2b", "3c");
+                assertThat(sut.map(Stream.of("a", "b", "c"), (a, b) -> a + b)).containsExactly("1a", "2b", "3c");
+                assertThat(sut.map(new String[]{"a", "b", "c"}, (a, b) -> a + b)).containsExactly("1a", "2b", "3c");
+                assertThat(sut.map("abc", (a, b) -> "" + a + b)).containsExactly("1a", "2b", "3c");
             }
 
             @Test
@@ -98,8 +108,20 @@ class StringSeqTest {
                 assertThat(sut.map(ISeq.sequence("ab"), (a, b) -> "" + a + b)).containsExactly("1a", "2b");
                 assertThat(sut.map(ISeq.sequence("abcd"), (a, b) -> "" + a + b)).containsExactly("1a", "2b", "3c");
 
+                assertThat(sut.map(ISeq.sequence("ab").iterator(), (a, b) -> "" + a + b)).containsExactly("1a", "2b");
+                assertThat(sut.map(ISeq.sequence("abcd").iterator(), (a, b) -> "" + a + b)).containsExactly("1a", "2b", "3c");
+
                 assertThat(sut.map(List.of("a", "b"), (a, b) -> a + b)).containsExactly("1a", "2b");
                 assertThat(sut.map(List.of("a", "b", "c", "d"), (a, b) -> a + b)).containsExactly("1a", "2b", "3c");
+
+                assertThat(sut.map(Stream.of("a", "b"), (a, b) -> a + b)).containsExactly("1a", "2b");
+                assertThat(sut.map(Stream.of("a", "b", "c", "d"), (a, b) -> a + b)).containsExactly("1a", "2b", "3c");
+
+                assertThat(sut.map(new String[]{"a", "b"}, (a, b) -> a + b)).containsExactly("1a", "2b");
+                assertThat(sut.map(new String[]{"a", "b", "c", "d"}, (a, b) -> a + b)).containsExactly("1a", "2b", "3c");
+
+                assertThat(sut.map("ab", (a, b) -> "" + a + b)).containsExactly("1a", "2b");
+                assertThat(sut.map("abcd", (a, b) -> "" + a + b)).containsExactly("1a", "2b", "3c");
             }
         }
     }

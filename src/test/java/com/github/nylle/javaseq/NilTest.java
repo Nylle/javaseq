@@ -7,6 +7,7 @@ import org.mockito.Mockito;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -117,7 +118,12 @@ public class NilTest {
         @Test
         void returnsNilWhenMappingWithOtherColl() {
             assertThat(Nil.<Integer>empty().map(Nil.<Integer>empty(), (a, b) -> a + b)).isEqualTo(Nil.empty());
+            assertThat(Nil.<Integer>empty().map(ISeq.of(1, 2), (a, b) -> a + b)).isEqualTo(Nil.empty());
+            assertThat(Nil.<Integer>empty().map(Stream.of(1, 2), (a, b) -> a + b)).isEqualTo(Nil.empty());
+            assertThat(Nil.<Integer>empty().map(ISeq.of(1, 2).iterator(), (a, b) -> a + b)).isEqualTo(Nil.empty());
             assertThat(Nil.<Integer>empty().map(List.of(1, 2), (a, b) -> a + b)).isEqualTo(Nil.empty());
+            assertThat(Nil.<Integer>empty().map(new Integer[]{1, 2}, (a, b) -> a + b)).isEqualTo(Nil.empty());
+            assertThat(Nil.<Integer>empty().map("", (a, b) -> a + b)).isEqualTo(Nil.empty());
         }
     }
 
