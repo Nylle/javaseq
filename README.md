@@ -269,4 +269,7 @@ If you're using [Lombok](https://projectlombok.org/) you can add `@ExtensionMeth
 - Returns a seq of the items in extended Stream.
 
 #### Map::toSeq()
-- Returns a seq<Map.Entry> of the items in extended Map.
+- Returns a seq of the key-value-pairs in extended Map.
+
+#### String::toSeq()
+- Returns a seq of the characters in extended String.
