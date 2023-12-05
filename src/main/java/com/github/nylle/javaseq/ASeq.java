@@ -21,18 +21,6 @@ import java.util.stream.StreamSupport;
 
 public abstract class ASeq<T> extends AbstractList<T> implements ISeq<T> {
 
-    public abstract T first();
-
-    public abstract ISeq<T> rest();
-
-    public abstract boolean isRealized();
-
-    public abstract ISeq<T> filter(Predicate<? super T> pred);
-
-    public abstract <R> ISeq<R> map(Function<? super T, ? extends R> f);
-
-    public abstract <R> ISeq<R> mapcat(Function<? super T, ? extends Iterable<? extends R>> f);
-
     public ISeq<T> take(long n) {
         if(n <= 0) {
             return ISeq.of();
@@ -40,7 +28,7 @@ public abstract class ASeq<T> extends AbstractList<T> implements ISeq<T> {
         if (n == 1) {
             return ISeq.of(first());
         }
-        return ISeq.cons(first(), rest().take(n - 1));
+        return rest().take(n - 1).cons(first());
     }
 
     public ISeq<T> drop(long n) {
