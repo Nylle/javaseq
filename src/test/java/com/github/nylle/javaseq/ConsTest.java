@@ -19,14 +19,14 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 class ConsTest {
 
     @Test
-    void firstReturnsHead() {
+    void firstReturnsFirstItem() {
         var sut = ISeq.cons(0, ISeq.cons(1, ISeq.cons(2, ISeq.cons(3, ISeq.of()))));
 
         assertThat(sut.first()).isEqualTo(0);
     }
 
     @Test
-    void restReturnsTail() {
+    void restReturnsSeqWithItemsExceptFirst() {
         var sut = ISeq.cons(0, ISeq.cons(1, ISeq.cons(2, ISeq.cons(3, ISeq.of()))));
 
         var rest = sut.rest();

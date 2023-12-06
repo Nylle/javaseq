@@ -1,5 +1,6 @@
 package com.github.nylle.javaseq;
 
+import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -67,5 +68,25 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
     @Override
     public boolean isEmpty() {
         return false;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        StringSeq that = (StringSeq) o;
+
+        if (i != that.i) return false;
+        return Objects.equals(s, that.s);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (s != null ? s.hashCode() : 0);
+        result = 31 * result + i;
+        return result;
     }
 }

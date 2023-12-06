@@ -137,7 +137,7 @@ public abstract class ASeq<T> extends AbstractList<T> implements ISeq<T> {
 
     public void run(Consumer<? super T> proc) {
         proc.accept(first());
-        rest().forEach(proc);
+        rest().run(proc);
     }
 
     public ISeq<T> distinct() {
