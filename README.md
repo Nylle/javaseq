@@ -103,15 +103,15 @@ While Streams help to work with lazy collections by providing the aforementioned
 #### map(f)
 - Returns a seq of the result of applying f to each item in this seq.
 
-#### map(other, f)
-- Returns a seq of the result of applying f to the set of first items in both this seq and other, followed by applying f to the set of second items in this seq and other, until any one of the seqs is exhausted. Any remaining items in either seq are ignored.
+#### map(coll, f)
+- Returns a seq of the result of applying f to the set of first items in both this seq and coll, followed by applying f to the set of second items in this seq and coll, until any one of the collections is exhausted. Any remaining items in either collection are ignored.
 _(This is similar to zipping two collections.)_
 
 #### mapcat(f)
 - Returns a seq of the result of applying concat to the result of applying map to f and the items in this seq. Function f should return a collection. _(This is similar to [Stream::flatMap](https://docs.oracle.com/javase/8/docs/api/java/util/stream/Stream.html#flatMap-java.util.function.Function-).)_
 
-#### mapcat(other, f)
-- Returns a seq of the result of applying concat to the result of applying map to f and other and the items in this seq. Function f should return a collection. 
+#### mapcat(coll, f)
+- Returns a seq of the result of applying concat to the result of applying map to f and coll and the items in this seq. Function f should return a collection. 
 
 #### takeWhile(pred)
 - Returns a seq of successive items from this seq while pred(item) returns true.
