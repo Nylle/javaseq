@@ -30,17 +30,17 @@ class Cons<T> extends ASeq<T> implements ISeq<T> {
 	}
 
 	@Override
-	public <R> ISeq<R> map(Function<? super T, ? extends R> f) {
-		return ISeq.cons(f.apply(first), rest.map(f));
-	}
-
-	@Override
 	public ISeq<T> filter(Predicate<? super T> pred) {
 		if (pred.test(first)) {
 			return ISeq.cons(first, rest.filter(pred));
 		} else {
 			return rest.filter(pred);
 		}
+	}
+
+	@Override
+	public <R> ISeq<R> map(Function<? super T, ? extends R> f) {
+		return ISeq.cons(f.apply(first), rest.map(f));
 	}
 
 	@Override
