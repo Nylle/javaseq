@@ -55,10 +55,24 @@ public abstract class ASeq<T> extends AbstractList<T> implements ISeq<T> {
         return map(ISeq.sequence(coll), f);
     }
 
-    public <S, R> ISeq<R> map(ISeq<? extends S> coll, BiFunction<? super T, ? super S, ? extends R> f) {
-        return coll.isEmpty()
-                ? ISeq.of()
-                : ISeq.lazySeq(f.apply(first(), coll.first()), () -> rest().map(coll.rest(), f));
+    public <S, R> ISeq<R> mapcat(Iterable<? extends S> coll, BiFunction<? super T, ? super S, Iterable<? extends R>> f) {
+        return mapcat(ISeq.sequence(coll), f);
+    }
+
+    public <S, R> ISeq<R> mapcat(Iterator<? extends S> coll, BiFunction<? super T, ? super S, Iterable<? extends R>> f) {
+        return mapcat(ISeq.sequence(coll), f);
+    }
+
+    public <S, R> ISeq<R> mapcat(Stream<? extends S> coll, BiFunction<? super T, ? super S, Iterable<? extends R>> f) {
+        return mapcat(ISeq.sequence(coll), f);
+    }
+
+    public <S, R> ISeq<R> mapcat(S[] coll, BiFunction<? super T, ? super S, Iterable<? extends R>> f) {
+        return mapcat(ISeq.sequence(coll), f);
+    }
+
+    public <R> ISeq<R> mapcat(CharSequence coll, BiFunction<? super T, ? super Character, Iterable<? extends R>> f) {
+        return mapcat(ISeq.sequence(coll), f);
     }
 
     public ISeq<T> takeWhile(Predicate<? super T> pred) {

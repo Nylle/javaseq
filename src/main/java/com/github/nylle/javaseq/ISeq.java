@@ -122,7 +122,17 @@ public interface ISeq<T> extends List<T> {
 
     <R> ISeq<R> mapcat(Function<? super T, ? extends Iterable<? extends R>> f);
 
+    <S, R> ISeq<R> mapcat(ISeq<? extends S> coll, BiFunction<? super T, ? super S, Iterable<? extends R>> f);
+
     <S, R> ISeq<R> mapcat(Iterable<? extends S> coll, BiFunction<? super T, ? super S, Iterable<? extends R>> f);
+
+    <S, R> ISeq<R> mapcat(Iterator<? extends S> coll, BiFunction<? super T, ? super S, Iterable<? extends R>> f);
+
+    <S, R> ISeq<R> mapcat(Stream<? extends S> coll, BiFunction<? super T, ? super S, Iterable<? extends R>> f);
+
+    <S, R> ISeq<R> mapcat(S[] coll, BiFunction<? super T, ? super S, Iterable<? extends R>> f);
+
+    <R> ISeq<R> mapcat(CharSequence coll, BiFunction<? super T, ? super Character, Iterable<? extends R>> f);
 
     ISeq<T> takeWhile(Predicate<? super T> pred);
 

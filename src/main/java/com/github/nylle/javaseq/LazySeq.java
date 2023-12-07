@@ -38,8 +38,16 @@ class LazySeq<T> extends ASeq<T> implements ISeq<T> {
 		return rest != null;
 	}
 
+	@Override
 	public <R> ISeq<R> map(Function<? super T, ? extends R> f) {
 		return ISeq.lazySeq(f.apply(first()), () -> rest().map(f));
+	}
+
+	@Override
+	public <S, R> ISeq<R> map(ISeq<? extends S> coll, BiFunction<? super T, ? super S, ? extends R> f) {
+		return coll.isEmpty()
+				? ISeq.of()
+				: ISeq.lazySeq(f.apply(first(), coll.first()), () -> rest().map(coll.rest(), f));
 	}
 
 	@Override
@@ -57,11 +65,10 @@ class LazySeq<T> extends ASeq<T> implements ISeq<T> {
 	}
 
 	@Override
-	public <S, R> ISeq<R> mapcat(Iterable<? extends S> coll, BiFunction<? super T, ? super S, Iterable<? extends R>> f) {
-		var other = ISeq.sequence(coll);
-		return other.isEmpty()
+	public <S, R> ISeq<R> mapcat(ISeq<? extends S> coll, BiFunction<? super T, ? super S, Iterable<? extends R>> f) {
+		return coll.isEmpty()
 				? ISeq.of()
-				: concat(ASeq.<R>copy(f.apply(first(), other.first())).iterator(), () -> rest().mapcat(other.rest(), f));
+				: concat(ASeq.<R>copy(f.apply(first(), coll.first())).iterator(), () -> rest().mapcat(coll.rest(), f));
 	}
 
 	@Override

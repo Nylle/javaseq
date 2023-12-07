@@ -44,16 +44,22 @@ class Cons<T> extends ASeq<T> implements ISeq<T> {
 	}
 
 	@Override
+	public <S, R> ISeq<R> map(ISeq<? extends S> coll, BiFunction<? super T, ? super S, ? extends R> f) {
+		return coll.isEmpty()
+				? ISeq.of()
+				: ISeq.cons(f.apply(first(), coll.first()), rest().map(coll.rest(), f));
+	}
+
+	@Override
 	public <R> ISeq<R> mapcat(Function<? super T, ? extends Iterable<? extends R>> f) {
 		return ISeq.concat(copy(f.apply(first)), rest.mapcat(f));
 	}
 
 	@Override
-	public <S, R> ISeq<R> mapcat(Iterable<? extends S> coll, BiFunction<? super T, ? super S, Iterable<? extends R>> f) {
-		var other = ISeq.sequence(coll);
-		return other.isEmpty()
+	public <S, R> ISeq<R> mapcat(ISeq<? extends S> coll, BiFunction<? super T, ? super S, Iterable<? extends R>> f) {
+		return coll.isEmpty()
 				? ISeq.of()
-				: ISeq.concat(copy(f.apply(first(), other.first())), rest.mapcat(other.rest(), f));
+				: ISeq.concat(copy(f.apply(first(), coll.first())), rest.mapcat(coll.rest(), f));
 	}
 
 	@Override

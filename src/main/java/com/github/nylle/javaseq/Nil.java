@@ -69,7 +69,7 @@ class Nil<T> extends ASeq<T> implements ISeq<T> {
 	}
 
 	@Override
-	public <S, R> ISeq<R> mapcat(Iterable<? extends S> coll, BiFunction<? super T, ? super S, Iterable<? extends R>> f) {
+	public <S, R> ISeq<R> mapcat(ISeq<? extends S> coll, BiFunction<? super T, ? super S, Iterable<? extends R>> f) {
 		return empty();
 	}
 
