@@ -1,5 +1,6 @@
 package com.github.nylle.javaseq;
 
+import java.util.ArrayList;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -16,6 +17,16 @@ public class ChunkedCons<T> extends ASeq<T> implements ISeq<T> {
         this.rest = rest;
     }
 
+    static <T> ISeq<T> chunked(ISeq<T> seq) {
+        if(seq.isEmpty()) {
+            return seq;
+        }
+        if (seq instanceof ChunkedCons<T> s) {
+            return s;
+        }
+        return new ChunkedCons<>(ArrayChunk.from(seq.partitionAll(CHUNK_SIZE).first()), seq.drop(CHUNK_SIZE));
+    }
+
     @Override
     public T first() {
         return chunk.nth(0);
@@ -23,7 +34,7 @@ public class ChunkedCons<T> extends ASeq<T> implements ISeq<T> {
 
     @Override
     public ISeq<T> rest() {
-        if(chunk.count() > 1) {
+        if (chunk.count() > 1) {
             return new ChunkedCons<>(chunk.dropFirst(), rest);
         }
         return rest;
@@ -36,11 +47,14 @@ public class ChunkedCons<T> extends ASeq<T> implements ISeq<T> {
 
     @Override
     public ISeq<T> filter(Predicate<? super T> pred) {
-        if (pred.test(first())) {
-            return ISeq.cons(first(), rest().filter(pred));
-        } else {
-            return rest().filter(pred);
+        var acc = new ArrayList<T>();
+        for (int i = 0; i < chunk.count(); i++) {
+            if (pred.test(chunk.nth(i))) {
+                acc.add(chunk.nth(i));
+            }
         }
+
+        return ISeq.concat(acc, chunked(rest).filter(pred));
     }
 
     @Override

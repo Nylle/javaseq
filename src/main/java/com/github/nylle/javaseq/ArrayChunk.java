@@ -14,7 +14,7 @@ public class ArrayChunk<T> implements IChunk<T> {
         this.end = end;
     }
 
-    static <T> ArrayChunk<T> fromList(List<T> list) {
+    static <T> ArrayChunk<T> from(List<T> list) {
         return new ArrayChunk<>((T[])list.toArray(new Object[0]), 0, list.size());
     }
 
