@@ -1108,7 +1108,7 @@ class LazySeqTest {
         }
 
         @Test
-        @Disabled("cannot handle large collections right now")
+        @Disabled("cannot handle large collections yet")
         void canHandleLargeCollections() {
             var sut = ISeq.iterate(0, x -> x + 1);
 

@@ -1,12 +1,17 @@
 package com.github.nylle.javaseq;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 class ChunkedConsTest {
 
@@ -214,11 +219,12 @@ class ChunkedConsTest {
             var sut = new ChunkedCons<>(ArrayChunk.from(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
 
             assertThat(sut.take(4))
-                    .isExactlyInstanceOf(Cons.class)
+                    .isExactlyInstanceOf(ChunkedCons.class)
                     .containsExactly(1, 2, 3, 4);
         }
 
         @Test
+        @Disabled("cannot handle large collections yet")
         void canHandleLargeCollection() {
 //            var sut = new ChunkedCons<>(ISeq.range(10000));
 //
@@ -226,5 +232,37 @@ class ChunkedConsTest {
 //
 //            assertThat(actual).hasSize(10000);
         }
+    }
+
+    @Test
+    void sizeReturnsSizeOfSeq() {
+        var sut = new ChunkedCons<>(ArrayChunk.from(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
+
+        assertThat(sut.size()).isEqualTo(6);
+        assertThat(sut.rest().size()).isEqualTo(5);
+    }
+
+    @Test
+    void runCallsProcForEveryItemPresent() {
+        var proc = Mockito.<Consumer<Integer>>mock();
+
+        var sut = new ChunkedCons<>(ArrayChunk.from(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
+
+        sut.run(proc);
+
+        verify(proc).accept(1);
+        verify(proc).accept(2);
+        verify(proc).accept(3);
+        verify(proc).accept(4);
+        verify(proc).accept(5);
+        verify(proc).accept(6);
+        verifyNoMoreInteractions(proc);
+    }
+
+    @Test
+    void toListReturnsAllItems() {
+        var sut = new ChunkedCons<>(ArrayChunk.from(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
+
+        assertThat(sut.toList()).containsExactly(1, 2, 3, 4, 5, 6);
     }
 }

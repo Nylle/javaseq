@@ -12,6 +12,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
 public interface ISeq<T> extends List<T> {
@@ -68,7 +69,7 @@ public interface ISeq<T> extends List<T> {
         return new StringSeq(coll, 0);
     }
 
-    static <T> ISeq<T> iterate(T x, Function<T, T> f) {
+    static <T> ISeq<T> iterate(T x, UnaryOperator<T> f) {
         return ISeq.lazySeq(x, () -> iterate(f.apply(x), f));
     }
 
