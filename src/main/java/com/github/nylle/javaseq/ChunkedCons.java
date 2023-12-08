@@ -10,8 +10,6 @@ import java.util.function.Predicate;
 
 public class ChunkedCons<T> extends ASeq<T> implements ISeq<T> {
 
-    public static final int CHUNK_SIZE = 1000;
-
     private final IChunk<T> chunk;
     private final ISeq<T> rest;
 
@@ -103,6 +101,24 @@ public class ChunkedCons<T> extends ASeq<T> implements ISeq<T> {
             acc = acc.cons(nth(i));
         }
         return acc;
+    }
+
+    @Override
+    public ISeq<T> drop(long n) {
+        if (n < 1) {
+            return this;
+        }
+
+        if (n > chunk.count()) {
+            return rest.drop(n - chunk.count());
+        }
+
+        IChunk<T> acc = chunk;
+        for(int i = 0; i < n; i++) {
+            acc = acc.dropFirst();
+        }
+
+        return new ChunkedCons<>(acc, rest);
     }
 
     @Override

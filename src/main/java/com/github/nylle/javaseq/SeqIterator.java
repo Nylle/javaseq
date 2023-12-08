@@ -8,7 +8,7 @@ public class SeqIterator<T> implements Iterator<T> {
 
 	private ISeq<T> seq;
 
-	public SeqIterator(ASeq<T> seq) {
+	public SeqIterator(ISeq<T> seq) {
 		this.seq = seq;
 	}
 

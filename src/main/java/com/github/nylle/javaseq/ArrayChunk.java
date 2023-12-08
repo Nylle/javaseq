@@ -1,7 +1,5 @@
 package com.github.nylle.javaseq;
 
-import java.util.List;
-
 public class ArrayChunk<T> implements IChunk<T> {
 
     private final T[] array;
@@ -12,10 +10,6 @@ public class ArrayChunk<T> implements IChunk<T> {
         this.array = array;
         this.offset = offset;
         this.end = end;
-    }
-
-    static <T> ArrayChunk<T> from(List<T> list) {
-        return new ArrayChunk<>((T[])list.toArray(new Object[0]), 0, list.size());
     }
 
     @Override
