@@ -8,6 +8,7 @@ import org.mockito.Mockito;
 import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -1039,6 +1040,19 @@ class ConsTest {
             assertThat(sut.toList())
                     .isInstanceOf(List.class)
                     .containsExactly(0, 1, 2, 3);
+        }
+    }
+
+    @Nested
+    class ToSet {
+
+        @Test
+        void returnsSetContainingTheUniqueItemsInThisSeq() {
+            var sut = ISeq.of(0, 1, 2, 3, 2, 1, 0, 4);
+
+            assertThat(sut.toSet())
+                    .isInstanceOf(Set.class)
+                    .containsExactlyInAnyOrder(0, 1, 2, 3, 4);
         }
     }
 

@@ -268,6 +268,10 @@ public abstract class ASeq<T> extends AbstractList<T> implements ISeq<T> {
         return List.copyOf(this.realize());
     }
 
+    public Set<T> toSet() {
+        return Set.copyOf(this.realize());
+    }
+
     public ISeq<T> realize() {
         rest().realize();
         return this;

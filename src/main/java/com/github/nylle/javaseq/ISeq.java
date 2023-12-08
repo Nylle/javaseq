@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
@@ -51,7 +52,7 @@ public interface ISeq<T> extends List<T> {
     }
 
     static <T> ISeq<T> sequence(Iterator<T> coll) {
-        return coll == null || !coll.hasNext() ? ISeq.of() : lazySeq(coll.next(), () -> ISeq.sequence(coll));
+        return coll == null || !coll.hasNext() ? ISeq.of() : ISeq.lazySeq(coll.next(), () -> ISeq.sequence(coll));
     }
 
     static <T> ISeq<T> sequence(Stream<T> coll) {
@@ -199,4 +200,6 @@ public interface ISeq<T> extends List<T> {
     <K, V> Map<K, V> toMap();
 
     List<T> toList();
+
+    Set<T> toSet();
 }

@@ -9,6 +9,7 @@ import org.mockito.Mockito;
 import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -1114,6 +1115,21 @@ class LazySeqTest {
 
             assertThat(sut.isRealized()).isFalse();
             assertThat(sut.take(10000).toList()).hasSize(10000);
+            assertThat(sut.isRealized()).isTrue();
+        }
+    }
+
+    @Nested
+    class ToSet {
+
+        @Test
+        void returnsFullyRealizedSet() {
+            var sut = ISeq.iterate(0, x -> x + 1);
+
+            assertThat(sut.isRealized()).isFalse();
+            assertThat(sut.take(4).toSet())
+                    .isInstanceOf(Set.class)
+                    .containsExactlyInAnyOrder(0, 1, 2, 3);
             assertThat(sut.isRealized()).isTrue();
         }
     }

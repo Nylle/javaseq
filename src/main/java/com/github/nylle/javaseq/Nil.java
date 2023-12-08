@@ -2,6 +2,7 @@ package com.github.nylle.javaseq;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
@@ -140,6 +141,11 @@ class Nil<T> extends ASeq<T> implements ISeq<T> {
 	@Override
 	public ISeq<T> realize() {
 		return this;
+	}
+
+	@Override
+	public <K, V> Map<K, V> toMap() {
+		return Map.of();
 	}
 
 	@Override

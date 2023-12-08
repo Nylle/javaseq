@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -308,6 +309,17 @@ class ChunkedConsTest {
     void toListReturnsAllItems() {
         var sut = new ChunkedCons<>(Util.arrayChunk(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
 
-        assertThat(sut.toList()).containsExactly(1, 2, 3, 4, 5, 6);
+        assertThat(sut.toList())
+                .isInstanceOf(List.class)
+                .containsExactly(1, 2, 3, 4, 5, 6);
+    }
+
+    @Test
+    void toSetReturnsUniqueItems() {
+        var sut = new ChunkedCons<>(Util.arrayChunk(List.of(1, 2, 2)), ISeq.of(6, 3, 6));
+
+        assertThat(sut.toSet())
+                .isInstanceOf(Set.class)
+                .containsExactlyInAnyOrder(1, 2, 3, 6);
     }
 }

@@ -6,6 +6,7 @@ import org.mockito.Mockito;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -332,27 +333,24 @@ public class NilTest {
         assertThat(Nil.empty().parallelStream()).isEmpty();
     }
 
-    @Nested
-    class ToMap {
-
-        @Test
-        void throwsIfSeqIsNotOfTypeEntry() {
-            assertThatExceptionOfType(UnsupportedOperationException.class)
-                    .isThrownBy(() -> Nil.empty().toMap())
-                    .withMessage("ISeq is not of type Map.Entry. Provide key- and value-mappers");
-        }
-
-        @Test
-        void toMapReturnsEmptyMap() {
-            assertThat(Nil.empty().toMap(k -> k, v -> v)).isEmpty();
-            assertThat(Nil.empty().toMap(k -> k, v -> v, (a, b) -> a)).isEmpty();
-        }
+    @Test
+    void toMapReturnsEmptyMap() {
+        assertThat(Nil.empty().toMap()).isEmpty();
+        assertThat(Nil.empty().toMap(k -> k, v -> v)).isEmpty();
+        assertThat(Nil.empty().toMap(k -> k, v -> v, (a, b) -> a)).isEmpty();
     }
 
     @Test
     void toListReturnsEmptyList() {
         assertThat(Nil.empty().toList())
                 .isInstanceOf(List.class)
+                .isEmpty();
+    }
+
+    @Test
+    void toSetReturnsEmptySet() {
+        assertThat(Nil.empty().toSet())
+                .isInstanceOf(Set.class)
                 .isEmpty();
     }
 
