@@ -67,8 +67,12 @@ class ISeqTest {
     class LazySeqTest {
 
         @Test
-        void returnsSeqFromFirstElementAndSeqSupplier() {
-            var actual = ISeq.lazySeq("a", () -> ISeq.lazySeq("b", () -> ISeq.lazySeq("c", () -> Nil.empty())));
+        void returnsSeqFromSupplier() {
+            var actual = ISeq.lazySeq(() ->
+                    ISeq.cons("a", ISeq.lazySeq(() ->
+                            ISeq.cons("b", ISeq.lazySeq(() ->
+                                    ISeq.cons("c", ISeq.lazySeq(() ->
+                                            Nil.empty())))))));
 
             assertThat(actual)
                     .isInstanceOf(LazySeq.class)
@@ -178,7 +182,7 @@ class ISeqTest {
             var actual = ISeq.concat(ISeq.of("a", "b"), ISeq.of("c", "d"), ISeq.of("e", "f"));
 
             assertThat(actual)
-                    .isInstanceOf(LazySeq.class)
+                    .isInstanceOf(Cons.class)
                     .containsExactly("a", "b", "c", "d", "e", "f");
         }
 
@@ -187,7 +191,7 @@ class ISeqTest {
             var actual = ISeq.concat(List.of("a", "b"), List.of("c", "d"), List.of("e", "f"));
 
             assertThat(actual)
-                    .isInstanceOf(LazySeq.class)
+                    .isInstanceOf(Cons.class)
                     .containsExactly("a", "b", "c", "d", "e", "f");
         }
     }

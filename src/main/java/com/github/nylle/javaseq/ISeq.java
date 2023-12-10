@@ -36,12 +36,8 @@ public interface ISeq<T> extends List<T> {
         return new Cons<>(x, seq);
     }
 
-    static <T> ISeq<T> lazySeq(T x, Supplier<ISeq<T>> f) {
-        return new LazySeq<>(x, f);
-    }
-
-    static <T> ISeq<T> lazySeq2(Supplier<ISeq<T>> f) {
-        return new LazySeq2<>(f);
+    static <T> ISeq<T> lazySeq(Supplier<ISeq<T>> f) {
+        return new LazySeq<>(f);
     }
 
     static <T> ISeq<T> sequence(T[] coll) {
@@ -56,7 +52,9 @@ public interface ISeq<T> extends List<T> {
     }
 
     static <T> ISeq<T> sequence(Iterator<T> coll) {
-        return coll == null || !coll.hasNext() ? ISeq.of() : ISeq.lazySeq(coll.next(), () -> ISeq.sequence(coll));
+        return coll == null || !coll.hasNext()
+                ? ISeq.of()
+                : ISeq.lazySeq(() -> new Cons<>(coll.next(), ISeq.sequence(coll)));
     }
 
     static <T> ISeq<T> sequence(Stream<T> coll) {
@@ -75,7 +73,7 @@ public interface ISeq<T> extends List<T> {
     }
 
     static <T> ISeq<T> iterate(T x, UnaryOperator<T> f) {
-        return ISeq.lazySeq(x, () -> iterate(f.apply(x), f));
+        return ISeq.lazySeq(() -> ISeq.cons(x, iterate(f.apply(x), f)));
     }
 
     @SafeVarargs

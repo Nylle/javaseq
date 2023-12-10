@@ -13,7 +13,7 @@ public class Util {
 
     public static <T> ISeq<T> chunkIteratorSeq(Iterator<T> iterator) {
         if(iterator.hasNext()) {
-            return new LazySeq2<>(() -> {
+            return new LazySeq<>(() -> {
                     T[] arr = (T[]) new Object[CHUNK_SIZE];
                     int n = 0;
                     while(iterator.hasNext() && n < CHUNK_SIZE) {

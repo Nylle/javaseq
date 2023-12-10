@@ -22,7 +22,7 @@ import java.util.stream.StreamSupport;
 public abstract class ASeq<T> extends AbstractList<T> implements ISeq<T> {
 
     public ISeq<T> take(long n) {
-        if(n <= 0) {
+        if (n <= 0) {
             return ISeq.of();
         }
         if (n == 1) {
@@ -77,7 +77,7 @@ public abstract class ASeq<T> extends AbstractList<T> implements ISeq<T> {
 
     public ISeq<T> takeWhile(Predicate<? super T> pred) {
         if (pred.test(first())) {
-            return ISeq.lazySeq(first(), () -> rest().takeWhile(pred));
+            return ISeq.lazySeq(() -> ISeq.cons(first(), rest().takeWhile(pred)));
         } else {
             return ISeq.of();
         }
@@ -105,11 +105,12 @@ public abstract class ASeq<T> extends AbstractList<T> implements ISeq<T> {
         }
         var partition = take(n).toList();
         if (partition.size() < n) {
-            return pad == null
-                    ? ISeq.of()
-                    : ISeq.lazySeq(ISeq.concat(partition, ISeq.sequence(pad).take(n - (long) partition.size())).toList(), () -> drop(step).partition(n, step, pad));
+            if (pad == null) return ISeq.of();
+            return ISeq.cons(
+                    ISeq.concat(partition, ISeq.sequence(pad).take(n - (long) partition.size())).toList(),
+                    ISeq.lazySeq(() -> drop(step).partition(n, step, pad)));
         }
-        return ISeq.lazySeq(partition, () -> drop(step).partition(n, step, pad));
+        return ISeq.lazySeq(() -> ISeq.cons(partition, drop(step).partition(n, step, pad)));
     }
 
     public ISeq<List<T>> partitionAll(int n) {
@@ -125,7 +126,7 @@ public abstract class ASeq<T> extends AbstractList<T> implements ISeq<T> {
     }
 
     public <U> ISeq<U> reductions(U init, BiFunction<U, ? super T, U> f) {
-        return ISeq.lazySeq(init, () -> rest().reductions(f.apply(init, first()), f));
+        return ISeq.lazySeq(() -> ISeq.cons(init, rest().reductions(f.apply(init, first()), f)));
     }
 
     public ISeq<T> cons(T x) {
@@ -284,7 +285,7 @@ public abstract class ASeq<T> extends AbstractList<T> implements ISeq<T> {
         }
         var next = result.first();
         exclude.add(next);
-        return ISeq.lazySeq(next, () -> distinct(result.rest(), exclude));
+        return ISeq.lazySeq(() -> ISeq.cons(next, distinct(result.rest(), exclude)));
     }
 
     protected static <R> ArrayList<R> copy(Iterable<? extends R> res) {
