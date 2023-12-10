@@ -1,6 +1,5 @@
 package com.github.nylle.javaseq;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -1105,16 +1104,6 @@ class LazySeqTest {
             assertThat(sut.take(4).toList())
                     .isInstanceOf(List.class)
                     .containsExactly(0, 1, 2, 3);
-            assertThat(sut.isRealized()).isTrue();
-        }
-
-        @Test
-        @Disabled("cannot handle large collections yet")
-        void canHandleLargeCollections() {
-            var sut = ISeq.iterate(0, x -> x + 1);
-
-            assertThat(sut.isRealized()).isFalse();
-            assertThat(sut.take(10000).toList()).hasSize(10000);
             assertThat(sut.isRealized()).isTrue();
         }
     }
