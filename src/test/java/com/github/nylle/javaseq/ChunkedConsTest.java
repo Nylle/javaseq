@@ -15,16 +15,20 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 class ChunkedConsTest {
 
+    private static <T> ArrayChunk<T> arrayChunk(List<T> list) {
+        return new ArrayChunk<>((T[])list.toArray(new Object[0]), 0, list.size());
+    }
+
     @Test
     void firstReturnsFirstItem() {
-        var sut = new ChunkedCons<>(Util.arrayChunk(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
+        var sut = new ChunkedCons<>(arrayChunk(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
 
         assertThat(sut.first()).isEqualTo(1);
     }
 
     @Test
     void restReturnsSeqWithItemsExceptFirst() {
-        var sut = new ChunkedCons<>(Util.arrayChunk(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
+        var sut = new ChunkedCons<>(arrayChunk(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
 
         var actual = sut.rest();
 
@@ -38,7 +42,7 @@ class ChunkedConsTest {
 
     @Test
     void isRealizedReturnsTrue() {
-        assertThat(new ChunkedCons<>(Util.arrayChunk(List.of(1, 2, 3)), ISeq.of(4, 5, 6)).isRealized()).isTrue();
+        assertThat(new ChunkedCons<>(arrayChunk(List.of(1, 2, 3)), ISeq.of(4, 5, 6)).isRealized()).isTrue();
     }
 
     @Nested
@@ -46,14 +50,14 @@ class ChunkedConsTest {
 
         @Test
         void returnsNilWhenNoItemsMatch() {
-            var sut = new ChunkedCons<>(Util.arrayChunk(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
+            var sut = new ChunkedCons<>(arrayChunk(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
 
             assertThat(sut.filter(x -> x < 1)).isEmpty();
         }
 
         @Test
         void returnsMatchingItems() {
-            var sut = new ChunkedCons<>(Util.arrayChunk(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
+            var sut = new ChunkedCons<>(arrayChunk(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
 
             assertThat(sut.filter(x -> x > 1 && x < 6)).containsExactly(2, 3, 4, 5);
         }
@@ -64,14 +68,14 @@ class ChunkedConsTest {
 
         @Test
         void returnsSingleMapResult() {
-            var sut = new ChunkedCons<>(Util.arrayChunk(List.of("xxx")), ISeq.of());
+            var sut = new ChunkedCons<>(arrayChunk(List.of("xxx")), ISeq.of());
 
             assertThat(sut.map(x -> x.length())).isEqualTo(ISeq.of(3));
         }
 
         @Test
         void returnsAllMapResults() {
-            var sut = new ChunkedCons<>(Util.arrayChunk(List.of("xxx", "ab")), ISeq.of("baz", "foobar"));
+            var sut = new ChunkedCons<>(arrayChunk(List.of("xxx", "ab")), ISeq.of("baz", "foobar"));
 
             assertThat(sut.map(x -> x.length())).isEqualTo(ISeq.of(3, 2, 3, 6));
         }
@@ -81,7 +85,7 @@ class ChunkedConsTest {
 
             @Test
             void returnsEmptySeqWhenProvidingEmptyOther() {
-                var sut = new ChunkedCons<>(Util.arrayChunk(List.of("xxx", "ab")), ISeq.of("baz", "foobar"));
+                var sut = new ChunkedCons<>(arrayChunk(List.of("xxx", "ab")), ISeq.of("baz", "foobar"));
 
                 assertThat(sut.map(ISeq.<Integer>of(), (a, b) -> a + b)).isEmpty();
                 assertThat(sut.map(ISeq.<Integer>of().iterator(), (a, b) -> a + b)).isEmpty();
@@ -93,7 +97,7 @@ class ChunkedConsTest {
 
             @Test
             void returnsANewSeqWithTheItemsOfBothInitialSeqsAreCombinedUsingF() {
-                var sut = new ChunkedCons<>(Util.arrayChunk(List.of(1, 2)), ISeq.of(3));
+                var sut = new ChunkedCons<>(arrayChunk(List.of(1, 2)), ISeq.of(3));
 
                 assertThat(sut.map(ISeq.of("a", "b", "c"), (a, b) -> a + b)).containsExactly("1a", "2b", "3c");
                 assertThat(sut.map(ISeq.of("a", "b", "c").iterator(), (a, b) -> a + b)).containsExactly("1a", "2b", "3c");
@@ -105,7 +109,7 @@ class ChunkedConsTest {
 
             @Test
             void ignoresRemainingItemsIfOneOfTheSeqsIsExhausted() {
-                var sut = new ChunkedCons<>(Util.arrayChunk(List.of(1, 2)), ISeq.of(3));
+                var sut = new ChunkedCons<>(arrayChunk(List.of(1, 2)), ISeq.of(3));
 
                 assertThat(sut.map(ISeq.of("a", "b"), (a, b) -> a + b)).containsExactly("1a", "2b");
                 assertThat(sut.map(ISeq.of("a", "b", "c", "d"), (a, b) -> a + b)).containsExactly("1a", "2b", "3c");
@@ -133,14 +137,14 @@ class ChunkedConsTest {
 
         @Test
         void returnsFlattenedMapResult() {
-            var sut = new ChunkedCons<>(Util.arrayChunk(List.of(1, 2)), ISeq.of(3, 4));
+            var sut = new ChunkedCons<>(arrayChunk(List.of(1, 2)), ISeq.of(3, 4));
 
             assertThat(sut.mapcat(x -> List.of(x, x))).containsExactly(1, 1, 2, 2, 3, 3, 4, 4);
         }
 
         @Test
         void ignoresEmptyResults() {
-            var sut = new ChunkedCons<>(Util.arrayChunk(List.of(0, 1)), ISeq.of(2, 3));
+            var sut = new ChunkedCons<>(arrayChunk(List.of(0, 1)), ISeq.of(2, 3));
 
             assertThat(sut.mapcat(x -> x == 0 ? List.of() : List.of(x, x))).containsExactly(1, 1, 2, 2, 3, 3);
         }
@@ -150,14 +154,14 @@ class ChunkedConsTest {
 
             @Test
             void returnsEmptySeqWhenProvidingEmptyOther() {
-                var sut = new ChunkedCons<>(Util.arrayChunk(List.of(0, 1)), ISeq.of(2, 3));
+                var sut = new ChunkedCons<>(arrayChunk(List.of(0, 1)), ISeq.of(2, 3));
 
                 assertThat(sut.mapcat(List.<Integer>of(), (a, b) -> List.of(a + b, a + b))).isEmpty();
             }
 
             @Test
             void returnsANewSeqWithTheItemsOfBothInitialSeqsAreCombinedUsingF() {
-                var sut = new ChunkedCons<>(Util.arrayChunk(List.of(1, 2)), ISeq.of(3));
+                var sut = new ChunkedCons<>(arrayChunk(List.of(1, 2)), ISeq.of(3));
 
                 assertThat(sut.mapcat(List.of("a", "b", "c"), (a, b) -> List.of(a + b, a + b)))
                         .containsExactly("1a", "1a", "2b", "2b", "3c", "3c");
@@ -165,7 +169,7 @@ class ChunkedConsTest {
 
             @Test
             void ignoresRemainingItemsIfOneOfTheSeqsIsExhausted() {
-                var sut = new ChunkedCons<>(Util.arrayChunk(List.of(1, 2)), ISeq.of(3));
+                var sut = new ChunkedCons<>(arrayChunk(List.of(1, 2)), ISeq.of(3));
 
                 assertThat(sut.mapcat(List.of("a", "b"), (a, b) -> List.of(a + b, a + b)))
                         .containsExactly("1a", "1a", "2b", "2b");
@@ -180,7 +184,7 @@ class ChunkedConsTest {
 
         @Test
         void returnsNilWithNegativeItems() {
-            var sut = new ChunkedCons<>(Util.arrayChunk(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
+            var sut = new ChunkedCons<>(arrayChunk(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
 
             assertThat(sut.take(-1))
                     .isExactlyInstanceOf(Nil.class)
@@ -189,7 +193,7 @@ class ChunkedConsTest {
 
         @Test
         void returnsNilWithZeroItems() {
-            var sut = new ChunkedCons<>(Util.arrayChunk(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
+            var sut = new ChunkedCons<>(arrayChunk(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
 
             assertThat(sut.take(0))
                     .isExactlyInstanceOf(Nil.class)
@@ -198,7 +202,7 @@ class ChunkedConsTest {
 
         @Test
         void returnsConsWithFewerItemsThanChunk() {
-            var sut = new ChunkedCons<>(Util.arrayChunk(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
+            var sut = new ChunkedCons<>(arrayChunk(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
 
             assertThat(sut.take(2))
                     .isExactlyInstanceOf(Cons.class)
@@ -207,7 +211,7 @@ class ChunkedConsTest {
 
         @Test
         void returnsConsWithSameItemsAsChunk() {
-            var sut = new ChunkedCons<>(Util.arrayChunk(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
+            var sut = new ChunkedCons<>(arrayChunk(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
 
             assertThat(sut.take(3))
                     .isExactlyInstanceOf(Cons.class)
@@ -216,7 +220,7 @@ class ChunkedConsTest {
 
         @Test
         void returnsConsWithMoreItemsThanChunk() {
-            var sut = new ChunkedCons<>(Util.arrayChunk(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
+            var sut = new ChunkedCons<>(arrayChunk(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
 
             assertThat(sut.take(4))
                     .isExactlyInstanceOf(ChunkedCons.class)
@@ -226,7 +230,7 @@ class ChunkedConsTest {
 
         @Test
         void returnsUnchangedConsTakingMoreItemsThanPresent() {
-            var sut = new ChunkedCons<>(Util.arrayChunk(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
+            var sut = new ChunkedCons<>(arrayChunk(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
 
             assertThat(sut.take(6)).containsExactly(1, 2, 3, 4, 5, 6);
             assertThat(sut.take(7)).containsExactly(1, 2, 3, 4, 5, 6);
@@ -238,42 +242,42 @@ class ChunkedConsTest {
 
         @Test
         void returnsUnchangedSeqWithNegativeItemsToDrop() {
-            var sut = new ChunkedCons<>(Util.arrayChunk(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
+            var sut = new ChunkedCons<>(arrayChunk(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
 
             assertThat(sut.drop(-1)).containsExactly(1, 2, 3, 4, 5, 6);
         }
 
         @Test
         void returnsUnchangedSeqWithZeroItemsToDrop() {
-            var sut = new ChunkedCons<>(Util.arrayChunk(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
+            var sut = new ChunkedCons<>(arrayChunk(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
 
             assertThat(sut.drop(0)).containsExactly(1, 2, 3, 4, 5, 6);
         }
 
         @Test
         void returnsConsDroppingFewerItemsThanChunk() {
-            var sut = new ChunkedCons<>(Util.arrayChunk(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
+            var sut = new ChunkedCons<>(arrayChunk(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
 
             assertThat(sut.drop(2)).containsExactly(3, 4, 5, 6);
         }
 
         @Test
         void returnsConsDroppingSameItemsAsChunk() {
-            var sut = new ChunkedCons<>(Util.arrayChunk(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
+            var sut = new ChunkedCons<>(arrayChunk(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
 
             assertThat(sut.drop(3)).containsExactly(4, 5, 6);
         }
 
         @Test
         void returnsConsDroppingMoreItemsThanChunk() {
-            var sut = new ChunkedCons<>(Util.arrayChunk(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
+            var sut = new ChunkedCons<>(arrayChunk(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
 
             assertThat(sut.drop(4)).containsExactly(5, 6);
         }
 
         @Test
         void returnsEmptySeqIfMoreItemsAreDroppedThanPresent() {
-            var sut = new ChunkedCons<>(Util.arrayChunk(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
+            var sut = new ChunkedCons<>(arrayChunk(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
 
             assertThat(sut.drop(6)).isEmpty();
             assertThat(sut.drop(7)).isEmpty();
@@ -282,7 +286,7 @@ class ChunkedConsTest {
 
     @Test
     void sizeReturnsSizeOfSeq() {
-        var sut = new ChunkedCons<>(Util.arrayChunk(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
+        var sut = new ChunkedCons<>(arrayChunk(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
 
         assertThat(sut.size()).isEqualTo(6);
         assertThat(sut.rest().size()).isEqualTo(5);
@@ -292,7 +296,7 @@ class ChunkedConsTest {
     void runCallsProcForEveryItemPresent() {
         var proc = Mockito.<Consumer<Integer>>mock();
 
-        var sut = new ChunkedCons<>(Util.arrayChunk(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
+        var sut = new ChunkedCons<>(arrayChunk(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
 
         sut.run(proc);
 
@@ -307,7 +311,7 @@ class ChunkedConsTest {
 
     @Test
     void toListReturnsAllItems() {
-        var sut = new ChunkedCons<>(Util.arrayChunk(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
+        var sut = new ChunkedCons<>(arrayChunk(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
 
         assertThat(sut.toList())
                 .isInstanceOf(List.class)
@@ -316,7 +320,7 @@ class ChunkedConsTest {
 
     @Test
     void toSetReturnsUniqueItems() {
-        var sut = new ChunkedCons<>(Util.arrayChunk(List.of(1, 2, 2)), ISeq.of(6, 3, 6));
+        var sut = new ChunkedCons<>(arrayChunk(List.of(1, 2, 2)), ISeq.of(6, 3, 6));
 
         assertThat(sut.toSet())
                 .isInstanceOf(Set.class)
