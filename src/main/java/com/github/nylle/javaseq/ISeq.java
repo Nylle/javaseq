@@ -40,6 +40,10 @@ public interface ISeq<T> extends List<T> {
         return new LazySeq<>(x, f);
     }
 
+    static <T> ISeq<T> lazySeq2(Supplier<ISeq<T>> f) {
+        return new LazySeq2<>(f);
+    }
+
     static <T> ISeq<T> sequence(T[] coll) {
         return coll == null ? ISeq.of() : ISeq.sequence(Arrays.asList(coll).iterator());
     }
