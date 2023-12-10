@@ -2,7 +2,6 @@ package com.github.nylle.javaseq;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -137,25 +136,5 @@ public class ChunkedCons<T> extends ASeq<T> implements ISeq<T> {
         }
         acc.addAll(rest.toList());
         return acc;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-
-        ChunkedCons<?> that = (ChunkedCons<?>) o;
-
-        if (!Objects.equals(chunk, that.chunk)) return false;
-        return Objects.equals(rest, that.rest);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + (chunk != null ? chunk.hashCode() : 0);
-        result = 31 * result + (rest != null ? rest.hashCode() : 0);
-        return result;
     }
 }

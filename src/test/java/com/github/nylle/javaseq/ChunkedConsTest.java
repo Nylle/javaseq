@@ -70,14 +70,14 @@ class ChunkedConsTest {
         void returnsSingleMapResult() {
             var sut = new ChunkedCons<>(arrayChunk(List.of("xxx")), ISeq.of());
 
-            assertThat(sut.map(x -> x.length())).isEqualTo(ISeq.of(3));
+            assertThat(sut.map(x -> x.length())).containsExactly(3);
         }
 
         @Test
         void returnsAllMapResults() {
             var sut = new ChunkedCons<>(arrayChunk(List.of("xxx", "ab")), ISeq.of("baz", "foobar"));
 
-            assertThat(sut.map(x -> x.length())).isEqualTo(ISeq.of(3, 2, 3, 6));
+            assertThat(sut.map(x -> x.length())).containsExactly(3, 2, 3, 6);
         }
 
         @Nested
