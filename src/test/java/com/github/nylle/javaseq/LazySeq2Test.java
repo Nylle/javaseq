@@ -8,7 +8,6 @@ import org.mockito.Mockito;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
@@ -1708,17 +1707,6 @@ class LazySeq2Test {
             assertThat(actual.hasNext()).isTrue();
             assertThat(actual.next()).isEqualTo(1);
             assertThat(actual.hasNext()).isTrue();
-        }
-
-        @Test
-        void iteratorThrowsWhenTryingToAccessNextWhenThereIsNone() {
-            var actual = iterate(0, x -> x + 1).take(2).iterator();
-
-            assertThat(actual.next()).isEqualTo(0);
-            assertThat(actual.next()).isEqualTo(1);
-            assertThat(actual.hasNext()).isFalse();
-            assertThatExceptionOfType(NoSuchElementException.class)
-                    .isThrownBy(() -> actual.next());
         }
     }
 

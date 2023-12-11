@@ -1,7 +1,6 @@
 package com.github.nylle.javaseq;
 
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 
 public class SeqIterator<T> implements Iterator<T> {
@@ -21,9 +20,6 @@ public class SeqIterator<T> implements Iterator<T> {
 	public T next() {
 		var next = seq.first();
 		seq = seq.rest();
-		if (next == null) {
-			throw new NoSuchElementException();
-		}
 		return next;
 	}
 

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -18,6 +19,13 @@ class ISeqTest {
     @Nested
     @DisplayName("of")
     class Of {
+
+        @Test
+        void returnsSeqWithNulls() {
+            var sut = ISeq.of(null, null, null);
+
+            assertThat(sut).containsExactly(null, null, null);
+        }
 
         @Test
         void returnsEmptySeq() {
@@ -53,6 +61,13 @@ class ISeqTest {
     class ConsTest {
 
         @Test
+        void returnsSeqWithNulls() {
+            var sut = ISeq.cons(null, ISeq.cons(null, ISeq.cons(null, Nil.empty())));
+
+            assertThat(sut).containsExactly(null, null, null);
+        }
+
+        @Test
         void returnsSeqFromFirstElementAndSeq() {
             var actual = ISeq.cons("a", ISeq.cons("b", ISeq.cons("c", Nil.empty())));
 
@@ -65,6 +80,17 @@ class ISeqTest {
     @Nested
     @DisplayName("lazySeq")
     class LazySeqTest {
+
+        @Test
+        void returnsSeqWithNulls() {
+            var sut = ISeq.lazySeq(() ->
+                    ISeq.cons(null, ISeq.lazySeq(() ->
+                            ISeq.cons(null, ISeq.lazySeq(() ->
+                                    ISeq.cons(null, ISeq.lazySeq(() ->
+                                            Nil.empty())))))));
+
+            assertThat(sut).containsExactly(null, null, null);
+        }
 
         @Test
         void returnsSeqFromSupplier() {
@@ -83,6 +109,18 @@ class ISeqTest {
     @Nested
     @DisplayName("sequence")
     class Sequence {
+
+        @Test
+        void returnsSeqWithNulls() {
+            var list = new ArrayList<String>();
+            list.add(null);
+            list.add(null);
+            list.add(null);
+
+            assertThat(ISeq.sequence(list))
+                    .isInstanceOf(LazySeq.class)
+                    .containsExactly(null, null, null);
+        }
 
         @Test
         void returnsSeqOfItemsInIterable() {
@@ -113,7 +151,7 @@ class ISeqTest {
 
         @Test
         void returnsSeqOfItemsInArray() {
-            var array = new Integer[] {1, 2, 3};
+            var array = new Integer[]{1, 2, 3};
 
             assertThat(ISeq.sequence(array))
                     .isInstanceOf(LazySeq.class)
@@ -178,6 +216,13 @@ class ISeqTest {
     class Concat {
 
         @Test
+        void returnsSeqFromConcatenatingMultipleSeqsWithNulls() {
+            var sut = ISeq.concat(ISeq.of(null, null), ISeq.of(null, null), ISeq.of(null, null));
+
+            assertThat(sut).containsExactly(null, null, null, null, null, null);
+        }
+
+        @Test
         void returnsSeqFromConcatenatingMultipleSeqs() {
             var actual = ISeq.concat(ISeq.of("a", "b"), ISeq.of("c", "d"), ISeq.of("e", "f"));
 
@@ -213,8 +258,14 @@ class ISeqTest {
     class Iterate {
 
         @Test
-        void returnsSeqOfInitialValueUsingFunction() {
+        void returnsSeqWithNulls() {
+            var sut = ISeq.iterate(null, x -> null);
 
+            assertThat(sut.take(4)).containsExactly(null, null, null, null);
+        }
+
+        @Test
+        void returnsSeqOfInitialValueUsingFunction() {
             var actual = ISeq.iterate(0, x -> x + 1);
 
             assertThat(actual.take(4))
