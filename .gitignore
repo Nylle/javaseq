@@ -27,3 +27,5 @@ replay_pid*
 .idea
 
 /target
+/src/main/java/com/reference
+/src/test/java/com/reference

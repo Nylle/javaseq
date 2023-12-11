@@ -52,7 +52,7 @@ While Streams help to work with lazy collections by providing the aforementioned
 - Returns a fully realized seq of all supplied xs.
 
 #### ISeq.cons(x, seq)
-- Returns a fully realized seq of x and seq. _(This is like prepending x to seq.)_)
+- Returns a new seq where x is the first element and seq is the rest.
 
 #### ISeq.lazySeq(body)
 - Takes a body of expressions (supplier) that returns an ISeq or Nil that will invoke the body only the first time it is accessed, and will cache the result and return it on all subsequent calls (see [isRealized](#isrealized)).
