@@ -241,18 +241,14 @@ class StringSeqTest {
         void returnsNilWithNegativeItems() {
             var sut = ISeq.sequence("foo");
 
-            assertThat(sut.take(-1))
-                    .isExactlyInstanceOf(Nil.class)
-                    .isEmpty();
+            assertThat(sut.take(-1)).isEqualTo(Nil.empty());
         }
 
         @Test
         void returnsNilWithZeroItems() {
             var sut = ISeq.sequence("foo");
 
-            assertThat(sut.take(0))
-                    .isExactlyInstanceOf(Nil.class)
-                    .isEmpty();
+            assertThat(sut.take(0)).isEqualTo(Nil.empty());
         }
 
         @Test

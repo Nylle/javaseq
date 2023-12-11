@@ -54,8 +54,8 @@ While Streams help to work with lazy collections by providing the aforementioned
 #### ISeq.cons(x, seq)
 - Returns a fully realized seq of x and seq. _(This is like prepending x to seq.)_)
 
-#### ISeq.lazySeq(x, f)
-- Returns a lazy seq of x and supplier f.
+#### ISeq.lazySeq(body)
+- Takes a body of expressions (supplier) that returns an ISeq or Nil that will invoke the body only the first time it is accessed, and will cache the result and return it on all subsequent calls (see [isRealized](#isrealized)).
 
 #### ISeq.sequence(coll)
 - Coerces coll to a (possibly empty) seq, if it is not already one. Will not force a lazy Stream or Iterator. If coll is a String, the returned seq will contain items of type Character. If coll is a Map<K, V> the returned seq will contain items of type Map.Entry<K, V> (see [toMap](#tomap)). Yields empty seq if coll is null or empty.

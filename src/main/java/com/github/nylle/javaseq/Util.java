@@ -1,5 +1,6 @@
 package com.github.nylle.javaseq;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -28,6 +29,12 @@ public class Util {
     public static <T> Set<T> conj(Set<T> seen, T x) {
         var result = new HashSet<>(seen);
         result.add(x);
+        return result;
+    }
+
+    public static <R> ArrayList<R> copy(Iterable<? extends R> res) {
+        var result = new ArrayList<R>();
+        res.forEach(x -> result.add(x));
         return result;
     }
 }

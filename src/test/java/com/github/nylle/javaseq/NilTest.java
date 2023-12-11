@@ -263,8 +263,8 @@ public class NilTest {
     }
 
     @Test
-    void isRealizedReturnsFalse() {
-        assertThat(Nil.empty().isRealized()).isFalse();
+    void isRealizedReturnsTrue() {
+        assertThat(Nil.empty().isRealized()).isTrue();
     }
 
     @Test

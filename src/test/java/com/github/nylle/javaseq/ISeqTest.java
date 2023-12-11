@@ -98,7 +98,7 @@ class ISeqTest {
             var infiniteIterator = Stream.iterate(0, x -> x + 1).iterator();
 
             assertThat(ISeq.sequence(infiniteIterator).take(4))
-                    .isInstanceOf(Cons.class)
+                    .isInstanceOf(LazySeq.class)
                     .containsExactly(0, 1, 2, 3);
         }
 
@@ -107,7 +107,7 @@ class ISeqTest {
             var infiniteStream = Stream.iterate(0, x -> x + 1);
 
             assertThat(ISeq.sequence(infiniteStream).take(4))
-                    .isInstanceOf(Cons.class)
+                    .isInstanceOf(LazySeq.class)
                     .containsExactly(0, 1, 2, 3);
         }
 
@@ -165,10 +165,10 @@ class ISeqTest {
         @Test
         void doesNotForceLazyColl() {
             assertThat(ISeq.sequence(Stream.iterate(0, x -> x + 1)).take(3))
-                    .isInstanceOf(Cons.class)
+                    .isInstanceOf(LazySeq.class)
                     .containsExactly(0, 1, 2);
             assertThat(ISeq.sequence(Stream.iterate(0, x -> x + 1).iterator()).take(3))
-                    .isInstanceOf(Cons.class)
+                    .isInstanceOf(LazySeq.class)
                     .containsExactly(0, 1, 2);
         }
     }
@@ -182,7 +182,7 @@ class ISeqTest {
             var actual = ISeq.concat(ISeq.of("a", "b"), ISeq.of("c", "d"), ISeq.of("e", "f"));
 
             assertThat(actual)
-                    .isInstanceOf(Cons.class)
+                    .isInstanceOf(LazySeq.class)
                     .containsExactly("a", "b", "c", "d", "e", "f");
         }
 
@@ -191,8 +191,20 @@ class ISeqTest {
             var actual = ISeq.concat(List.of("a", "b"), List.of("c", "d"), List.of("e", "f"));
 
             assertThat(actual)
-                    .isInstanceOf(Cons.class)
+                    .isInstanceOf(LazySeq.class)
                     .containsExactly("a", "b", "c", "d", "e", "f");
+        }
+
+        @Test
+        void isLazy() {
+            assertThat(ISeq.concat(ISeq.of("a", "b"), ISeq.of("c", "d"), ISeq.iterate("e", x -> x + "e")).take(7))
+                    .containsExactly("a", "b", "c", "d", "e", "ee", "eee");
+
+            assertThat(ISeq.concat(ISeq.of("a", "b"), ISeq.iterate("c", x -> x + "c"), ISeq.of("e", "f")).take(7))
+                    .containsExactly("a", "b", "c", "cc", "ccc", "cccc", "ccccc");
+
+            assertThat(ISeq.concat(ISeq.iterate("a", x -> x + "a"), ISeq.of("c", "d"), ISeq.of("e", "f")).take(7))
+                    .containsExactly("a", "aa", "aaa", "aaaa", "aaaaa", "aaaaaa", "aaaaaaa");
         }
     }
 
@@ -217,7 +229,7 @@ class ISeqTest {
         @Test
         void returnsInfiniteSeqOfIntegersStartingWithZero() {
             assertThat(ISeq.range().take(3))
-                    .isInstanceOf(Cons.class)
+                    .isInstanceOf(LazySeq.class)
                     .containsExactly(0, 1, 2);
         }
 
@@ -244,16 +256,16 @@ class ISeqTest {
         @Test
         void returnsInfiniteSeqOfStartWhenStepIsZero() {
             assertThat(ISeq.range(10, 25, 0).take(10))
-                    .isInstanceOf(Cons.class)
+                    .isInstanceOf(LazySeq.class)
                     .containsExactly(10, 10, 10, 10, 10, 10, 10, 10, 10, 10);
         }
 
         @Test
         void returnsEmptySeqWhenStartIsEqualToEnd() {
-            assertThat(ISeq.range(10, 10)).isInstanceOf(Nil.class).isEmpty();
-            assertThat(ISeq.range(-10, -10)).isInstanceOf(Nil.class).isEmpty();
-            assertThat(ISeq.range(1, 1, 1)).isInstanceOf(Nil.class).isEmpty();
-            assertThat(ISeq.range(-1, -1, 1)).isInstanceOf(Nil.class).isEmpty();
+            assertThat(ISeq.range(10, 10)).isEqualTo(Nil.empty());
+            assertThat(ISeq.range(-10, -10)).isEqualTo(Nil.empty());
+            assertThat(ISeq.range(1, 1, 1)).isEqualTo(Nil.empty());
+            assertThat(ISeq.range(-1, -1, 1)).isEqualTo(Nil.empty());
         }
     }
 }

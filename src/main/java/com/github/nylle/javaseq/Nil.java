@@ -1,12 +1,6 @@
 package com.github.nylle.javaseq;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.function.BiFunction;
-import java.util.function.BinaryOperator;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -31,22 +25,17 @@ class Nil<T> extends ASeq<T> implements ISeq<T> {
 
 	@Override
 	public boolean isRealized() {
-		return false;
-	}
-
-	@Override
-	public ISeq<T> take(long n) {
-		return empty();
-	}
-
-	@Override
-	public ISeq<T> drop(long n) {
-		return empty();
+		return true;
 	}
 
 	@Override
 	public T get(int index) {
 		throw new IndexOutOfBoundsException(index);
+	}
+
+	@Override
+	public ISeq<T> filter(Predicate<? super T> pred) {
+		return empty();
 	}
 
 	@Override
@@ -56,11 +45,6 @@ class Nil<T> extends ASeq<T> implements ISeq<T> {
 
 	@Override
 	public <S, R> ISeq<R> map(ISeq<? extends S> coll, BiFunction<? super T, ? super S, ? extends R> f) {
-		return empty();
-	}
-
-	@Override
-	public ISeq<T> filter(Predicate<? super T> pred) {
 		return empty();
 	}
 
@@ -75,77 +59,13 @@ class Nil<T> extends ASeq<T> implements ISeq<T> {
 	}
 
 	@Override
-	public Optional<T> min(Comparator<? super T> comp) {
-		return Optional.empty();
-	}
-
-	@Override
-	public Optional<T> max(Comparator<? super T> comp) {
-		return Optional.empty();
-	}
-
-	@Override
 	public int size() {
 		return 0;
 	}
 
 	@Override
-	public boolean some(Predicate<? super T> pred) {
-		return false;
-	}
-
-	@Override
-	public boolean every(Predicate<? super T> pred) {
-		return true;
-	}
-
-	@Override
-	public T nth(int index, T notFound) {
-		return notFound;
-	}
-
-	@Override
-	public ISeq<T> takeWhile(Predicate<? super T> pred) {
-		return empty();
-	}
-
-	@Override
-	public ISeq<T> dropWhile(Predicate<? super T> pred) {
-		return empty();
-	}
-
-	@Override
-	public ISeq<List<T>> partition(int n, int step, Iterable<T> pad) {
-		return empty();
-	}
-
-	@Override
-	public ISeq<T> reductions(BinaryOperator<T> f) {
-		return empty();
-	}
-
-	@Override
-	public <U> ISeq<U> reductions(U init, BiFunction<U, ? super T, U> f) {
-		return ISeq.of(init);
-	}
-
-	@Override
-	public void run(Consumer<? super T> proc) {
-	}
-
-	@Override
-	public ISeq<T> distinct() {
-		return empty();
-	}
-
-	@Override
 	public ISeq<T> realize() {
 		return this;
-	}
-
-	@Override
-	public <K, V> Map<K, V> toMap() {
-		return Map.of();
 	}
 
 	@Override

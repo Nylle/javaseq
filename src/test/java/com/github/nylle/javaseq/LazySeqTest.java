@@ -350,6 +350,20 @@ class LazySeqTest {
         }
 
         @Test
+        void realizeReturnsEmpty() {
+            var sut = CanBeEmpty.<String>createEmpty();
+
+            assertThat(sut.isRealized()).isFalse();
+
+            var forced = sut.realize();
+
+            assertThat(sut).isEmpty();
+            assertThat(sut.isRealized()).isTrue();
+            assertThat(forced.isRealized()).isTrue();
+            assertThat(sut).isSameAs(forced);
+        }
+
+        @Test
         void iteratorReturnsEmptyIterator() {
             assertThat(createEmpty().iterator().hasNext()).isFalse();
         }
@@ -431,6 +445,8 @@ class LazySeqTest {
         void returnsTrueIfFirstItemWasAccessed() {
             var sut = iterate(0, x -> x + 1);
 
+            assertThat(sut.isRealized()).isFalse();
+
             sut.first();
 
             assertThat(sut.isRealized()).isTrue();
@@ -439,6 +455,8 @@ class LazySeqTest {
         @Test
         void returnsTrueIfRestWasAccessed() {
             var sut = iterate(0, x -> x + 1);
+
+            assertThat(sut.isRealized()).isFalse();
 
             sut.rest();
 
@@ -460,6 +478,13 @@ class LazySeqTest {
     class Filter {
 
         @Test
+        void doesNotRealizeSeqUnlessAccessed() {
+            var sut = iterate(0, x -> x + 1);
+
+            assertThat(sut.filter(x -> x > 0).isRealized()).isFalse();
+        }
+
+        @Test
         void returnsNilWhenNoItemsMatch() {
             var sut = iterate(0, x -> x + 1).take(10);
 
@@ -477,6 +502,13 @@ class LazySeqTest {
     @Nested
     @DisplayName("map")
     class MapTest {
+
+        @Test
+        void doesNotRealizeSeqUnlessAccessed() {
+            var sut = iterate("x", x -> x + "x");
+
+            assertThat(sut.map(x -> x.length()).isRealized()).isFalse();
+        }
 
         @Test
         void returnsSingleMapResult() {
@@ -501,6 +533,13 @@ class LazySeqTest {
 
         @Nested
         class WithOtherSeq {
+
+            @Test
+            void doesNotRealizeSeqUnlessAccessed() {
+                var sut = iterate("x", x -> x + "x");
+
+                assertThat(sut.map(ISeq.of("a", "b", "c"), (a, b) -> (a + b).length()).isRealized()).isFalse();
+            }
 
             @Test
             void returnsEmptySeqWhenProvidingEmptyOther() {
@@ -561,10 +600,24 @@ class LazySeqTest {
     class Mapcat {
 
         @Test
+        void doesNotRealizeSeqUnlessAccessed() {
+            var sut = ISeq.of(range(0, 3), range(3, 6));
+
+            assertThat(sut.mapcat(x -> x).isRealized()).isFalse();
+        }
+
+        @Test
         void returnsFlattenedSeq() {
             var sut = ISeq.of(range(0, 3), range(3, 6));
 
             assertThat(sut.mapcat(x -> x)).containsExactly(0, 1, 2, 3, 4, 5);
+        }
+
+        @Test
+        void returnsLazySeqWithMappingResultsConcatenated() {
+            var sut = iterate(8, x -> x + 1).map(x -> x.toString());
+
+            assertThat(sut.mapcat(x -> ISeq.sequence(x.split(""))).take(8)).containsExactly("8", "9", "1", "0", "1", "1", "1", "2");
         }
 
         @Test
@@ -581,8 +634,22 @@ class LazySeqTest {
             assertThat(sut.mapcat(x -> ISeq.of(x, x)).take(6)).containsExactly(0, 0, 1, 1, 2, 2);
         }
 
+        @Test
+        void returnsInfiniteLazySeqIfMappingResultIsInfinite() {
+            var sut = iterate("x", x -> x + "x");
+
+            assertThat(sut.mapcat(x -> iterate("Y", y -> y + "Y")).take(4)).containsExactly("Y", "YY", "YYY", "YYYY");
+        }
+
         @Nested
         class WithOtherColl {
+
+            @Test
+            void doesNotRealizeSeqUnlessAccessed() {
+                var sut = range(1, 4);
+
+                assertThat(sut.mapcat(ISeq.of("a", "b", "c"), (a, b) -> ISeq.of(a + b, a + b)).isRealized()).isFalse();
+            }
 
             @Test
             void returnsEmptySeqWhenProvidingEmptyOther() {
@@ -616,6 +683,14 @@ class LazySeqTest {
 
                 assertThat(sut.mapcat(other, (a, b) -> ISeq.of(a + b, a + b)).take(8))
                         .containsExactly(0, 0, 2, 2, 4, 4, 6, 6);
+            }
+
+            @Test
+            void returnsInfiniteLazySeqIfMappingResultIsInfinite() {
+                var sut = iterate("x", x -> x + "x");
+                var other = iterate("a", x -> x + "b");
+
+                assertThat(sut.mapcat(other, (a, b) -> iterate("Y", y -> y + a + b)).take(4)).containsExactly("Y", "Yxa", "Yxaxa", "Yxaxaxa");
             }
         }
     }
@@ -705,21 +780,24 @@ class LazySeqTest {
     class Take {
 
         @Test
+        void doesNotRealizeSeqUnlessAccessed() {
+            var sut = iterate(0, x -> x + 1);
+
+            assertThat(sut.take(3).isRealized()).isFalse();
+        }
+
+        @Test
         void returnsNilForNegativeItems() {
             var sut = iterate(0, x -> x + 1);
 
-            assertThat(sut.take(-1))
-                    .isExactlyInstanceOf(Nil.class)
-                    .isEmpty();
+            assertThat(sut.take(-1)).isEqualTo(Nil.empty());
         }
 
         @Test
         void returnsNilForZeroItems() {
             var sut = iterate(0, x -> x + 1);
 
-            assertThat(sut.take(0))
-                    .isExactlyInstanceOf(Nil.class)
-                    .isEmpty();
+            assertThat(sut.take(0)).isEqualTo(Nil.empty());
         }
 
         @Test
@@ -727,13 +805,20 @@ class LazySeqTest {
             var sut = iterate(0, x -> x + 1);
 
             assertThat(sut.take(3))
-                    .isExactlyInstanceOf(Cons.class)
+                    .isExactlyInstanceOf(LazySeq.class)
                     .containsExactly(0, 1, 2);
         }
     }
 
     @Nested
     class Drop {
+
+        @Test
+        void doesNotRealizeSeqUnlessAccessed() {
+            var sut = iterate(0, x -> x + 1);
+
+            assertThat(sut.drop(3).isRealized()).isFalse();
+        }
 
         @Test
         void returnsUnchangedSeqWithNegativeItemsToDrop() {
@@ -775,6 +860,13 @@ class LazySeqTest {
     class TakeWhile {
 
         @Test
+        void doesNotRealizeSeqUnlessAccessed() {
+            var sut = iterate(0, x -> x + 1);
+
+            assertThat(sut.takeWhile(x -> x < 3).isRealized()).isFalse();
+        }
+
+        @Test
         void returnsEmptySeqWhenFirstItemDoesNotMatch() {
             assertThat(iterate(0, x -> x + 1).takeWhile(x -> x > 0)).isEmpty();
         }
@@ -799,6 +891,13 @@ class LazySeqTest {
     class DropWhile {
 
         @Test
+        void doesNotRealizeSeqUnlessAccessed() {
+            var sut = iterate(0, x -> x + 1);
+
+            assertThat(sut.dropWhile(x -> x < 2).isRealized()).isFalse();
+        }
+
+        @Test
         void returnsEmptySeqWhenAllItemsMatch() {
             assertThat(range(1, 5).dropWhile(x -> x > 0)).isEmpty();
         }
@@ -816,6 +915,13 @@ class LazySeqTest {
 
     @Nested
     class Partition {
+
+        @Test
+        void doesNotRealizeSeqUnlessAccessed() {
+            var sut = iterate(0, x -> x + 1);
+
+            assertThat(sut.partition(3).isRealized()).isFalse();
+        }
 
         @Test
         void returnsEmptySeqForNegativeSizeN() {
@@ -971,6 +1077,13 @@ class LazySeqTest {
     class PartitionAll {
 
         @Test
+        void doesNotRealizeSeqUnlessAccessed() {
+            var sut = iterate(0, x -> x + 1);
+
+            assertThat(sut.partitionAll(3).isRealized()).isFalse();
+        }
+
+        @Test
         void returnsEmptySeqForNegativeSizeN() {
             var sut = iterate(0, x -> x + 1);
 
@@ -1083,6 +1196,16 @@ class LazySeqTest {
     class Reductions {
 
         @Test
+        void doesNotRealizeSeqUnlessAccessed() {
+            var sut = iterate(0, x -> x + 1);
+
+            assertThat(sut.reductions((a, b) -> a + b).isRealized()).isFalse();
+
+            assertThat(sut.reductions(0, (a, b) -> a + b).isRealized()).isTrue();
+            assertThat(sut.reductions(0, (a, b) -> a + b).rest().isRealized()).isFalse();
+        }
+
+        @Test
         void returnsASeqWithTheIntermediateValuesOfTheReduction() {
             var sut = iterate(1, x -> x + 1);
 
@@ -1128,9 +1251,20 @@ class LazySeqTest {
     class Reduce {
 
         @Test
+        void returnsEmptyOptionalForLessThanTwoItemsWhenValIsNotSupplied() {
+            var sut = iterate(0, x -> x + 1);
+
+            assertThat(sut.take(0).reduce((a, b) -> a + b)).isEmpty();
+            assertThat(sut.take(1).reduce((a, b) -> a + b)).isEmpty();
+        }
+
+        @Test
         void returnsOptionalResultWhenValIsNotSupplied() {
             var sut = iterate(0, x -> x + 1);
 
+            assertThat(sut.take(0).reduce((a, b) -> a + b)).isEmpty();
+            assertThat(sut.take(1).reduce((a, b) -> a + b)).isEmpty();
+            assertThat(sut.take(2).reduce((a, b) -> a + b)).hasValue(1);
             assertThat(sut.take(4).reduce((a, b) -> a + b)).hasValue(6);
         }
 
@@ -1138,6 +1272,8 @@ class LazySeqTest {
         void returnsResultWhenValIsSupplied() {
             var sut = iterate(1, x -> x + 1);
 
+            assertThat(sut.take(1).reduce(0, (a, b) -> a + b)).isEqualTo(1);
+            assertThat(sut.take(2).reduce(0, (a, b) -> a + b)).isEqualTo(3);
             assertThat(sut.take(3).reduce(0, (a, b) -> a + b)).isEqualTo(6);
         }
 
@@ -1145,12 +1281,22 @@ class LazySeqTest {
         void returnsResultOfDifferentTypeThanSeq() {
             var sut = iterate(0, x -> x + 1);
 
+            assertThat(sut.take(1).reduce("", (acc, x) -> acc + x.toString())).isEqualTo("0");
+            assertThat(sut.take(2).reduce("", (acc, x) -> acc + x.toString())).isEqualTo("01");
+            assertThat(sut.take(3).reduce("", (acc, x) -> acc + x.toString())).isEqualTo("012");
             assertThat(sut.take(4).reduce("", (acc, x) -> acc + x.toString())).isEqualTo("0123");
         }
     }
 
     @Nested
     class Distinct {
+
+        @Test
+        void doesNotRealizeSeqUnlessAccessed() {
+            var sut = iterate(0, x -> x + 1);
+
+            assertThat(sut.distinct().isRealized()).isFalse();
+        }
 
         @Test
         void returnsSeqWithSingleItem() {
@@ -1475,15 +1621,19 @@ class LazySeqTest {
         }
     }
 
-    @Test
-    void realizeRealizesThisSeqAndReturnsIt() {
-        var sut = range(4);
-        assertThat(sut.isRealized()).isFalse();
+    @Nested
+    class Realize {
 
-        var forced = sut.realize();
-        assertThat(sut.isRealized()).isTrue();
-        assertThat(forced).isSameAs(sut);
-        assertThat(forced.isRealized()).isTrue();
+        @Test
+        void realizesThisSeqAndReturnsIt() {
+            var sut = range(4).map(x -> x.toString());
+            assertThat(sut.isRealized()).isFalse();
+
+            var forced = sut.realize();
+            assertThat(sut.isRealized()).isTrue();
+            assertThat(forced).isSameAs(sut);
+            assertThat(forced.isRealized()).isTrue();
+        }
     }
 
     @Nested

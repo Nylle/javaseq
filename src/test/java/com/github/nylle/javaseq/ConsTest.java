@@ -63,18 +63,14 @@ class ConsTest {
         void returnsNilWithNegativeItems() {
             var sut = ISeq.cons(0, ISeq.cons(1, ISeq.cons(2, ISeq.cons(3, ISeq.of()))));
 
-            assertThat(sut.take(-1))
-                    .isExactlyInstanceOf(Nil.class)
-                    .isEmpty();
+            assertThat(sut.take(-1)).isEqualTo(Nil.empty());
         }
 
         @Test
         void returnsNilWithZeroItems() {
             var sut = ISeq.cons(0, ISeq.cons(1, ISeq.cons(2, ISeq.cons(3, ISeq.of()))));
 
-            assertThat(sut.take(0))
-                    .isExactlyInstanceOf(Nil.class)
-                    .isEmpty();
+            assertThat(sut.take(0)).isEqualTo(Nil.empty());
         }
 
         @Test
@@ -82,7 +78,7 @@ class ConsTest {
             var sut = ISeq.cons(0, ISeq.cons(1, ISeq.cons(2, ISeq.cons(3, ISeq.of()))));
 
             assertThat(sut.take(3))
-                    .isExactlyInstanceOf(Cons.class)
+                    .isExactlyInstanceOf(LazySeq.class)
                     .containsExactly(0, 1, 2);
         }
     }
