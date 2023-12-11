@@ -76,6 +76,19 @@ class StringSeqTest {
             assertThat(sut.map(x -> x.toString().toUpperCase())).containsExactly("F", "O", "O");
         }
 
+        @Test
+        void returnsSeqWithInfiniteSeqs() {
+            var sut = ISeq.sequence("0123");
+
+            var actual = sut.map(x -> ISeq.iterate("0", i -> "" + x + i));
+
+            assertThat(actual).hasSize(4);
+            assertThat(actual.nth(0).take(3)).containsExactly("0", "00", "000");
+            assertThat(actual.nth(1).take(3)).containsExactly("0", "10", "110");
+            assertThat(actual.nth(2).take(3)).containsExactly("0", "20", "220");
+            assertThat(actual.nth(3).take(3)).containsExactly("0", "30", "330");
+        }
+
         @Nested
         class WithOtherColl {
 
@@ -122,6 +135,21 @@ class StringSeqTest {
 
                 assertThat(sut.map("ab", (a, b) -> "" + a + b)).containsExactly("1a", "2b");
                 assertThat(sut.map("abcd", (a, b) -> "" + a + b)).containsExactly("1a", "2b", "3c");
+
+                assertThat(sut.map(ISeq.iterate("x", x -> x + "x"), (a, b) -> "" + a + b)).containsExactly("1x", "2xx", "3xxx");
+            }
+
+            @Test
+            void returnsSeqWithInfiniteSeqsIfMappingResultIsInfinite() {
+                var sut = ISeq.sequence("0123");
+
+                var actual = sut.map(ISeq.iterate(0, x -> x + 1), (a, b) -> ISeq.iterate("0", i -> i + a + b));
+
+                assertThat(actual).hasSize(4);
+                assertThat(actual.nth(0).take(3)).containsExactly("0", "000", "00000");
+                assertThat(actual.nth(1).take(3)).containsExactly("0", "011", "01111");
+                assertThat(actual.nth(2).take(3)).containsExactly("0", "022", "02222");
+                assertThat(actual.nth(3).take(3)).containsExactly("0", "033", "03333");
             }
         }
     }
@@ -148,6 +176,13 @@ class StringSeqTest {
             var sut = ISeq.sequence("foo");
 
             assertThat(sut.mapcat(x -> x == 'f' ? List.of() : List.of(x, x))).containsExactly('o', 'o', 'o', 'o');
+        }
+
+        @Test
+        void returnsInfiniteLazySeqIfMappingResultIsInfinite() {
+            var sut = ISeq.sequence("0123");
+
+            assertThat(sut.mapcat(x -> ISeq.iterate("Y", y -> y + "Y")).take(4)).containsExactly("Y", "YY", "YYY", "YYYY");
         }
 
         @Nested
@@ -181,6 +216,17 @@ class StringSeqTest {
                         .containsExactly("1a", "1a", "2b", "2b");
                 assertThat(sut.mapcat(List.of("a", "b", "c", "d"), (a, b) -> List.of(a + b, a + b)))
                         .containsExactly("1a", "1a", "2b", "2b", "3c", "3c");
+
+                assertThat(sut.mapcat(ISeq.iterate("Y", y -> y + "Y"), (a, b) -> List.of(a + b, a + b)))
+                        .containsExactly("1Y", "1Y", "2YY", "2YY", "3YYY", "3YYY");
+            }
+
+            @Test
+            void returnsInfiniteLazySeqIfMappingResultIsInfinite() {
+                var sut = ISeq.sequence("123");
+                var other = List.of("a", "b", "c");
+
+                assertThat(sut.mapcat(other, (a, b) -> ISeq.iterate("Y", y -> y + a + b)).take(4)).containsExactly("Y", "Y1a", "Y1a1a", "Y1a1a1a");
             }
         }
     }

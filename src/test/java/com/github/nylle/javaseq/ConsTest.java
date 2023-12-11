@@ -141,6 +141,19 @@ class ConsTest {
             assertThat(sut.map(x -> x.length())).isEqualTo(ISeq.of(3, 2, 3, 6));
         }
 
+        @Test
+        void returnsSeqWithInfiniteSeqs() {
+            var sut = ISeq.of(0, 1, 2, 3);
+
+            var actual = sut.map(x -> ISeq.iterate(x, i -> i + x));
+
+            assertThat(actual).hasSize(4);
+            assertThat(actual.nth(0).take(3)).containsExactly(0, 0, 0);
+            assertThat(actual.nth(1).take(3)).containsExactly(1, 2, 3);
+            assertThat(actual.nth(2).take(3)).containsExactly(2, 4, 6);
+            assertThat(actual.nth(3).take(3)).containsExactly(3, 6, 9);
+        }
+
         @Nested
         class WithOtherColl {
 
@@ -187,6 +200,21 @@ class ConsTest {
 
                 assertThat(sut.map("ab", (a, b) -> "" + a + b)).containsExactly("1a", "2b");
                 assertThat(sut.map("abcd", (a, b) -> "" + a + b)).containsExactly("1a", "2b", "3c");
+
+                assertThat(sut.map(ISeq.iterate(0, x -> x + 1), (a, b) -> a + b)).containsExactly(1, 3, 5);
+            }
+
+            @Test
+            void returnsSeqWithInfiniteSeqsIfMappingResultIsInfinite() {
+                var sut = ISeq.of(0, 1, 2, 3);
+
+                var actual = sut.map(ISeq.iterate(0, x -> x + 1), (a, b) -> ISeq.iterate(a, i -> i + a + b));
+
+                assertThat(actual).hasSize(4);
+                assertThat(actual.nth(0).take(3)).containsExactly(0, 0, 0);
+                assertThat(actual.nth(1).take(3)).containsExactly(1, 3, 5);
+                assertThat(actual.nth(2).take(3)).containsExactly(2, 6, 10);
+                assertThat(actual.nth(3).take(3)).containsExactly(3, 9, 15);
             }
         }
     }
@@ -217,6 +245,13 @@ class ConsTest {
             assertThat(sut.mapcat(x -> x == 0 ? List.of() : List.of(x, x))).containsExactly(1, 1, 2, 2, 3, 3);
         }
 
+        @Test
+        void returnsInfiniteLazySeqIfMappingResultIsInfinite() {
+            var sut = ISeq.of(0, 1, 2, 3);
+
+            assertThat(sut.mapcat(x -> ISeq.iterate("Y", y -> y + "Y")).take(4)).containsExactly("Y", "YY", "YYY", "YYYY");
+        }
+
         @Nested
         class WithOtherColl {
 
@@ -241,6 +276,16 @@ class ConsTest {
                         .containsExactly("1a", "1a", "2b", "2b");
                 assertThat(sut.mapcat(List.of("a", "b", "c", "d"), (a, b) -> List.of(a + b, a + b)))
                         .containsExactly("1a", "1a", "2b", "2b", "3c", "3c");
+                assertThat(sut.mapcat(ISeq.iterate("Y", y -> y + "Y"), (a, b) -> List.of(a + b, a + b)))
+                        .containsExactly("1Y", "1Y", "2YY", "2YY", "3YYY", "3YYY");
+            }
+
+            @Test
+            void returnsInfiniteLazySeqIfMappingResultIsInfinite() {
+                var sut = ISeq.of(1, 2, 3);
+                var other = List.of("a", "b", "c");
+
+                assertThat(sut.mapcat(other, (a, b) -> ISeq.iterate("Y", y -> y + a + b)).take(4)).containsExactly("Y", "Y1a", "Y1a1a", "Y1a1a1a");
             }
         }
     }

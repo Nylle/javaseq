@@ -71,18 +71,12 @@ public class ChunkedCons<T> extends ASeq<T> implements ISeq<T> {
 
     @Override
     public <R> ISeq<R> mapcat(Function<? super T, ? extends Iterable<? extends R>> f) {
-        var acc = new ArrayList<R>();
-        for (int i = 0; i < chunk.count(); i++) {
-            acc.addAll(Util.copy(f.apply(chunk.nth(i))));
-        }
-        return ISeq.concat(acc, rest.mapcat(f));
+        return Fn.mapcat(f, this);
     }
 
     @Override
     public <S, R> ISeq<R> mapcat(ISeq<? extends S> coll, BiFunction<? super T, ? super S, Iterable<? extends R>> f) {
-        return coll.isEmpty()
-                ? ISeq.of()
-                : ISeq.concat(Util.copy(f.apply(first(), coll.first())), rest().mapcat(coll.rest(), f));
+        return Fn.mapcat(f, this, coll);
     }
 
     @Override

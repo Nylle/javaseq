@@ -530,6 +530,19 @@ class LazySeqTest {
             assertThat(sut.map(x -> x * 100).take(3)).containsExactly(0, 100, 200);
         }
 
+        @Test
+        void returnsInfiniteSeqWithInfiniteSeqs() {
+            var sut = iterate(0, i -> i + 1);
+
+            var actual = sut.map(x -> iterate(x, i -> i + x)).take(4);
+
+            assertThat(actual).hasSize(4);
+            assertThat(actual.nth(0).take(3)).containsExactly(0, 0, 0);
+            assertThat(actual.nth(1).take(3)).containsExactly(1, 2, 3);
+            assertThat(actual.nth(2).take(3)).containsExactly(2, 4, 6);
+            assertThat(actual.nth(3).take(3)).containsExactly(3, 6, 9);
+        }
+
         @Nested
         class WithOtherSeq {
 
@@ -586,7 +599,7 @@ class LazySeqTest {
             }
 
             @Test
-            void isLazy() {
+            void returnsInfiniteLazySeqIfOtherIsInfinite() {
                 var sut = iterate(0, x -> x + 1);
                 var other = iterate(0, x -> x + 1);
 
@@ -676,11 +689,11 @@ class LazySeqTest {
             }
 
             @Test
-            void isLazy() {
+            void returnsInfiniteLazySeqIfOtherIsInfinite() {
                 var sut = iterate(0, x -> x + 1);
-                var other = iterate(0, x -> x + 1);
+                var infiniteOther = iterate(0, x -> x + 1);
 
-                assertThat(sut.mapcat(other, (a, b) -> ISeq.of(a + b, a + b)).take(8))
+                assertThat(sut.mapcat(infiniteOther, (a, b) -> ISeq.of(a + b, a + b)).take(8))
                         .containsExactly(0, 0, 2, 2, 4, 4, 6, 6);
             }
 

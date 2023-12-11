@@ -48,27 +48,27 @@ class LazySeq2<T> extends ASeq<T> implements ISeq<T> {
 
     @Override
     public ISeq<T> filter(Predicate<? super T> pred) {
-        return Fn.filter(pred, this);
+        return Fn2.filter(pred, this);
     }
 
     @Override
     public <R> ISeq<R> map(Function<? super T, ? extends R> f) {
-        return Fn.map(f, this);
+        return Fn2.map(f, this);
     }
 
     @Override
     public <S, R> ISeq<R> map(ISeq<? extends S> coll, BiFunction<? super T, ? super S, ? extends R> f) {
-        return Fn.map(f, this, coll);
+        return Fn2.map(f, this, coll);
     }
 
     @Override
     public <R> ISeq<R> mapcat(Function<? super T, ? extends Iterable<? extends R>> f) {
-        return Fn.mapcat(f, this);
+        return Fn2.mapcat(f, this);
     }
 
     @Override
     public <S, R> ISeq<R> mapcat(ISeq<? extends S> coll, BiFunction<? super T, ? super S, Iterable<? extends R>> f) {
-        return Fn.mapcat(f, this, coll);
+        return Fn2.mapcat(f, this, coll);
     }
 
     @Override
@@ -113,7 +113,7 @@ class LazySeq2<T> extends ASeq<T> implements ISeq<T> {
 
     @Override
     public ISeq<T> distinct() {
-        return Fn.distinct(this);
+        return Fn2.distinct(this);
     }
 
     @Override
