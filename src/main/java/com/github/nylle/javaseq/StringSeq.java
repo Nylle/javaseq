@@ -54,16 +54,6 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
     }
 
     @Override
-    public <R> ISeq<R> mapcat(Function<? super Character, ? extends Iterable<? extends R>> f) {
-        return Fn.mapcat(f, this);
-    }
-
-    @Override
-    public <S, R> ISeq<R> mapcat(ISeq<? extends S> coll, BiFunction<? super Character, ? super S, Iterable<? extends R>> f) {
-        return Fn.mapcat(f, this, coll);
-    }
-
-    @Override
     public ISeq<Character> cons(Character x) {
         return new StringSeq(x.toString() + s.subSequence(i, s.length()), 0);
     }

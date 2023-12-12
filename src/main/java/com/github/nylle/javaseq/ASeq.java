@@ -1,9 +1,7 @@
 package com.github.nylle.javaseq;
 
 import java.util.AbstractList;
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -19,233 +17,173 @@ import java.util.stream.StreamSupport;
 
 public abstract class ASeq<T> extends AbstractList<T> implements ISeq<T> {
 
+    public ISeq<T> filter(Predicate<? super T> pred) {
+        return Fn.filter(pred, this);
+    }
+
+    public <R> ISeq<R> map(Function<? super T, ? extends R> f) {
+        return Fn.map(f, this);
+    }
+
+    public <S, R> ISeq<R> map(ISeq<? extends S> coll, BiFunction<? super T, ? super S, ? extends R> f) {
+        return Fn.map(f, this, coll);
+    }
+
     public <S, R> ISeq<R> map(Iterable<? extends S> coll, BiFunction<? super T, ? super S, ? extends R> f) {
-        return map(ISeq.sequence(coll), f);
+        return map(Fn.seq(coll), f);
     }
 
     public <S, R> ISeq<R> map(Iterator<? extends S> coll, BiFunction<? super T, ? super S, ? extends R> f) {
-        return map(ISeq.sequence(coll), f);
+        return map(Fn.seq(coll), f);
     }
 
     public <S, R> ISeq<R> map(Stream<? extends S> coll, BiFunction<? super T, ? super S, ? extends R> f) {
-        return map(ISeq.sequence(coll), f);
+        return map(Fn.seq(coll), f);
     }
 
     public <S, R> ISeq<R> map(S[] coll, BiFunction<? super T, ? super S, ? extends R> f) {
-        return map(ISeq.sequence(coll), f);
+        return map(Fn.seq(coll), f);
     }
 
     public <R> ISeq<R> map(CharSequence coll, BiFunction<? super T, ? super Character, ? extends R> f) {
-        return map(ISeq.sequence(coll), f);
+        return map(Fn.seq(coll), f);
+    }
+
+    public <R> ISeq<R> mapcat(Function<? super T, ? extends Iterable<? extends R>> f) {
+        return Fn.mapcat(f, this);
+    }
+
+    public <S, R> ISeq<R> mapcat(ISeq<? extends S> coll, BiFunction<? super T, ? super S, Iterable<? extends R>> f) {
+        return Fn.mapcat(f, this, coll);
     }
 
     public <S, R> ISeq<R> mapcat(Iterable<? extends S> coll, BiFunction<? super T, ? super S, Iterable<? extends R>> f) {
-        return mapcat(ISeq.sequence(coll), f);
+        return Fn.mapcat(f, this, Fn.seq(coll));
     }
 
     public <S, R> ISeq<R> mapcat(Iterator<? extends S> coll, BiFunction<? super T, ? super S, Iterable<? extends R>> f) {
-        return mapcat(ISeq.sequence(coll), f);
+        return Fn.mapcat(f, this, Fn.seq(coll));
     }
 
     public <S, R> ISeq<R> mapcat(Stream<? extends S> coll, BiFunction<? super T, ? super S, Iterable<? extends R>> f) {
-        return mapcat(ISeq.sequence(coll), f);
+        return Fn.mapcat(f, this, Fn.seq(coll));
     }
 
     public <S, R> ISeq<R> mapcat(S[] coll, BiFunction<? super T, ? super S, Iterable<? extends R>> f) {
-        return mapcat(ISeq.sequence(coll), f);
+        return Fn.mapcat(f, this, Fn.seq(coll));
     }
 
     public <R> ISeq<R> mapcat(CharSequence coll, BiFunction<? super T, ? super Character, Iterable<? extends R>> f) {
-        return mapcat(ISeq.sequence(coll), f);
+        return Fn.mapcat(f, this, Fn.seq(coll));
     }
 
     public ISeq<T> take(long n) {
-        return ISeq.lazySeq(() -> {
-            if (isEmpty() || n <= 0) {
-                return ISeq.of();
-            }
-            return n == 1 ? ISeq.of(first()) : rest().take(n - 1).cons(first());
-        });
+        return Fn.take(n, this);
     }
 
     public ISeq<T> drop(long n) {
-        return ISeq.lazySeq(() -> {
-            if (isEmpty()) {
-                return ISeq.of();
-            }
-            return n > 0 ? rest().drop(n - 1) : this;
-        });
+        return Fn.drop(n, this);
     }
 
     public ISeq<T> takeWhile(Predicate<? super T> pred) {
-        return ISeq.lazySeq(() -> isEmpty() || !pred.test(first())
-                ? ISeq.of()
-                : ISeq.cons(first(), rest().takeWhile(pred)));
+        return Fn.takeWhile(pred, this);
     }
 
     public ISeq<T> dropWhile(Predicate<? super T> pred) {
-        return ISeq.lazySeq(() -> {
-            if (isEmpty()) {
-                return ISeq.of();
-            }
-            return pred.test(first()) ? rest().dropWhile(pred) : this;
-        });
+        return Fn.dropWhile(pred, this);
     }
 
     public ISeq<List<T>> partition(int n) {
-        return partition(n, n);
+        return Fn.partition(n, this);
     }
 
     public ISeq<List<T>> partition(int n, int step) {
-        return partition(n, step, null);
+        return Fn.partition(n, step, this);
     }
 
     public ISeq<List<T>> partition(int n, int step, Iterable<T> pad) {
-        return ISeq.lazySeq(() -> {
-            if (n < 0 || isEmpty()) {
-                return ISeq.of();
-            }
-            var partition = take(n).toList();
-            if (partition.size() < n) {
-                if (pad == null) return ISeq.of();
-                return ISeq.cons(
-                        ISeq.concat(partition, ISeq.sequence(pad).take(n - (long) partition.size())).toList(),
-                        drop(step).partition(n, step, pad));
-            }
-            return ISeq.cons(partition, drop(step).partition(n, step, pad));
-        });
+        return Fn.partition(n, step, pad, this);
     }
 
     public ISeq<List<T>> partitionAll(int n) {
-        return partition(n, n, List.of());
+        return Fn.partitionAll(n, this);
     }
 
     public ISeq<List<T>> partitionAll(int n, int step) {
-        return partition(n, step, List.of());
+        return Fn.partitionAll(n, step, this);
     }
 
     public ISeq<T> reductions(BinaryOperator<T> f) {
-        return ISeq.lazySeq(() -> isEmpty() ? ISeq.of() : rest().reductions(first(), f));
+        return Fn.reductions(f, this);
     }
 
     public <U> ISeq<U> reductions(U init, BiFunction<U, ? super T, U> f) {
-        return isEmpty()
-                ? ISeq.of(init)
-                : ISeq.cons(init, ISeq.lazySeq(() -> rest().reductions(f.apply(init, first()), f)));
+        return Fn.reductions(init, f, this);
     }
 
     public ISeq<T> cons(T x) {
-        return ISeq.cons(x, this);
+        return Fn.cons(x, this);
     }
 
     public Optional<T> reduce(BinaryOperator<T> f) {
-        return isEmpty() || rest().isEmpty() ? Optional.empty() : Optional.of(rest().reduce(first(), f));
+        return Fn.reduce(f, this);
     }
 
     public <U> U reduce(U val, BiFunction<U, ? super T, U> f) {
-        var result = val;
-        ISeq<T> seq = this;
-        while (!seq.isEmpty()) {
-            result = f.apply(result, seq.first());
-            seq = seq.rest();
-        }
-        return result;
+        return Fn.reduce(val, f, this);
     }
 
     public void run(Consumer<? super T> proc) {
-        if (!isEmpty()) {
-            proc.accept(first());
-            rest().run(proc);
-        }
+        Fn.run(proc, this);
     }
 
     public ISeq<T> distinct() {
-        return step(this, new HashSet<>());
-    }
-
-    private static <T> ISeq<T> step(ISeq<T> seq, Set<T> seen) {
-        return ISeq.lazySeq(() -> {
-            var result = seq.filter(x -> !seen.contains(x));
-            if (result.isEmpty()) {
-                return ISeq.of();
-            }
-            var first = result.first();
-            return ISeq.cons(first, step(result.rest(), Util.conj(seen, first)));
-        });
+        return Fn.distinct(this);
     }
 
     @SuppressWarnings("unchecked")
     public ISeq<T> sorted() {
-        return sorted((o1, o2) -> ((Comparable<T>) o1).compareTo(o2));
+        return Fn.sort(this);
     }
 
     public ISeq<T> sorted(Comparator<? super T> comp) {
-        var result = new ArrayList<>(this);
-        result.sort(comp);
-        return ISeq.sequence(result);
+        return Fn.sort(comp, this);
     }
 
     public boolean some(Predicate<? super T> pred) {
-        return !isEmpty() && (pred.test(first()) || rest().some(pred));
+        return Fn.some(pred, this);
     }
 
     public boolean every(Predicate<? super T> pred) {
-        return isEmpty() || pred.test(first()) && rest().every(pred);
+        return Fn.every(pred, this);
     }
 
     public boolean notAny(Predicate<? super T> pred) {
-        return isEmpty() || every(pred.negate());
+        return Fn.notAny(pred, this);
     }
 
     public Optional<T> max(Comparator<? super T> comp) {
-        if (isEmpty()) {
-            return Optional.empty();
-        }
-        if (rest().isEmpty()) {
-            return Optional.of(first());
-        }
-        var result = first();
-        var seq = this.rest();
-        while (!seq.isEmpty()) {
-            var next = seq.first();
-            result = comp.compare(result, next) > 0 ? result : next;
-            seq = seq.rest();
-        }
-        return Optional.of(result);
+        return Fn.max(comp, this);
     }
 
     public Optional<T> min(Comparator<? super T> comp) {
-        return max(comp.reversed());
+        return Fn.min(comp, this);
     }
 
     public <C extends Comparable<? super C>> Optional<T> maxKey(Function<T, C> f) {
-        return max(Comparator.comparing(t -> f.apply(t)));
+        return Fn.maxKey(f, this);
     }
 
     public <C extends Comparable<? super C>> Optional<T> minKey(Function<T, C> f) {
-        return min(Comparator.comparing(t -> f.apply(t)));
+        return Fn.minKey(f, this);
     }
 
     public T nth(int index) {
-        var result = nth(index, null);
-        if (result == null) {
-            throw new IndexOutOfBoundsException(index);
-        }
-        return result;
+        return Fn.nth(this, index);
     }
 
     public T nth(int index, T notFound) {
-        if (index < 0 || isEmpty()) {
-            return notFound;
-        }
-        ISeq<T> seq = this;
-        for (int i = index; i > 0; --i) {
-            if (seq.rest().isEmpty()) {
-                return notFound;
-            }
-            seq = seq.rest();
-        }
-        return seq.first();
+        return Fn.nth(this, index, notFound);
     }
 
     public Optional<T> find(int i) {

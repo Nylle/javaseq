@@ -1,6 +1,5 @@
 package com.github.nylle.javaseq;
 
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -20,7 +19,7 @@ public interface ISeq<T> extends List<T> {
 
     @SuppressWarnings("unchecked")
     static <T> ISeq<T> of() {
-        return Nil.empty();
+        return Fn.nil();
     }
 
     @SafeVarargs
@@ -33,52 +32,44 @@ public interface ISeq<T> extends List<T> {
     }
 
     static <T> ISeq<T> cons(T x, ISeq<T> seq) {
-        return new Cons<>(x, seq);
+        return Fn.cons(x, seq);
     }
 
     static <T> ISeq<T> lazySeq(Supplier<ISeq<T>> f) {
-        return new LazySeq<>(f);
+        return Fn.lazySeq(f);
     }
 
     static <T> ISeq<T> sequence(T[] coll) {
-        return coll == null ? ISeq.of() : ISeq.sequence(Arrays.asList(coll).iterator());
+        return Fn.seq(coll);
     }
 
     static <T> ISeq<T> sequence(Iterable<T> coll) {
-        if (coll == null) {
-            return ISeq.of();
-        }
-        return coll instanceof ISeq<T> seq ? seq : ISeq.sequence(coll.iterator());
+        return Fn.seq(coll);
     }
 
     static <T> ISeq<T> sequence(Iterator<T> coll) {
-        return coll == null || !coll.hasNext()
-                ? ISeq.of()
-                : ISeq.lazySeq(() -> new Cons<>(coll.next(), ISeq.sequence(coll)));
+        return Fn.seq(coll);
     }
 
     static <T> ISeq<T> sequence(Stream<T> coll) {
-        return coll == null ? of() : ISeq.sequence(coll.iterator());
+        return Fn.seq(coll);
     }
 
     static <K, V> ISeq<Map.Entry<K, V>> sequence(Map<K, V> coll) {
-        return coll == null ? ISeq.of() : ISeq.sequence(coll.entrySet().iterator());
+        return Fn.seq(coll);
     }
 
     static ISeq<Character> sequence(CharSequence coll) {
-        if(coll == null || coll.isEmpty()) {
-            return ISeq.of();
-        }
-        return new StringSeq(coll, 0);
+        return Fn.seq(coll);
     }
 
     static <T> ISeq<T> iterate(T x, UnaryOperator<T> f) {
-        return ISeq.lazySeq(() -> ISeq.cons(x, iterate(f.apply(x), f)));
+        return Fn.iterate(x, f);
     }
 
     @SafeVarargs
     static <T> ISeq<T> concat(Iterable<T>... colls) {
-        return ISeq.sequence(colls).mapcat(x -> x);
+        return Fn.concat(colls);
     }
 
     static ISeq<Integer> range() {

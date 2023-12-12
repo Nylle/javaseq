@@ -1213,7 +1213,7 @@ class LazySeqTest {
 
             assertThat(sut.reductions((a, b) -> a + b).isRealized()).isFalse();
 
-            assertThat(sut.reductions(0, (a, b) -> a + b).isRealized()).isTrue();
+            assertThat(sut.reductions(0, (a, b) -> a + b).isRealized()).isFalse();
             assertThat(sut.reductions(0, (a, b) -> a + b).rest().isRealized()).isFalse();
         }
 
