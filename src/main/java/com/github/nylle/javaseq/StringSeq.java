@@ -150,7 +150,7 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
                 result = f.apply(result, str.charAt(i));
                 acc = Fn.cons(result, acc);
             }
-            return Fn.reverse(acc);
+            return acc.reverse();
         });
     }
 
