@@ -276,14 +276,14 @@ public class Fn {
         return step(seq, new HashSet<>());
     }
 
-    private static <T> ISeq<T> step(ISeq<T> seq, Set<T> seen) {
+    private static <T> ISeq<T> step(final ISeq<T> seq, final Set<T> seen) {
         return lazySeq(() -> {
             var result = seq.filter(x -> !seen.contains(x));
             if (result.isEmpty()) {
                 return nil();
             }
             var first = result.first();
-            return cons(first, step(result.rest(), conj(seen, first)));
+            return step(result.rest(), conj(seen, first)).cons(first);
         });
     }
 
@@ -298,6 +298,15 @@ public class Fn {
         return seq(result);
     }
 
+    public static <T> ISeq<T> reverse(ISeq<T> seq) {
+        var iter = seq.iterator();
+        var acc = ISeq.<T>of();
+        while(iter.hasNext()) {
+            acc = cons(iter.next(), acc);
+        }
+        return acc;
+    }
+
     public static <T> boolean some(Predicate<? super T> pred, ISeq<T> seq) {
         return !seq.isEmpty() && (pred.test(seq.first()) || seq.rest().some(pred));
     }
@@ -307,7 +316,7 @@ public class Fn {
     }
 
     public static <T> boolean notAny(Predicate<? super T> pred, ISeq<T> seq) {
-        return seq.isEmpty() || every(pred.negate(), seq);
+        return seq.isEmpty() || seq.every(pred.negate());
     }
 
     public static <T> Optional<T> max(Comparator<? super T> comp, ISeq<T> seq) {
@@ -328,7 +337,7 @@ public class Fn {
     }
 
     public static <T> Optional<T> min(Comparator<? super T> comp, ISeq<T> seq) {
-        return max(comp.reversed(), seq);
+        return seq.max(comp.reversed());
     }
 
     public static <T, C extends Comparable<? super C>> Optional<T> maxKey(Function<T, C> f, ISeq<T> seq) {
@@ -340,7 +349,7 @@ public class Fn {
     }
 
     public static <T> T nth(ISeq<T> seq, int index) {
-        var result = nth(seq, index, null);
+        var result = seq.nth(index, null);
         if (result == null) {
             throw new IndexOutOfBoundsException(index);
         }
@@ -359,5 +368,25 @@ public class Fn {
             s = s.rest();
         }
         return s.first();
+    }
+
+
+
+
+
+
+    private static final int CHUNK_SIZE = 32;
+    public static <T> ISeq<T> chunkIteratorSeq(Iterator<T> iterator) {
+        if(iterator.hasNext()) {
+            return new LazySeq<>(() -> {
+                T[] arr = (T[]) new Object[CHUNK_SIZE];
+                int n = 0;
+                while(iterator.hasNext() && n < CHUNK_SIZE) {
+                    arr[n++] = iterator.next();
+                }
+                return new ChunkedCons<>(new ArrayChunk<>(arr, 0, n), chunkIteratorSeq(iterator));
+            });
+        }
+        return Nil.empty();
     }
 }

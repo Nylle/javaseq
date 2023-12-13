@@ -52,16 +52,14 @@ class StringSeqTest {
 
         @Test
         void returnsNilWhenNoItemsMatch() {
-            var sut = ISeq.sequence("foobar");
-
-            assertThat(sut.filter(x -> x == 'x')).isEmpty();
+            assertThat(ISeq.sequence("foobar").filter(x -> x == 'x')).isEmpty();
+            assertThat(ISeq.sequence("xfoobar").rest().filter(x -> x == 'x')).isEmpty();
         }
 
         @Test
         void returnsMatchingItems() {
-            var sut = ISeq.sequence("foobarbaz");
-
-            assertThat(sut.filter(x -> x == 'a')).containsExactly('a', 'a');
+            assertThat(ISeq.sequence("foobarbaz").filter(x -> x == 'a')).containsExactly('a', 'a');
+            assertThat(ISeq.sequence("xfoobarbaz").rest().filter(x -> x == 'a')).containsExactly('a', 'a');
         }
     }
 
@@ -284,24 +282,20 @@ class StringSeqTest {
 
         @Test
         void returnsNilWithNegativeItems() {
-            var sut = ISeq.sequence("foo");
-
-            assertThat(sut.take(-1)).isEqualTo(Nil.empty());
+            assertThat(ISeq.sequence("foo").take(-1)).isEqualTo(Nil.empty());
+            assertThat(ISeq.sequence("xfoo").rest().take(-1)).isEqualTo(Nil.empty());
         }
 
         @Test
         void returnsNilWithZeroItems() {
-            var sut = ISeq.sequence("foo");
-
-            assertThat(sut.take(0)).isEqualTo(Nil.empty());
+            assertThat(ISeq.sequence("foo").take(0)).isEqualTo(Nil.empty());
+            assertThat(ISeq.sequence("xfoo").rest().take(0)).isEqualTo(Nil.empty());
         }
 
         @Test
         void returnsStringSeqWithMoreThanZeroItems() {
-            var sut = ISeq.sequence("foo");
-
-            assertThat(sut.take(3))
-                    .containsExactly('f', 'o', 'o');
+            assertThat(ISeq.sequence("foobar").take(3)).containsExactly('f', 'o', 'o');
+            assertThat(ISeq.sequence("xfoobar").rest().take(3)).containsExactly('f', 'o', 'o');
         }
     }
 
@@ -311,21 +305,25 @@ class StringSeqTest {
         @Test
         void returnsUnchangedSeqWithNegativeItemsToDrop() {
             assertThat(ISeq.sequence("foo").drop(-1)).containsExactly('f', 'o', 'o');
+            assertThat(ISeq.sequence("xfoo").rest().drop(-1)).containsExactly('f', 'o', 'o');
         }
 
         @Test
         void returnsUnchangedSeqWithZeroItemsToDrop() {
             assertThat(ISeq.sequence("foo").drop(0)).containsExactly('f', 'o', 'o');
+            assertThat(ISeq.sequence("xfoo").rest().drop(0)).containsExactly('f', 'o', 'o');
         }
 
         @Test
         void returnsSeqOfAllButTheFirstNItems() {
             assertThat(ISeq.sequence("hello").drop(2)).containsExactly('l', 'l', 'o');
+            assertThat(ISeq.sequence("xhello").rest().drop(2)).containsExactly('l', 'l', 'o');
         }
 
         @Test
         void returnsEmptySeqIfMoreItemsAreDroppedThanPresent() {
             assertThat(ISeq.sequence("foo").drop(5)).isEmpty();
+            assertThat(ISeq.sequence("xfoo").rest().drop(5)).isEmpty();
         }
     }
 
@@ -335,21 +333,25 @@ class StringSeqTest {
         @Test
         void returnsEmptySeqWhenFirstItemDoesNotMatch() {
             assertThat(ISeq.sequence("foo").takeWhile(x -> x != 'f')).isEmpty();
+            assertThat(ISeq.sequence("xfoo").rest().takeWhile(x -> x != 'f')).isEmpty();
         }
 
         @Test
         void returnsSeqWithSingleMatchingItem() {
             assertThat(ISeq.sequence("foo").takeWhile(x -> x == 'f')).containsExactly('f');
+            assertThat(ISeq.sequence("xfoo").rest().takeWhile(x -> x == 'f')).containsExactly('f');
         }
 
         @Test
         void returnsSeqWithMatchingItems() {
             assertThat(ISeq.sequence("foobar").takeWhile(x -> x > 'a')).containsExactly('f', 'o', 'o', 'b');
+            assertThat(ISeq.sequence("xfoobar").rest().takeWhile(x -> x > 'a')).containsExactly('f', 'o', 'o', 'b');
         }
 
         @Test
         void returnsSeqWithAllMatchingItems() {
             assertThat(ISeq.sequence("foo").takeWhile(x -> x > 'a')).containsExactly('f', 'o', 'o');
+            assertThat(ISeq.sequence("xfoo").rest().takeWhile(x -> x > 'a')).containsExactly('f', 'o', 'o');
         }
     }
 
@@ -359,16 +361,19 @@ class StringSeqTest {
         @Test
         void returnsEmptySeqWhenAllItemsMatch() {
             assertThat(ISeq.sequence("foo").dropWhile(x -> x > 'a')).isEmpty();
+            assertThat(ISeq.sequence("xfoo").rest().dropWhile(x -> x > 'a')).isEmpty();
         }
 
         @Test
         void returnsSeqWithItemsThatDoNotMatch() {
-            assertThat(ISeq.sequence("foo").dropWhile(x -> x < 'o').take(4)).containsExactly('o', 'o');
+            assertThat(ISeq.sequence("foo").dropWhile(x -> x < 'o')).containsExactly('o', 'o');
+            assertThat(ISeq.sequence("xfoo").rest().dropWhile(x -> x < 'o')).containsExactly('o', 'o');
         }
 
         @Test
         void returnsEntireSeqWhenFirstItemDoesNotMatch() {
-            assertThat(ISeq.sequence("foo").dropWhile(x -> x > 'f').take(4)).containsExactly('f', 'o', 'o');
+            assertThat(ISeq.sequence("foo").dropWhile(x -> x > 'f')).containsExactly('f', 'o', 'o');
+            assertThat(ISeq.sequence("xfoo").rest().dropWhile(x -> x > 'f')).containsExactly('f', 'o', 'o');
         }
     }
 
@@ -608,11 +613,8 @@ class StringSeqTest {
         void returnsSeqOfOneEmptyListForStepGreaterThanOrEqualToSizeN() {
             var sut = ISeq.sequence("foo");
 
-            assertThat(sut.partitionAll(0, 3)).containsExactly(
-                    List.of());
-
-            assertThat(sut.partitionAll(0, 4)).containsExactly(
-                    List.of());
+            assertThat(sut.partitionAll(0, 3)).containsExactly(List.of());
+            assertThat(sut.partitionAll(0, 4)).containsExactly(List.of());
         }
 
         @Test
@@ -721,16 +723,17 @@ class StringSeqTest {
 
         @Test
         void returnsSeqWithAllItemsSortedUsingDefaultComparator() {
-            var sut = ISeq.sequence("acdfgeb");
+            var sut = ISeq.sequence("aßCcá$B7äA0Áb");
 
-            assertThat(sut.sorted()).containsExactly('a', 'b', 'c', 'd', 'e', 'f', 'g');
+            assertThat(sut.sorted()).containsExactly('$', '0', '7', 'A', 'B', 'C', 'a', 'b', 'c', 'Á', 'ß', 'á', 'ä');
         }
 
         @Test
         void returnsSeqWithAllItemsSortedUsingSuppliedComparator() {
-            var sut = ISeq.sequence("acdfgeb");
+            var sut = ISeq.sequence("aßCcá$B7äA0Áb");
 
-            assertThat(sut.sorted(Comparator.reverseOrder())).containsExactly('g', 'f', 'e', 'd', 'c', 'b', 'a');
+            assertThat(sut.sorted(Comparator.reverseOrder()))
+                    .containsExactly('ä', 'á', 'ß', 'Á', 'c', 'b', 'a', 'C', 'B', 'A', '7', '0', '$');
         }
     }
 
