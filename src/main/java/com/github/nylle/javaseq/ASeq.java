@@ -19,6 +19,10 @@ import java.util.stream.StreamSupport;
 
 public abstract class ASeq<T> extends AbstractList<T> implements ISeq<T> {
 
+    public T second() {
+        return nth(1, null);
+    }
+
     public ISeq<T> cons(T x) {
         return Fn.cons(x, this);
     }
@@ -254,9 +258,13 @@ public abstract class ASeq<T> extends AbstractList<T> implements ISeq<T> {
         return Fn.seq(result);
     }
 
-    //TODO!
     public ISeq<T> reverse() {
-        return Fn.reverse(this);
+        var iter = iterator();
+        var acc = Fn.<T>nil();
+        while(iter.hasNext()) {
+            acc = Fn.cons(iter.next(), acc);
+        }
+        return acc;
     }
 
     public boolean some(Predicate<? super T> pred) {
@@ -320,6 +328,10 @@ public abstract class ASeq<T> extends AbstractList<T> implements ISeq<T> {
             s = s.rest();
         }
         return s.first();
+    }
+
+    public String str() {
+        return reduce("", (a, b) -> a + b);
     }
 
     public Optional<T> find(int i) {

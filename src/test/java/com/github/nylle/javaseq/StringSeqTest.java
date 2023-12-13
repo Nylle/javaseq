@@ -33,6 +33,24 @@ class StringSeqTest {
         assertThat(ISeq.sequence("foo").first()).isEqualTo('f');
     }
 
+    @Nested
+    class Second {
+
+        @Test
+        void returnsSecondCharacter() {
+            var sut = ISeq.sequence("foo");
+
+            assertThat(sut.second()).isEqualTo('o');
+        }
+
+        @Test
+        void returnsNullIfSeqHasOnlyOneElement() {
+            var sut = ISeq.sequence("f");
+
+            assertThat(sut.second()).isNull();
+        }
+    }
+
     @Test
     void restReturnsSeqOfAllCharactersButFirst() {
         var sut = ISeq.sequence("bar");
@@ -737,6 +755,13 @@ class StringSeqTest {
         }
     }
 
+    @Test
+    void reverseReturnsReversedSeq() {
+        var sut = ISeq.sequence("abcde");
+
+        assertThat(sut.reverse()).containsExactly('e', 'd', 'c', 'b', 'a');
+    }
+
     @Nested
     class Some {
 
@@ -902,6 +927,11 @@ class StringSeqTest {
 
             assertThat(sut.minKey(x -> x.toString())).hasValue('a');
         }
+    }
+
+    @Test
+    void strReturnsStringRepresentationOfSeq() {
+        assertThat(ISeq.sequence("foobar").str()).isEqualTo("foobar");
     }
 
     @Nested

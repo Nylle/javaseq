@@ -16,7 +16,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 class ChunkedConsTest {
 
     private static <T> ArrayChunk<T> arrayChunk(List<T> list) {
-        return new ArrayChunk<>((T[])list.toArray(new Object[0]), 0, list.size());
+        return new ArrayChunk<>((T[]) list.toArray(new Object[0]), 0, list.size());
     }
 
     @Test
@@ -24,6 +24,24 @@ class ChunkedConsTest {
         var sut = new ChunkedCons<>(arrayChunk(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
 
         assertThat(sut.first()).isEqualTo(1);
+    }
+
+    @Nested
+    class Second {
+
+        @Test
+        void returnsSecondItem() {
+            var sut = new ChunkedCons<>(arrayChunk(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
+
+            assertThat(sut.second()).isEqualTo(2);
+        }
+
+        @Test
+        void returnsNullIfSeqHasOnlyOneElement() {
+            var sut = new ChunkedCons<>(arrayChunk(List.of(1)), ISeq.of());
+
+            assertThat(sut.second()).isNull();
+        }
     }
 
     @Test
@@ -327,6 +345,21 @@ class ChunkedConsTest {
             assertThat(sut.drop(6)).isEmpty();
             assertThat(sut.drop(7)).isEmpty();
         }
+    }
+
+    @Test
+    void strReturnsConcatenatedStringRepresentationsOfAllItems() {
+        assertThat(new ChunkedCons<>(arrayChunk(List.of(1, 2)), ISeq.of(3, 4)).str())
+                .isEqualTo("1234");
+        assertThat(new ChunkedCons<>(arrayChunk(List.of(new Object(), new Object())), ISeq.of(new Object(), new Object())).str())
+                .matches("java\\.lang\\.Object@.+java\\.lang\\.Object@.+java\\.lang\\.Object@.+java\\.lang\\.Object@.+");
+    }
+
+    @Test
+    void reverseReturnsReversedSeq() {
+        var sut = new ChunkedCons<>(arrayChunk(List.of(1, 2, 3)), ISeq.of(4, 5, 6));
+
+        assertThat(sut.reverse()).containsExactly(6, 5, 4, 3, 2, 1);
     }
 
     @Test

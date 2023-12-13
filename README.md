@@ -88,6 +88,10 @@ While Streams help to work with lazy collections by providing the aforementioned
 - Returns the first item in this seq.
 - Returns null if this seq is empty. _(See [findFirst](#findfirst).)_
 
+#### second()
+- Returns the second item in this seq.
+- Returns null if this seq has less than two items.
+
 #### rest()
 - Returns a seq of the items in this seq after the first.
 
@@ -151,6 +155,9 @@ _(This is similar to zipping two collections.)_
 
 #### sorted(comp)
 - Returns a seq of the items of this seq sorted by using supplied comparator comp. **Caution:** The seq will be fully realized. If this seq is infinite, it will run infinitely or until system resources are exhausted.
+
+#### reverse()
+- Returns a seq of the items of this seq in reversed order. **Caution:** The seq will be fully realized. If this seq is infinite, it will run infinitely or until system resources are exhausted.
 
 #### reduce(f)
 - Returns an empty Optional if this seq contains no items.
@@ -221,6 +228,10 @@ _(This is similar to zipping two collections.)_
 
 #### toList()
 - Returns a List with all items in this seq. **Caution:** The seq will be fully realized. If this seq is infinite, it will run infinitely or until system resources are exhausted.
+
+#### str()
+- Returns an empty string if the seq is empty.
+- Returns the concatenation of x.toString() of all items x in this seq. **Caution:** The seq will be fully realized. If this seq is infinite, it will run infinitely or until system resources are exhausted.
 
 ### Interoperability
 

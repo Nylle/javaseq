@@ -25,6 +25,24 @@ class ConsTest {
         assertThat(sut.first()).isEqualTo(0);
     }
 
+    @Nested
+    class Second {
+
+        @Test
+        void returnsSecondItem() {
+            var sut = ISeq.cons(1, ISeq.cons(2, ISeq.cons(3, ISeq.of())));
+
+            assertThat(sut.second()).isEqualTo(2);
+        }
+
+        @Test
+        void returnsNullIfSeqHasOnlyOneElement() {
+            var sut = ISeq.cons(1, ISeq.of());
+
+            assertThat(sut.second()).isNull();
+        }
+    }
+
     @Test
     void restReturnsSeqWithItemsExceptFirst() {
         var sut = ISeq.cons(0, ISeq.cons(1, ISeq.cons(2, ISeq.cons(3, ISeq.of()))));
@@ -745,6 +763,13 @@ class ConsTest {
         }
     }
 
+    @Test
+    void reverseReturnsReversedSeq() {
+        var sut = ISeq.of(10, 9, 7, 8);
+
+        assertThat(sut.reverse()).containsExactly(8, 7, 9, 10);
+    }
+
     @Nested
     class Some {
 
@@ -1008,6 +1033,14 @@ class ConsTest {
                     .isThrownBy(() -> sut.nth(1))
                     .withMessage("Index out of range: 1");
         }
+    }
+
+    @Test
+    void strReturnsConcatenatedStringRepresentationsOfAllItems() {
+        assertThat(ISeq.cons("", ISeq.cons("0", ISeq.cons("01", ISeq.cons("012", ISeq.of())))).str())
+                .isEqualTo("001012");
+        assertThat(ISeq.cons(new Object(), ISeq.cons(new Object(), ISeq.cons(new Object(), ISeq.of()))).str())
+                .matches("java\\.lang\\.Object@.+java\\.lang\\.Object@.+java\\.lang\\.Object@.+");
     }
 
     @Nested

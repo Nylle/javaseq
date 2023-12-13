@@ -90,6 +90,8 @@ public interface ISeq<T> extends List<T> {
 
     T first();
 
+    T second();
+
     ISeq<T> rest();
 
     boolean isRealized();
@@ -160,6 +162,8 @@ public interface ISeq<T> extends List<T> {
 
     ISeq<T> sorted(Comparator<? super T> comp);
 
+    ISeq<T> reverse();
+
     boolean some(Predicate<? super T> pred);
 
     boolean every(Predicate<? super T> pred);
@@ -177,6 +181,8 @@ public interface ISeq<T> extends List<T> {
     T nth(int index);
 
     T nth(int index, T notFound);
+
+    String str();
 
     Optional<T> find(int i);
 

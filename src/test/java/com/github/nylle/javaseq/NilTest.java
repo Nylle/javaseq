@@ -22,6 +22,11 @@ public class NilTest {
     }
 
     @Test
+    void secondReturnsNull() {
+        assertThat(Nil.empty().second()).isNull();
+    }
+
+    @Test
     void restReturnsNil() {
         assertThat(Nil.empty().rest()).isEqualTo(Nil.empty());
     }
@@ -248,6 +253,11 @@ public class NilTest {
     }
 
     @Test
+    void reverseReturnsNil() {
+        assertThat(Nil.empty().reverse()).isEqualTo(Nil.empty());
+    }
+
+    @Test
     void someReturnsFalse() {
         assertThat(Nil.<Integer>empty().some(x -> true)).isFalse();
     }
@@ -285,6 +295,11 @@ public class NilTest {
     @Test
     void minKeyReturnsEmptyOptional() {
         assertThat(Nil.<Integer>empty().minKey(x -> Math.abs(x))).isEmpty();
+    }
+
+    @Test
+    void strReturnsEmptyString() {
+        assertThat(Nil.empty().str()).isEmpty();
     }
 
     @Test

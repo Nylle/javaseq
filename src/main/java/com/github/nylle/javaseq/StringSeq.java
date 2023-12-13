@@ -226,6 +226,7 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
         return notFound;
     }
 
+    @Override
     public ISeq<Character> reverse() {
         return new StringSeq(new StringBuilder(str.subSequence(index, length)).reverse().toString(), 0);
     }

@@ -57,6 +57,11 @@ class LazySeqTest {
         }
 
         @Test
+        void secondReturnsNull() {
+            assertThat(createEmpty().second()).isNull();
+        }
+
+        @Test
         void restReturnsNil() {
             assertThat(createEmpty().rest()).isEqualTo(Nil.empty());
         }
@@ -409,6 +414,24 @@ class LazySeqTest {
         var sut = iterate(0, x -> x + 1);
 
         assertThat(sut.first()).isEqualTo(0);
+    }
+
+    @Nested
+    class Second {
+
+        @Test
+        void returnsSecondItem() {
+            var sut = iterate(0, x -> x + 1);
+
+            assertThat(sut.second()).isEqualTo(1);
+        }
+
+        @Test
+        void returnsNullIfSeqHasOnlyOneElement() {
+            var sut = range(1);
+
+            assertThat(sut.second()).isNull();
+        }
     }
 
     @Test
@@ -1361,6 +1384,13 @@ class LazySeqTest {
         }
     }
 
+    @Test
+    void reverseReturnsReversedSeq() {
+        var sut = range(5);
+
+        assertThat(sut.reverse()).containsExactly(4, 3, 2, 1, 0);
+    }
+
     @Nested
     class Some {
 
@@ -1582,6 +1612,14 @@ class LazySeqTest {
 
             assertThat(sut.minKey(x -> x.length())).hasValue("x");
         }
+    }
+
+    @Test
+    void strReturnsConcatenatedStringRepresentationsOfAllItems() {
+        assertThat(range(7).str()).isEqualTo("0123456");
+
+        assertThat(sequence(List.of(new Object(), new Object()).iterator()).str())
+                .matches("java\\.lang\\.Object@.+java\\.lang\\.Object@.+");
     }
 
     @Nested
