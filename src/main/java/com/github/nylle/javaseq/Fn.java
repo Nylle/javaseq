@@ -1,6 +1,5 @@
 package com.github.nylle.javaseq;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -21,6 +20,21 @@ import java.util.stream.Stream;
 public class Fn {
 
     private Fn() {
+    }
+
+    private static final int CHUNK_SIZE = 32;
+    static <T> ISeq<T> chunkIteratorSeq(Iterator<T> iterator) {
+        if(iterator.hasNext()) {
+            return new LazySeq<>(() -> {
+                T[] arr = (T[]) new Object[CHUNK_SIZE];
+                int n = 0;
+                while(iterator.hasNext() && n < CHUNK_SIZE) {
+                    arr[n++] = iterator.next();
+                }
+                return new ChunkedCons<>(new ArrayChunk<>(arr, 0, n), chunkIteratorSeq(iterator));
+            });
+        }
+        return Nil.empty();
     }
 
     // util
@@ -96,244 +110,129 @@ public class Fn {
         return seq(colls).mapcat(x -> x);
     }
 
-    // reducers
-
-    public static <T> ISeq<T> take(long n, ISeq<T> seq) {
-        return lazySeq(() -> {
-            if (!seq.isEmpty() && n > 0) {
-                return n == 1
-                        ? ISeq.of(seq.first())
-                        : seq.rest().take(n - 1).cons(seq.first());
-            }
-            return nil();
-        });
-    }
-
-    public static <T> ISeq<T> drop(long n, ISeq<T> seq) {
-        return lazySeq(() -> {
-            if (!seq.isEmpty()) {
-                return n > 0
-                        ? seq.rest().drop(n - 1)
-                        : seq;
-            }
-            return nil();
-        });
-    }
-
-    public static <T> ISeq<T> takeWhile(Predicate<? super T> pred, ISeq<T> seq) {
-        return lazySeq(() -> {
-            if (!seq.isEmpty() && pred.test(seq.first())) {
-                return seq.rest().takeWhile(pred).cons(seq.first());
-            }
-            return nil();
-        });
-    }
-
-    public static <T> ISeq<T> dropWhile(Predicate<? super T> pred, ISeq<T> seq) {
-        return lazySeq(() -> {
-            if (!seq.isEmpty()) {
-                return pred.test(seq.first())
-                        ? seq.rest().dropWhile(pred)
-                        : seq;
-            }
-            return nil();
-        });
-    }
-
-    public static <T> ISeq<T> filter(Predicate<? super T> pred, ISeq<T> seq) {
-        return lazySeq(() -> {
-            if (!seq.isEmpty()) {
-                return pred.test(seq.first())
-                        ? lazySeq(() -> seq.rest().filter(pred)).cons(seq.first())
-                        : seq.rest().filter(pred);
-            }
-            return nil();
-        });
-    }
-
-    public static <R, T> ISeq<R> map(Function<? super T, ? extends R> f, ISeq<T> seq) {
-        return lazySeq(() -> {
-            if (!seq.isEmpty()) {
-                return cons(f.apply(seq.first()), seq.rest().map(f));
-            }
-            return nil();
-        });
-    }
-
-    public static <R, S, T> ISeq<R> map(BiFunction<? super T, ? super S, ? extends R> f, ISeq<T> seq1, ISeq<? extends S> seq2) {
-        return lazySeq(() -> {
-            if (!seq1.isEmpty() && !seq2.isEmpty()) {
-                return cons(f.apply(seq1.first(), seq2.first()), seq1.rest().map(seq2.rest(), f));
-            }
-            return nil();
-        });
-    }
-
-    public static <R, T> ISeq<R> mapcat(Function<? super T, ? extends Iterable<? extends R>> f, ISeq<T> seq) {
-        return lazySeq(() -> {
-            if (!seq.isEmpty()) {
-                return concat(f.apply(seq.first()).iterator(), mapcat(f, seq.rest()));
-            }
-            return nil();
-        });
-    }
-
-    public static <R, S, T> ISeq<R> mapcat(BiFunction<? super T, ? super S, Iterable<? extends R>> f, ISeq<T> seq1, ISeq<? extends S> seq2) {
-        return lazySeq(() -> {
-            if (!seq1.isEmpty() && !seq2.isEmpty()) {
-                return concat(f.apply(seq1.first(), seq2.first()).iterator(), mapcat(f, seq1.rest(), seq2.rest()));
-            }
-            return nil();
-        });
-    }
-
-    private static <T> ISeq<T> concat(Iterator<? extends T> iterator, ISeq<T> seq) {
-        return lazySeq(() -> {
+    public static <T> ISeq<T> concat(Iterator<? extends T> iterator, ISeq<T> seq) {
+        return Fn.lazySeq(() -> {
             if (iterator.hasNext()) {
-                return cons(iterator.next(), concat(iterator, seq));
+                return Fn.cons(iterator.next(), concat(iterator, seq));
             }
             return seq;
         });
     }
 
+    // forwarding functions
+
+    public static <T> ISeq<T> filter(Predicate<? super T> pred, ISeq<T> seq) {
+        return seq.filter(pred);
+    }
+
+    public static <R, T> ISeq<R> map(Function<? super T, ? extends R> f, ISeq<T> seq) {
+        return seq.map(f);
+    }
+
+    public static <R, S, T> ISeq<R> map(BiFunction<? super T, ? super S, ? extends R> f, ISeq<T> seq1, ISeq<? extends S> seq2) {
+        return seq1.map(seq2, f);
+    }
+
+    public static <R, T> ISeq<R> mapcat(Function<? super T, ? extends Iterable<? extends R>> f, ISeq<T> seq) {
+        return seq.mapcat(f);
+    }
+
+    public static <R, S, T> ISeq<R> mapcat(BiFunction<? super T, ? super S, Iterable<? extends R>> f, ISeq<T> seq1, ISeq<? extends S> seq2) {
+        return seq1.mapcat(seq2, f);
+    }
+
+    public static <T> ISeq<T> take(long n, ISeq<T> seq) {
+        return seq.take(n);
+    }
+
+    public static <T> ISeq<T> drop(long n, ISeq<T> seq) {
+        return seq.drop(n);
+    }
+
+    public static <T> ISeq<T> takeWhile(Predicate<? super T> pred, ISeq<T> seq) {
+        return seq.takeWhile(pred);
+    }
+
+    public static <T> ISeq<T> dropWhile(Predicate<? super T> pred, ISeq<T> seq) {
+        return seq.dropWhile(pred);
+    }
+
     public static <T> ISeq<List<T>> partition(int n, ISeq<T> seq) {
-        return partition(n, n, seq);
+        return seq.partition(n);
     }
 
     public static <T> ISeq<List<T>> partition(int n, int step, ISeq<T> seq) {
-        return partition(n, step, null, seq);
+        return seq.partition(n, step);
     }
 
     public static <T> ISeq<List<T>> partition(int n, int step, Iterable<T> pad, ISeq<T> seq) {
-        return lazySeq(() -> {
-            if (n < 0 || seq.isEmpty()) {
-                return nil();
-            }
-            var part = seq.take(n).toList();
-            if (part.size() < n) {
-                if (pad == null) {
-                    return nil();
-                }
-                return cons(
-                        concat(part, seq(pad).take(n - (long) part.size())).toList(),
-                        partition(n, step, pad, seq.drop(step)));
-            }
-            return cons(part, partition(n, step, pad, seq.drop(step)));
-        });
+        return seq.partition(n, step, pad);
     }
 
     public static <T> ISeq<List<T>> partitionAll(int n, ISeq<T> seq) {
-        return partition(n, n, List.of(), seq);
+        return seq.partitionAll(n);
     }
 
     public static <T> ISeq<List<T>> partitionAll(int n, int step, ISeq<T> seq) {
-        return partition(n, step, List.of(), seq);
+        return seq.partitionAll(n, step);
     }
 
     public static <T> ISeq<T> reductions(BinaryOperator<T> f, ISeq<T> seq) {
-        return lazySeq(() -> {
-            if (!seq.isEmpty()) {
-                return seq.rest().reductions(seq.first(), f);
-            }
-            return nil();
-        });
+        return seq.reductions(f);
     }
 
     public static <T, U> ISeq<U> reductions(U init, BiFunction<U, ? super T, U> f, ISeq<T> seq) {
-        return lazySeq(() -> {
-            if (!seq.isEmpty()) {
-                return cons(init, seq.rest().reductions(f.apply(init, seq.first()), f));
-            }
-            return ISeq.of(init);
-        });
+        return seq.reductions(init, f);
     }
 
     public static <T> Optional<T> reduce(BinaryOperator<T> f, ISeq<T> seq) {
-        if (!seq.isEmpty() && !seq.rest().isEmpty()) {
-            return Optional.of(seq.rest().reduce(seq.first(), f));
-        }
-        return Optional.empty();
+        return seq.reduce(f);
     }
 
     public static <T, U> U reduce(U val, BiFunction<U, ? super T, U> f, ISeq<T> seq) {
-        var result = val;
-        ISeq<T> s = seq;
-        while (!s.isEmpty()) {
-            result = f.apply(result, s.first());
-            s = s.rest();
-        }
-        return result;
+        return seq.reduce(val, f);
     }
 
     public static <T> void run(Consumer<? super T> proc, ISeq<T> seq) {
-        if (!seq.isEmpty()) {
-            proc.accept(seq.first());
-            seq.rest().run(proc);
-        }
+        seq.run(proc);
     }
 
     public static <T> ISeq<T> distinct(ISeq<T> seq) {
-        return step(seq, new HashSet<>());
-    }
-
-    private static <T> ISeq<T> step(final ISeq<T> seq, final Set<T> seen) {
-        return lazySeq(() -> {
-            var result = seq.filter(x -> !seen.contains(x));
-            if (result.isEmpty()) {
-                return nil();
-            }
-            var first = result.first();
-            return step(result.rest(), conj(seen, first)).cons(first);
-        });
+        return seq.distinct();
     }
 
     @SuppressWarnings("unchecked")
     public static <T> ISeq<T> sort(ISeq<T> seq) {
-        return sort((o1, o2) -> ((Comparable<T>) o1).compareTo(o2), seq);
+        return seq.sorted();
     }
 
     public static <T> ISeq<T> sort(Comparator<? super T> comp, ISeq<T> seq) {
-        var result = new ArrayList<>(seq);
-        result.sort(comp);
-        return seq(result);
+        return seq.sorted(comp);
     }
 
     public static <T> ISeq<T> reverse(ISeq<T> seq) {
         var iter = seq.iterator();
-        var acc = ISeq.<T>of();
+        var acc = Fn.<T>nil();
         while(iter.hasNext()) {
-            acc = cons(iter.next(), acc);
+            acc = Fn.cons(iter.next(), acc);
         }
         return acc;
     }
 
     public static <T> boolean some(Predicate<? super T> pred, ISeq<T> seq) {
-        return !seq.isEmpty() && (pred.test(seq.first()) || seq.rest().some(pred));
+        return seq.some(pred);
     }
 
     public static <T> boolean every(Predicate<? super T> pred, ISeq<T> seq) {
-        return seq.isEmpty() || pred.test(seq.first()) && seq.rest().every(pred);
+        return seq.every(pred);
     }
 
     public static <T> boolean notAny(Predicate<? super T> pred, ISeq<T> seq) {
-        return seq.isEmpty() || seq.every(pred.negate());
+        return seq.notAny(pred);
     }
 
     public static <T> Optional<T> max(Comparator<? super T> comp, ISeq<T> seq) {
-        if (seq.isEmpty()) {
-            return Optional.empty();
-        }
-        if (seq.rest().isEmpty()) {
-            return Optional.of(seq.first());
-        }
-        var result = seq.first();
-        var s = seq.rest();
-        while (!s.isEmpty()) {
-            var next = s.first();
-            result = comp.compare(result, next) > 0 ? result : next;
-            s = s.rest();
-        }
-        return Optional.of(result);
+        return seq.max(comp);
     }
 
     public static <T> Optional<T> min(Comparator<? super T> comp, ISeq<T> seq) {
@@ -341,52 +240,18 @@ public class Fn {
     }
 
     public static <T, C extends Comparable<? super C>> Optional<T> maxKey(Function<T, C> f, ISeq<T> seq) {
-        return max(Comparator.comparing(t -> f.apply(t)), seq);
+        return seq.max(Comparator.comparing(t -> f.apply(t)));
     }
 
     public static <T, C extends Comparable<? super C>> Optional<T> minKey(Function<T, C> f, ISeq<T> seq) {
-        return min(Comparator.comparing(t -> f.apply(t)), seq);
+        return seq.min(Comparator.comparing(t -> f.apply(t)));
     }
 
     public static <T> T nth(ISeq<T> seq, int index) {
-        var result = seq.nth(index, null);
-        if (result == null) {
-            throw new IndexOutOfBoundsException(index);
-        }
-        return result;
+        return seq.nth(index);
     }
 
     public static <T> T nth(ISeq<T> seq, int index, T notFound) {
-        if (index < 0 || seq.isEmpty()) {
-            return notFound;
-        }
-        ISeq<T> s = seq;
-        for (int i = index; i > 0; --i) {
-            if (s.rest().isEmpty()) {
-                return notFound;
-            }
-            s = s.rest();
-        }
-        return s.first();
-    }
-
-
-
-
-
-
-    private static final int CHUNK_SIZE = 32;
-    public static <T> ISeq<T> chunkIteratorSeq(Iterator<T> iterator) {
-        if(iterator.hasNext()) {
-            return new LazySeq<>(() -> {
-                T[] arr = (T[]) new Object[CHUNK_SIZE];
-                int n = 0;
-                while(iterator.hasNext() && n < CHUNK_SIZE) {
-                    arr[n++] = iterator.next();
-                }
-                return new ChunkedCons<>(new ArrayChunk<>(arr, 0, n), chunkIteratorSeq(iterator));
-            });
-        }
-        return Nil.empty();
+        return seq.nth(index, notFound);
     }
 }

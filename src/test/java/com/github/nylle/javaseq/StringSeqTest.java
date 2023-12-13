@@ -654,7 +654,7 @@ class StringSeqTest {
         void returnsASeqWithTheIntermediateValuesOfTheReduction() {
             var sut = ISeq.sequence("foo");
 
-            assertThat(sut.reductions((a, b) -> b)).containsExactly('f', 'o', 'o');
+            assertThat(sut.reductions((a, b) -> b).toList()).containsExactly('f', 'o', 'o');
         }
 
         @Test
