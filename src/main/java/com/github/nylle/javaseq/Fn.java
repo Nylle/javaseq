@@ -121,137 +121,138 @@ public class Fn {
 
     // forwarding functions
 
-    public static <T> ISeq<T> filter(Predicate<? super T> pred, ISeq<T> seq) {
-        return seq.filter(pred);
+    //TODO: overloads for
+    // Iterator<T>
+    // Stream<T>
+    // T[]
+    // CharSequence
+
+    public static <T> ISeq<T> filter(Predicate<? super T> pred, Iterable<T> coll) {
+        return seq(coll).filter(pred);
     }
 
-    public static <R, T> ISeq<R> map(Function<? super T, ? extends R> f, ISeq<T> seq) {
-        return seq.map(f);
+    public static <R, T> ISeq<R> map(Function<? super T, ? extends R> f, Iterable<? extends T> coll) {
+        return seq(coll).map(f);
     }
 
-    public static <R, S, T> ISeq<R> map(BiFunction<? super T, ? super S, ? extends R> f, ISeq<T> seq1, ISeq<? extends S> seq2) {
-        return seq1.map(seq2, f);
+    public static <R, S, T> ISeq<R> map(BiFunction<? super T, ? super S, ? extends R> f, Iterable<? extends T> coll1, Iterable<? extends S> coll2) {
+        return seq(coll1).map(coll2, f);
     }
 
-    public static <R, T> ISeq<R> mapcat(Function<? super T, ? extends Iterable<? extends R>> f, ISeq<T> seq) {
-        return seq.mapcat(f);
+    public static <R, T> ISeq<R> mapcat(Function<? super T, ? extends Iterable<? extends R>> f, Iterable<? extends T> coll) {
+        return seq(coll).mapcat(f);
     }
 
-    public static <R, S, T> ISeq<R> mapcat(BiFunction<? super T, ? super S, Iterable<? extends R>> f, ISeq<T> seq1, ISeq<? extends S> seq2) {
-        return seq1.mapcat(seq2, f);
+    public static <R, S, T> ISeq<R> mapcat(BiFunction<? super T, ? super S, Iterable<? extends R>> f, Iterable<? extends T> coll1, Iterable<? extends S> coll2) {
+        return seq(coll1).mapcat(coll2, f);
     }
 
-    public static <T> ISeq<T> take(long n, ISeq<T> seq) {
-        return seq.take(n);
+    public static <T> ISeq<T> take(long n, Iterable<T> coll) {
+        return seq(coll).take(n);
     }
 
-    public static <T> ISeq<T> drop(long n, ISeq<T> seq) {
-        return seq.drop(n);
+    public static <T> ISeq<T> drop(long n, Iterable<T> coll) {
+        return seq(coll).drop(n);
     }
 
-    public static <T> ISeq<T> takeWhile(Predicate<? super T> pred, ISeq<T> seq) {
-        return seq.takeWhile(pred);
+    public static <T> ISeq<T> takeWhile(Predicate<? super T> pred, Iterable<T> coll) {
+        return seq(coll).takeWhile(pred);
     }
 
-    public static <T> ISeq<T> dropWhile(Predicate<? super T> pred, ISeq<T> seq) {
-        return seq.dropWhile(pred);
+    public static <T> ISeq<T> dropWhile(Predicate<? super T> pred, Iterable<T> coll) {
+        return seq(coll).dropWhile(pred);
     }
 
-    public static <T> ISeq<List<T>> partition(int n, ISeq<T> seq) {
-        return seq.partition(n);
+    public static <T> ISeq<List<T>> partition(int n, Iterable<T> coll) {
+        return seq(coll).partition(n);
     }
 
-    public static <T> ISeq<List<T>> partition(int n, int step, ISeq<T> seq) {
-        return seq.partition(n, step);
+    public static <T> ISeq<List<T>> partition(int n, int step, Iterable<T> coll) {
+        return seq(coll).partition(n, step);
     }
 
-    public static <T> ISeq<List<T>> partition(int n, int step, Iterable<T> pad, ISeq<T> seq) {
-        return seq.partition(n, step, pad);
+    public static <T> ISeq<List<T>> partition(int n, int step, Iterable<T> pad, ISeq<T> coll) {
+        return seq(coll).partition(n, step, pad);
     }
 
-    public static <T> ISeq<List<T>> partitionAll(int n, ISeq<T> seq) {
-        return seq.partitionAll(n);
+    public static <T> ISeq<List<T>> partitionAll(int n, Iterable<T> coll) {
+        return seq(coll).partitionAll(n);
     }
 
-    public static <T> ISeq<List<T>> partitionAll(int n, int step, ISeq<T> seq) {
-        return seq.partitionAll(n, step);
+    public static <T> ISeq<List<T>> partitionAll(int n, int step, Iterable<T> coll) {
+        return seq(coll).partitionAll(n, step);
     }
 
-    public static <T> ISeq<T> reductions(BinaryOperator<T> f, ISeq<T> seq) {
-        return seq.reductions(f);
+    public static <T> ISeq<T> reductions(BinaryOperator<T> f, Iterable<T> coll) {
+        return seq(coll).reductions(f);
     }
 
-    public static <T, U> ISeq<U> reductions(U init, BiFunction<U, ? super T, U> f, ISeq<T> seq) {
-        return seq.reductions(init, f);
+    public static <T, U> ISeq<U> reductions(U init, BiFunction<U, ? super T, U> f, Iterable<? extends T> coll) {
+        return seq(coll).reductions(init, f);
     }
 
-    public static <T> Optional<T> reduce(BinaryOperator<T> f, ISeq<T> seq) {
-        return seq.reduce(f);
+    public static <T> Optional<T> reduce(BinaryOperator<T> f, Iterable<T> coll) {
+        return seq(coll).reduce(f);
     }
 
-    public static <T, U> U reduce(U val, BiFunction<U, ? super T, U> f, ISeq<T> seq) {
-        return seq.reduce(val, f);
+    public static <T, U> U reduce(U val, BiFunction<U, ? super T, U> f, Iterable<? extends T> coll) {
+        return seq(coll).reduce(val, f);
     }
 
-    public static <T> void run(Consumer<? super T> proc, ISeq<T> seq) {
-        seq.run(proc);
+    public static <T> void run(Consumer<? super T> proc, Iterable<? extends T> coll) {
+        seq(coll).run(proc);
     }
 
-    public static <T> ISeq<T> distinct(ISeq<T> seq) {
-        return seq.distinct();
+    public static <T> ISeq<T> distinct(Iterable<T> coll) {
+        return seq(coll).distinct();
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> ISeq<T> sort(ISeq<T> seq) {
-        return seq.sorted();
+    public static <T> ISeq<T> sort(Iterable<T> coll) {
+        return seq(coll).sorted();
     }
 
-    public static <T> ISeq<T> sort(Comparator<? super T> comp, ISeq<T> seq) {
-        return seq.sorted(comp);
+    public static <T> ISeq<T> sort(Comparator<? super T> comp, Iterable<T> coll) {
+        return seq(coll).sorted(comp);
     }
 
-    public static <T> ISeq<T> reverse(ISeq<T> seq) {
-        var iter = seq.iterator();
-        var acc = Fn.<T>nil();
-        while(iter.hasNext()) {
-            acc = Fn.cons(iter.next(), acc);
-        }
-        return acc;
+    public static <T> ISeq<T> reverse(Iterable<T> coll) {
+        return seq(coll).reverse();
     }
 
-    public static <T> boolean some(Predicate<? super T> pred, ISeq<T> seq) {
-        return seq.some(pred);
+    public static <T> boolean some(Predicate<? super T> pred, Iterable<T> coll) {
+        return seq(coll).some(pred);
     }
 
-    public static <T> boolean every(Predicate<? super T> pred, ISeq<T> seq) {
-        return seq.every(pred);
+    public static <T> boolean every(Predicate<? super T> pred, Iterable<T> coll) {
+        return seq(coll).every(pred);
     }
 
-    public static <T> boolean notAny(Predicate<? super T> pred, ISeq<T> seq) {
-        return seq.notAny(pred);
+    public static <T> boolean notAny(Predicate<? super T> pred, Iterable<T> coll) {
+        return seq(coll).notAny(pred);
     }
 
-    public static <T> Optional<T> max(Comparator<? super T> comp, ISeq<T> seq) {
-        return seq.max(comp);
+    public static <T> Optional<T> max(Comparator<? super T> comp, Iterable<T> coll) {
+        return seq(coll).max(comp);
     }
 
-    public static <T> Optional<T> min(Comparator<? super T> comp, ISeq<T> seq) {
-        return seq.max(comp.reversed());
+    public static <T> Optional<T> min(Comparator<? super T> comp, Iterable<T> coll) {
+        return seq(coll).max(comp.reversed());
     }
 
-    public static <T, C extends Comparable<? super C>> Optional<T> maxKey(Function<T, C> f, ISeq<T> seq) {
-        return seq.max(Comparator.comparing(t -> f.apply(t)));
+    public static <T, C extends Comparable<? super C>> Optional<T> maxKey(Function<T, C> f, Iterable<T> coll) {
+        return seq(coll).max(Comparator.comparing(t -> f.apply(t)));
     }
 
-    public static <T, C extends Comparable<? super C>> Optional<T> minKey(Function<T, C> f, ISeq<T> seq) {
-        return seq.min(Comparator.comparing(t -> f.apply(t)));
+    public static <T, C extends Comparable<? super C>> Optional<T> minKey(Function<T, C> f, Iterable<T> coll) {
+        return seq(coll).min(Comparator.comparing(t -> f.apply(t)));
     }
 
-    public static <T> T nth(ISeq<T> seq, int index) {
-        return seq.nth(index);
+    public static <T> T nth(Iterable<T> coll, int index) {
+        return seq(coll).nth(index);
     }
 
-    public static <T> T nth(ISeq<T> seq, int index, T notFound) {
-        return seq.nth(index, notFound);
+    public static <T> T nth(Iterable<T> coll, int index, T notFound) {
+        return seq(coll).nth(index, notFound);
     }
 }
