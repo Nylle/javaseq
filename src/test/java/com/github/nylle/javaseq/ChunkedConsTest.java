@@ -4,12 +4,14 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
@@ -249,47 +251,42 @@ class ChunkedConsTest {
         void returnsNilWithNegativeItems() {
             var sut = new ChunkedCons<>(arrayChunk(1, 2, 3), ISeq.of(4, 5, 6));
 
-            assertThat(sut.take(-1))
-                    .isExactlyInstanceOf(Nil.class)
-                    .isEmpty();
+            assertThat(sut.take(-1)).isEqualTo(Nil.empty());
         }
 
         @Test
         void returnsNilWithZeroItems() {
             var sut = new ChunkedCons<>(arrayChunk(1, 2, 3), ISeq.of(4, 5, 6));
 
-            assertThat(sut.take(0))
-                    .isExactlyInstanceOf(Nil.class)
-                    .isEmpty();
+            assertThat(sut.take(0)).isEqualTo(Nil.empty());
         }
 
         @Test
-        void returnsConsWithFewerItemsThanChunk() {
+        void returnsSeqWithFewerItemsThanChunk() {
             var sut = new ChunkedCons<>(arrayChunk(1, 2, 3), ISeq.of(4, 5, 6));
 
             assertThat(sut.take(2))
-                    .isExactlyInstanceOf(Cons.class)
+                    .isExactlyInstanceOf(LazySeq.class)
                     .containsExactly(1, 2);
         }
 
         @Test
-        void returnsConsWithSameItemsAsChunk() {
+        void returnsSeqWithSameItemsAsChunk() {
             var sut = new ChunkedCons<>(arrayChunk(1, 2, 3), ISeq.of(4, 5, 6));
 
             assertThat(sut.take(3))
-                    .isExactlyInstanceOf(Cons.class)
+                    .isExactlyInstanceOf(LazySeq.class)
                     .containsExactly(1, 2, 3);
         }
 
         @Test
-        void returnsConsWithMoreItemsThanChunk() {
+        void returnsSeqWithMoreItemsThanChunk() {
             var sut = new ChunkedCons<>(arrayChunk(1, 2, 3), ISeq.of(4, 5, 6));
 
             assertThat(sut.take(4))
-                    .isExactlyInstanceOf(ChunkedCons.class)
+                    .isExactlyInstanceOf(LazySeq.class)
                     .containsExactly(1, 2, 3, 4);
         }
-
 
         @Test
         void returnsUnchangedConsTakingMoreItemsThanPresent() {
@@ -318,21 +315,21 @@ class ChunkedConsTest {
         }
 
         @Test
-        void returnsConsDroppingFewerItemsThanChunk() {
+        void returnsSeqDroppingFewerItemsThanChunk() {
             var sut = new ChunkedCons<>(arrayChunk(1, 2, 3), ISeq.of(4, 5, 6));
 
             assertThat(sut.drop(2)).containsExactly(3, 4, 5, 6);
         }
 
         @Test
-        void returnsConsDroppingSameItemsAsChunk() {
+        void returnsSeqDroppingSameItemsAsChunk() {
             var sut = new ChunkedCons<>(arrayChunk(1, 2, 3), ISeq.of(4, 5, 6));
 
-            assertThat(sut.drop(3)).containsExactly(4, 5, 6);
+            assertThat(sut.drop(3).toList()).containsExactly(4, 5, 6);
         }
 
         @Test
-        void returnsConsDroppingMoreItemsThanChunk() {
+        void returnsSeqDroppingMoreItemsThanChunk() {
             var sut = new ChunkedCons<>(arrayChunk(1, 2, 3), ISeq.of(4, 5, 6));
 
             assertThat(sut.drop(4)).containsExactly(5, 6);
@@ -344,6 +341,329 @@ class ChunkedConsTest {
 
             assertThat(sut.drop(6)).isEmpty();
             assertThat(sut.drop(7)).isEmpty();
+        }
+    }
+
+    @Nested
+    class TakeWhile {
+
+        @Test
+        void returnsEmptySeqWhenFirstItemDoesNotMatch() {
+            var sut = new ChunkedCons<>(arrayChunk(1, 2, 3), ISeq.of(4, 5, 6));
+
+            assertThat(sut.takeWhile(x -> x < 1)).isEmpty();
+        }
+
+        @Test
+        void returnsSeqWithFewerItemsThanChunk() {
+            var sut = new ChunkedCons<>(arrayChunk(1, 2, 3), ISeq.of(4, 5, 6));
+
+            assertThat(sut.takeWhile(x -> x < 3))
+                    .isExactlyInstanceOf(LazySeq.class)
+                    .containsExactly(1, 2);
+        }
+
+        @Test
+        void returnsSeqWithSameItemsAsChunk() {
+            var sut = new ChunkedCons<>(arrayChunk(1, 2, 3), ISeq.of(4, 5, 6));
+
+            assertThat(sut.takeWhile(x -> x < 4))
+                    .isExactlyInstanceOf(LazySeq.class)
+                    .containsExactly(1, 2, 3);
+        }
+
+        @Test
+        void returnsSeqWithMoreItemsThanChunk() {
+            var sut = new ChunkedCons<>(arrayChunk(1, 2, 3), ISeq.of(4, 5, 6));
+
+            assertThat(sut.takeWhile(x -> x < 5))
+                    .isExactlyInstanceOf(LazySeq.class)
+                    .containsExactly(1, 2, 3, 4);
+        }
+
+        @Test
+        void returnsSeqWithAllItems() {
+            var sut = new ChunkedCons<>(arrayChunk(1, 2, 3), ISeq.of(4, 5, 6));
+
+            assertThat(sut.takeWhile(x -> true)).containsExactly(1, 2, 3, 4, 5, 6);
+        }
+    }
+
+    @Nested
+    class DropWhile {
+
+        @Test
+        void returnsEmptySeqWhenAllItemsMatch() {
+            var sut = new ChunkedCons<>(arrayChunk(1, 2, 3), ISeq.of(4, 5, 6));
+
+            assertThat(sut.dropWhile(x -> x > 0)).isEmpty();
+        }
+
+        @Test
+        void returnsSeqDroppingFewerItemsThanChunk() {
+            var sut = new ChunkedCons<>(arrayChunk(1, 2, 3), ISeq.of(4, 5, 6));
+
+            assertThat(sut.dropWhile(x -> x < 3))
+                    .isExactlyInstanceOf(LazySeq.class)
+                    .containsExactly(3, 4, 5, 6);
+        }
+
+        @Test
+        void returnsSeqDroppingSameItemsAsChunk() {
+            var sut = new ChunkedCons<>(arrayChunk(1, 2, 3), ISeq.of(4, 5, 6));
+
+            assertThat(sut.dropWhile(x -> x < 4))
+                    .isExactlyInstanceOf(LazySeq.class)
+                    .containsExactly(4, 5, 6);
+        }
+
+        @Test
+        void returnsSeqDroppingMoreItemsThanChunk() {
+            var sut = new ChunkedCons<>(arrayChunk(1, 2, 3), ISeq.of(4, 5, 6));
+
+            assertThat(sut.dropWhile(x -> x < 5))
+                    .isExactlyInstanceOf(LazySeq.class)
+                    .containsExactly(5, 6);
+        }
+
+        @Test
+        void returnsEntireSeqWhenFirstItemDoesNotMatch() {
+            var sut = new ChunkedCons<>(arrayChunk(1, 2, 3), ISeq.of(4, 5, 6));
+
+            assertThat(sut.dropWhile(x -> x > 2)).containsExactly(1, 2, 3, 4, 5, 6);
+        }
+
+        @Test
+        void returnsEntireSeqWhenNoItemMatches() {
+            var sut = new ChunkedCons<>(arrayChunk(1, 2, 3), ISeq.of(4, 5, 6));
+
+            assertThat(sut.dropWhile(x -> false)).containsExactly(1, 2, 3, 4, 5, 6);
+        }
+    }
+
+    @Nested
+    class Reductions {
+
+        @Test
+        void returnsASeqWithTheIntermediateValuesOfTheReduction() {
+            var sut = new ChunkedCons<>(arrayChunk("1", "2", "3"), ISeq.of("4", "5", "6"));
+
+            assertThat(sut.reductions((a, b) -> a + b)).containsExactly("1", "12", "123", "1234", "12345", "123456");
+        }
+
+        @Test
+        void returnsASeqWithTheIntermediateValuesOfTheReductionStartingWithInit() {
+            var sut = new ChunkedCons<>(arrayChunk("1", "2", "3"), ISeq.of("4", "5", "6"));
+
+            assertThat(sut.reductions("0", (a, b) -> a + b.toString())).containsExactly("0", "01", "012", "0123", "01234", "012345", "0123456");
+        }
+    }
+
+    @Nested
+    class Reduce {
+
+        @Test
+        void returnsOptionalResultWhenValIsNotSupplied() {
+            var sut = new ChunkedCons<>(arrayChunk(1, 2, 3), ISeq.of(4, 5, 6));
+
+            assertThat(sut.reduce((a, b) -> a + b)).hasValue(21);
+        }
+
+        @Test
+        void returnsResultWhenValIsSupplied() {
+            var sut = new ChunkedCons<>(arrayChunk(2, 3, 4), ISeq.of(5, 6, 7));
+
+            assertThat(sut.reduce(1, (a, b) -> a + b)).isEqualTo(28);
+        }
+
+        @Test
+        void returnsResultOfDifferentTypeThanSeq() {
+            var sut = new ChunkedCons<>(arrayChunk("a", "bb", "ccc"), ISeq.of("dddd", "eeeee", "ffffff"));
+
+            assertThat(sut.reduce(0, (acc, x) -> acc + x.length())).isEqualTo(21);
+        }
+    }
+
+    @Nested
+    class Some {
+
+        @Test
+        void returnsFalseIfNoneOfTheItemsMatchPred() {
+            var sut = new ChunkedCons<>(arrayChunk(1, 2, 3), ISeq.of(4, 5, 6));
+
+            assertThat(sut.take(10).some(x -> x < 0)).isFalse();
+        }
+
+        @Test
+        void returnsTrueIfAllItemsMatchPred() {
+            var sut = new ChunkedCons<>(arrayChunk(1, 2, 3), ISeq.of(4, 5, 6));
+
+            assertThat(sut.some(x -> x >= 0)).isTrue();
+        }
+
+        @Test
+        void returnsTrueIfFirstItemMatchesPred() {
+            var sut = new ChunkedCons<>(arrayChunk(1, 2, 3), ISeq.of(4, 5, 6));
+
+            assertThat(sut.some(x -> x == 1)).isTrue();
+        }
+
+        @Test
+        void returnsTrueIfSomeItemMatchesPred() {
+            var sut = new ChunkedCons<>(arrayChunk(1, 2, 3), ISeq.of(4, 5, 6));
+
+            assertThat(sut.some(x -> x == 2)).isTrue();
+            assertThat(sut.some(x -> x == 5)).isTrue();
+        }
+
+        @Test
+        void returnsTrueIfLastItemMatchesPred() {
+            var sut = new ChunkedCons<>(arrayChunk(1, 2, 3), ISeq.of(4, 5, 6));
+
+            assertThat(sut.some(x -> x == 3)).isTrue();
+            assertThat(sut.some(x -> x == 6)).isTrue();
+        }
+    }
+
+    @Nested
+    class Every {
+
+        @Test
+        void returnsTrueIfAllItemsInSeqMatchPred() {
+            var sut = new ChunkedCons<>(arrayChunk(1, 2, 3), ISeq.of(4, 5, 6));
+
+            assertThat(sut.every(x -> x > 0)).isTrue();
+        }
+
+        @Test
+        void returnsFalseIfFirstItemDoesNotMatchPred() {
+            var sut = new ChunkedCons<>(arrayChunk(1, 2, 3), ISeq.of(4, 5, 6));
+
+            assertThat(sut.every(x -> x == 0)).isFalse();
+        }
+
+        @Test
+        void returnsFalseIfAnyItemDoesNotMatchPred() {
+            var sut = new ChunkedCons<>(arrayChunk(1, 2, 3), ISeq.of(4, 5, 6));
+
+            assertThat(sut.every(x -> x < 2)).isFalse();
+            assertThat(sut.every(x -> x < 5)).isFalse();
+        }
+
+        @Test
+        void returnsFalseIfLastItemDoesNotMatchPred() {
+            var sut = new ChunkedCons<>(arrayChunk(1, 2, 3), ISeq.of(4, 5, 6));
+
+            assertThat(sut.every(x -> x < 3)).isFalse();
+            assertThat(sut.every(x -> x < 6)).isFalse();
+        }
+    }
+
+    @Nested
+    class Max {
+
+        @Test
+        void returnsSingleItem() {
+            var sut = new ChunkedCons<>(arrayChunk(1), ISeq.of());
+
+            assertThat(sut.max(Comparator.naturalOrder())).hasValue(1);
+        }
+
+        @Test
+        void returnsHighestNumber() {
+            var sut = new ChunkedCons<>(arrayChunk(1, 2, 3), ISeq.of(4, 5, 6));
+
+            assertThat(sut.max(Comparator.naturalOrder())).hasValue(6);
+        }
+
+        @Test
+        void returnsLongestString() {
+            var sut = new ChunkedCons<>(arrayChunk("x", "xx", "xxx"), ISeq.of("xxxx", "xxxxx", "xxxxxx"));
+
+            assertThat(sut.max(Comparator.comparingInt(x -> x.length()))).hasValue("xxxxxx");
+        }
+
+        @Test
+        void returnsTheLastOccurrenceOfLongestStringIfMoreThanOneItemFound() {
+            var sut = new ChunkedCons<>(arrayChunk("x", "xx", "aaa"), ISeq.of("", "x", "bbb"));
+
+            assertThat(sut.max(Comparator.comparingInt(x -> x.length()))).hasValue("bbb");
+        }
+    }
+
+    @Nested
+    class Min {
+
+        @Test
+        void returnsSingleItem() {
+            var sut = new ChunkedCons<>(arrayChunk(1), ISeq.of());
+
+            assertThat(sut.min(Comparator.naturalOrder())).hasValue(1);
+        }
+
+        @Test
+        void returnsLowestNumber() {
+            var sut = new ChunkedCons<>(arrayChunk(-5, -4, -3, -2), ISeq.of(-1, 0, 1, 2));
+
+            assertThat(sut.min(Comparator.naturalOrder())).hasValue(-5);
+        }
+
+        @Test
+        void returnsShortestString() {
+            var sut = new ChunkedCons<>(arrayChunk("xxxxxx", "xxxxx", "xxxx"), ISeq.of("x", "xx", "xxx"));
+
+            assertThat(sut.min(Comparator.comparingInt(x -> x.length()))).hasValue("x");
+        }
+
+        @Test
+        void returnsTheLastOccurrenceOfShortestStringIfMoreThanOneItemFound() {
+            var sut = new ChunkedCons<>(arrayChunk("a", "xx", "aaa"), ISeq.of("x", "bbb", "b"));
+
+            assertThat(sut.min(Comparator.comparingInt(x -> x.length()))).hasValue("b");
+        }
+    }
+
+    @Nested
+    class Nth {
+
+        @Test
+        void returnsValueAtIndex() {
+            var sut = new ChunkedCons<>(arrayChunk("", "0", "01"), ISeq.of("012", "0123", "01234"));
+
+            assertThat(sut.nth(0)).isEqualTo("");
+            assertThat(sut.nth(1)).isEqualTo("0");
+            assertThat(sut.nth(2)).isEqualTo("01");
+            assertThat(sut.nth(3)).isEqualTo("012");
+            assertThat(sut.nth(4)).isEqualTo("0123");
+            assertThat(sut.nth(5)).isEqualTo("01234");
+        }
+
+        @Test
+        void returnsDefaultValue() {
+            var sut = new ChunkedCons<>(arrayChunk("x"), ISeq.of());
+
+            assertThat(sut.nth(0, "y")).isEqualTo("x");
+            assertThat(sut.nth(1, "y")).isEqualTo("y");
+            assertThat(sut.nth(2, "y")).isEqualTo("y");
+            assertThat(sut.nth(3, "y")).isEqualTo("y");
+        }
+
+        @Test
+        void throwsForNegativeIndex() {
+            var sut = new ChunkedCons<>(arrayChunk("", "0", "01"), ISeq.of("012", "0123", "01234"));
+
+            assertThatExceptionOfType(IndexOutOfBoundsException.class)
+                    .isThrownBy(() -> sut.nth(-1))
+                    .withMessage("Index out of range: -1");
+        }
+
+        @Test
+        void throwsIfIndexNotPresent() {
+            var sut = new ChunkedCons<>(arrayChunk("", "0", "01"), ISeq.of("012", "0123", "01234"));
+
+            assertThatExceptionOfType(IndexOutOfBoundsException.class)
+                    .isThrownBy(() -> sut.nth(6))
+                    .withMessage("Index out of range: 6");
         }
     }
 

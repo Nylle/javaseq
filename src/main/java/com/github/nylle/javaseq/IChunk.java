@@ -6,5 +6,7 @@ public interface IChunk<T> {
 
     IChunk<T> dropFirst();
 
+    IChunk<T> dropLast(int n);
+
     int count();
 }

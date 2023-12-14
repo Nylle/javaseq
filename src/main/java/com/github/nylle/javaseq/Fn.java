@@ -34,7 +34,7 @@ public class Fn {
                 return new ChunkedCons<>(new ArrayChunk<>(arr, 0, n), chunkIteratorSeq(iterator));
             });
         }
-        return Nil.empty();
+        return nil();
     }
 
     // util
