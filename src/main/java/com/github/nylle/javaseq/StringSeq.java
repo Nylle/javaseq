@@ -247,7 +247,7 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
 
     @Override
     public int size() {
-        return length;
+        return length - index;
     }
 
     @Override

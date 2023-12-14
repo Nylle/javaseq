@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -17,6 +18,14 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 class ConsTest {
+
+    private static <T> ISeq<T> sutFrom(T... items) {
+        ISeq<T> cons = Nil.empty();
+        for (int i = items.length - 1; i >= 0; i--) {
+            cons = ISeq.cons(items[i], cons);
+        }
+        return cons;
+    }
 
     @Test
     void firstReturnsFirstItem() {
@@ -60,14 +69,14 @@ class ConsTest {
 
         @Test
         void returnsTrueForSingleItem() {
-            var sut = ISeq.of(0);
+            var sut = sutFrom(0);
 
             assertThat(sut.isRealized()).isTrue();
         }
 
         @Test
         void returnsTrueForAnyNumberOfItems() {
-            var sut = ISeq.of(1, 2, 3, 4);
+            var sut = sutFrom(1, 2, 3, 4);
 
             assertThat(sut.isRealized()).isTrue();
         }
@@ -78,21 +87,21 @@ class ConsTest {
 
         @Test
         void returnsNilWithNegativeItems() {
-            var sut = ISeq.cons(0, ISeq.cons(1, ISeq.cons(2, ISeq.cons(3, ISeq.of()))));
+            var sut = sutFrom(0, 1, 2, 3);
 
             assertThat(sut.take(-1)).isEqualTo(Nil.empty());
         }
 
         @Test
         void returnsNilWithZeroItems() {
-            var sut = ISeq.cons(0, ISeq.cons(1, ISeq.cons(2, ISeq.cons(3, ISeq.of()))));
+            var sut = sutFrom(0, 1, 2, 3);
 
             assertThat(sut.take(0)).isEqualTo(Nil.empty());
         }
 
         @Test
         void returnsConsWithMoreThanZeroItems() {
-            var sut = ISeq.cons(0, ISeq.cons(1, ISeq.cons(2, ISeq.cons(3, ISeq.of()))));
+            var sut = sutFrom(0, 1, 2, 3);
 
             assertThat(sut.take(3))
                     .isExactlyInstanceOf(LazySeq.class)
@@ -105,22 +114,22 @@ class ConsTest {
 
         @Test
         void returnsUnchangedSeqWithNegativeItemsToDrop() {
-            assertThat(ISeq.of(1, 2, 3, 4).drop(-1)).containsExactly(1, 2, 3, 4);
+            assertThat(sutFrom(1, 2, 3, 4).drop(-1)).containsExactly(1, 2, 3, 4);
         }
 
         @Test
         void returnsUnchangedSeqWithZeroItemsToDrop() {
-            assertThat(ISeq.of(1, 2, 3, 4).drop(0)).containsExactly(1, 2, 3, 4);
+            assertThat(sutFrom(1, 2, 3, 4).drop(0)).containsExactly(1, 2, 3, 4);
         }
 
         @Test
         void returnsSeqOfAllButTheFirstNItems() {
-            assertThat(ISeq.of(1, 2, 3, 4).drop(2)).containsExactly(3, 4);
+            assertThat(sutFrom(1, 2, 3, 4).drop(2)).containsExactly(3, 4);
         }
 
         @Test
         void returnsEmptySeqIfMoreItemsAreDroppedThanPresent() {
-            assertThat(ISeq.of(1, 2, 3, 4).drop(5)).isEmpty();
+            assertThat(sutFrom(1, 2, 3, 4).drop(5)).isEmpty();
         }
     }
 
@@ -129,14 +138,14 @@ class ConsTest {
 
         @Test
         void returnsNilWhenNoItemsMatch() {
-            var sut = ISeq.cons(0, ISeq.cons(1, ISeq.cons(2, ISeq.cons(3, ISeq.of()))));
+            var sut = sutFrom(0, 1, 2, 3);
 
             assertThat(sut.filter(x -> x < 0)).isEmpty();
         }
 
         @Test
         void returnsMatchingItems() {
-            var sut = ISeq.cons(0, ISeq.cons(1, ISeq.cons(2, ISeq.cons(3, ISeq.of()))));
+            var sut = sutFrom(0, 1, 2, 3);
 
             assertThat(sut.filter(x -> x > 1)).containsExactly(2, 3);
         }
@@ -147,21 +156,21 @@ class ConsTest {
 
         @Test
         void returnsSingleMapResult() {
-            var sut = ISeq.of("xxx");
+            var sut = sutFrom("xxx");
 
-            assertThat(sut.map(x -> x.length())).isEqualTo(ISeq.of(3));
+            assertThat(sut.map(x -> x.length())).containsExactly(3);
         }
 
         @Test
         void returnsAllMapResults() {
-            var sut = ISeq.of("xxx", "ab", "baz", "foobar");
+            var sut = sutFrom("xxx", "ab", "baz", "foobar");
 
-            assertThat(sut.map(x -> x.length())).isEqualTo(ISeq.of(3, 2, 3, 6));
+            assertThat(sut.map(x -> x.length())).containsExactly(3, 2, 3, 6);
         }
 
         @Test
         void returnsSeqWithInfiniteSeqs() {
-            var sut = ISeq.of(0, 1, 2, 3);
+            var sut = sutFrom(0, 1, 2, 3);
 
             var actual = sut.map(x -> ISeq.iterate(x, i -> i + x));
 
@@ -177,20 +186,20 @@ class ConsTest {
 
             @Test
             void returnsEmptySeqWhenProvidingEmptyOther() {
-                assertThat(ISeq.of(1, 2, 3).map(ISeq.<Integer>of(), (a, b) -> a + b)).isEmpty();
-                assertThat(ISeq.of(1, 2, 3).map(ISeq.<Integer>of().iterator(), (a, b) -> a + b)).isEmpty();
-                assertThat(ISeq.of(1, 2, 3).map(List.<Integer>of(), (a, b) -> a + b)).isEmpty();
-                assertThat(ISeq.of(1, 2, 3).map(Stream.<Integer>of(), (a, b) -> a + b)).isEmpty();
-                assertThat(ISeq.of(1, 2, 3).map(new Integer[0], (a, b) -> a + b)).isEmpty();
-                assertThat(ISeq.of(1, 2, 3).map("", (a, b) -> "" + a + b)).isEmpty();
+                assertThat(sutFrom(1, 2, 3).map(ISeq.<Integer>of(), (a, b) -> a + b)).isEmpty();
+                assertThat(sutFrom(1, 2, 3).map(Collections.<Integer>emptyIterator(), (a, b) -> a + b)).isEmpty();
+                assertThat(sutFrom(1, 2, 3).map(List.<Integer>of(), (a, b) -> a + b)).isEmpty();
+                assertThat(sutFrom(1, 2, 3).map(Stream.<Integer>of(), (a, b) -> a + b)).isEmpty();
+                assertThat(sutFrom(1, 2, 3).map(new Integer[0], (a, b) -> a + b)).isEmpty();
+                assertThat(sutFrom(1, 2, 3).map("", (a, b) -> "" + a + b)).isEmpty();
             }
 
             @Test
             void returnsANewSeqWithTheItemsOfBothInitialSeqsAreCombinedUsingF() {
-                var sut = ISeq.of(1, 2, 3);
+                var sut = sutFrom(1, 2, 3);
 
                 assertThat(sut.map(ISeq.of("a", "b", "c"), (a, b) -> a + b)).containsExactly("1a", "2b", "3c");
-                assertThat(sut.map(ISeq.of("a", "b", "c").iterator(), (a, b) -> a + b)).containsExactly("1a", "2b", "3c");
+                assertThat(sut.map(List.of("a", "b", "c").iterator(), (a, b) -> a + b)).containsExactly("1a", "2b", "3c");
                 assertThat(sut.map(List.of("a", "b", "c"), (a, b) -> a + b)).containsExactly("1a", "2b", "3c");
                 assertThat(sut.map(Stream.of("a", "b", "c"), (a, b) -> a + b)).containsExactly("1a", "2b", "3c");
                 assertThat(sut.map(new String[]{"a", "b", "c"}, (a, b) -> a + b)).containsExactly("1a", "2b", "3c");
@@ -199,7 +208,7 @@ class ConsTest {
 
             @Test
             void ignoresRemainingItemsIfOneOfTheSeqsIsExhausted() {
-                var sut = ISeq.of(1, 2, 3);
+                var sut = sutFrom(1, 2, 3);
 
                 assertThat(sut.map(ISeq.of("a", "b"), (a, b) -> a + b)).containsExactly("1a", "2b");
                 assertThat(sut.map(ISeq.of("a", "b", "c", "d"), (a, b) -> a + b)).containsExactly("1a", "2b", "3c");
@@ -224,7 +233,7 @@ class ConsTest {
 
             @Test
             void returnsSeqWithInfiniteSeqsIfMappingResultIsInfinite() {
-                var sut = ISeq.of(0, 1, 2, 3);
+                var sut = sutFrom(0, 1, 2, 3);
 
                 var actual = sut.map(ISeq.iterate(0, x -> x + 1), (a, b) -> ISeq.iterate(a, i -> i + a + b));
 
@@ -242,30 +251,28 @@ class ConsTest {
 
         @Test
         void returnsFlattenedMapResult() {
-            var sut = ISeq.cons(0, ISeq.cons(1, ISeq.cons(2, ISeq.of())));
+            var sut = sutFrom(0, 1, 2);
 
             assertThat(sut.mapcat(x -> List.of(x, x))).containsExactly(0, 0, 1, 1, 2, 2);
         }
 
         @Test
         void returnsFlattenedSeq() {
-            var sut = ISeq.of(
-                    ISeq.cons(0, ISeq.cons(1, ISeq.cons(2, ISeq.of()))),
-                    ISeq.cons(3, ISeq.cons(4, ISeq.cons(5, ISeq.of()))));
+            var sut = sutFrom(sutFrom(0, 1, 2), sutFrom(3, 4, 5));
 
             assertThat(sut.mapcat(x -> x)).containsExactly(0, 1, 2, 3, 4, 5);
         }
 
         @Test
         void ignoresEmptyResults() {
-            var sut = ISeq.of(0, 1, 2, 3);
+            var sut = sutFrom(0, 1, 2, 3);
 
             assertThat(sut.mapcat(x -> x == 0 ? List.of() : List.of(x, x))).containsExactly(1, 1, 2, 2, 3, 3);
         }
 
         @Test
         void returnsInfiniteLazySeqIfMappingResultIsInfinite() {
-            var sut = ISeq.of(0, 1, 2, 3);
+            var sut = sutFrom(0, 1, 2, 3);
 
             assertThat(sut.mapcat(x -> ISeq.iterate("Y", y -> y + "Y")).take(4)).containsExactly("Y", "YY", "YYY", "YYYY");
         }
@@ -275,12 +282,12 @@ class ConsTest {
 
             @Test
             void returnsEmptySeqWhenProvidingEmptyOther() {
-                assertThat(ISeq.of(1, 2, 3).mapcat(List.<Integer>of(), (a, b) -> List.of(a + b, a + b))).isEmpty();
+                assertThat(sutFrom(1, 2, 3).mapcat(List.<Integer>of(), (a, b) -> List.of(a + b, a + b))).isEmpty();
             }
 
             @Test
             void returnsANewSeqWithTheItemsOfBothInitialSeqsAreCombinedUsingF() {
-                var sut = ISeq.of(1, 2, 3);
+                var sut = sutFrom(1, 2, 3);
 
                 assertThat(sut.mapcat(List.of("a", "b", "c"), (a, b) -> List.of(a + b, a + b)))
                         .containsExactly("1a", "1a", "2b", "2b", "3c", "3c");
@@ -288,7 +295,7 @@ class ConsTest {
 
             @Test
             void ignoresRemainingItemsIfOneOfTheSeqsIsExhausted() {
-                var sut = ISeq.of(1, 2, 3);
+                var sut = sutFrom(1, 2, 3);
 
                 assertThat(sut.mapcat(List.of("a", "b"), (a, b) -> List.of(a + b, a + b)))
                         .containsExactly("1a", "1a", "2b", "2b");
@@ -300,7 +307,7 @@ class ConsTest {
 
             @Test
             void returnsInfiniteLazySeqIfMappingResultIsInfinite() {
-                var sut = ISeq.of(1, 2, 3);
+                var sut = sutFrom(1, 2, 3);
                 var other = List.of("a", "b", "c");
 
                 assertThat(sut.mapcat(other, (a, b) -> ISeq.iterate("Y", y -> y + a + b)).take(4)).containsExactly("Y", "Y1a", "Y1a1a", "Y1a1a1a");
@@ -313,22 +320,22 @@ class ConsTest {
 
         @Test
         void returnsEmptySeqWhenFirstItemDoesNotMatch() {
-            assertThat(ISeq.of(1).takeWhile(x -> x > 1)).isEmpty();
+            assertThat(sutFrom(1).takeWhile(x -> x > 1)).isEmpty();
         }
 
         @Test
         void returnsSeqWithSingleMatchingItem() {
-            assertThat(ISeq.of(1).takeWhile(x -> x > 0)).containsExactly(1);
+            assertThat(sutFrom(1).takeWhile(x -> x > 0)).containsExactly(1);
         }
 
         @Test
         void returnsSeqWithMatchingItems() {
-            assertThat(ISeq.of(0, 1, 2, 3).takeWhile(x -> x < 3)).containsExactly(0, 1, 2);
+            assertThat(sutFrom(0, 1, 2, 3).takeWhile(x -> x < 3)).containsExactly(0, 1, 2);
         }
 
         @Test
         void returnsSeqWithAllMatchingItems() {
-            assertThat(ISeq.of(1, 2, 3).takeWhile(x -> true)).containsExactly(1, 2, 3);
+            assertThat(sutFrom(1, 2, 3).takeWhile(x -> true)).containsExactly(1, 2, 3);
         }
     }
 
@@ -337,17 +344,17 @@ class ConsTest {
 
         @Test
         void returnsEmptySeqWhenAllItemsMatch() {
-            assertThat(ISeq.of(1, 2, 3, 4).dropWhile(x -> x > 0)).isEmpty();
+            assertThat(sutFrom(1, 2, 3, 4).dropWhile(x -> x > 0)).isEmpty();
         }
 
         @Test
         void returnsSeqWithItemsThatDoNotMatch() {
-            assertThat(ISeq.of(1, 2, 3, 4).dropWhile(x -> x < 3)).containsExactly(3, 4);
+            assertThat(sutFrom(1, 2, 3, 4).dropWhile(x -> x < 3)).containsExactly(3, 4);
         }
 
         @Test
         void returnsEntireSeqWhenFirstItemDoesNotMatch() {
-            assertThat(ISeq.of(1, 2, 3, 4).dropWhile(x -> x > 2)).containsExactly(1, 2, 3, 4);
+            assertThat(sutFrom(1, 2, 3, 4).dropWhile(x -> x > 2)).containsExactly(1, 2, 3, 4);
         }
     }
 
@@ -356,7 +363,7 @@ class ConsTest {
 
         @Test
         void returnsEmptySeqForNegativeSizeN() {
-            var sut = ISeq.of(1, 2, 3);
+            var sut = sutFrom(1, 2, 3);
 
             assertThat(sut.partition(-1)).isEmpty();
             assertThat(sut.partition(-1, 10)).isEmpty();
@@ -368,7 +375,7 @@ class ConsTest {
 
         @Test
         void returnsInfiniteSeqOfEmptyListsForZeroSizeN() {
-            var sut = ISeq.of(1, 2, 3);
+            var sut = sutFrom(1, 2, 3);
 
             assertThat(sut.partition(0).take(2)).containsExactly(
                     List.of(),
@@ -389,7 +396,7 @@ class ConsTest {
 
         @Test
         void returnsSeqOfListsOf1ItemEachAtOffsetsStepApart() {
-            var sut = ISeq.of(0, 1, 2, 3, 4);
+            var sut = sutFrom(0, 1, 2, 3, 4);
 
             assertThat(sut.partition(1).take(3)).containsExactly(
                     List.of(0),
@@ -409,7 +416,7 @@ class ConsTest {
 
         @Test
         void returnsSeqOfListsOfNItemsEachAtOffsetsStepApart() {
-            var sut = ISeq.of(0, 1, 2, 3, 4, 5, 6, 7, 8);
+            var sut = sutFrom(0, 1, 2, 3, 4, 5, 6, 7, 8);
 
             assertThat(sut.partition(3).take(3)).containsExactly(
                     List.of(0, 1, 2),
@@ -429,7 +436,7 @@ class ConsTest {
 
         @Test
         void dropsItemsThatDoNotMakeACompleteLastPartition() {
-            var sut = ISeq.of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+            var sut = sutFrom(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
 
             assertThat(sut.partition(4)).containsExactly(
                     List.of(0, 1, 2, 3),
@@ -447,7 +454,7 @@ class ConsTest {
 
         @Test
         void returnsSeqOfOneEmptyListForStepGreaterThanOrEqualToSizeN() {
-            var sut = ISeq.of(1, 2, 3);
+            var sut = sutFrom(1, 2, 3);
 
             assertThat(sut.partition(0, 3)).containsExactly(
                     List.of());
@@ -458,7 +465,7 @@ class ConsTest {
 
         @Test
         void returnsASlidingWindowIfStepIsLowerThanSizeN() {
-            var sut = ISeq.of(0, 1, 2, 3, 4, 5, 6);
+            var sut = sutFrom(0, 1, 2, 3, 4, 5, 6);
 
             assertThat(sut.partition(3, 2)).containsExactly(
                     List.of(0, 1, 2),
@@ -471,7 +478,7 @@ class ConsTest {
 
             @Test
             void fillsIncompleteLastPartitionWithItemsFromPad() {
-                var sut = ISeq.of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);
+                var sut = sutFrom(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);
 
                 assertThat(sut.partition(4, 4, List.of(-1, -2, -3, -4))).containsExactly(
                         List.of(0, 1, 2, 3),
@@ -488,7 +495,7 @@ class ConsTest {
 
             @Test
             void returnsAnIncompleteLastPartitionIfItemsInPadAreFewerThanRequired() {
-                var sut = ISeq.of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);
+                var sut = sutFrom(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);
 
                 assertThat(sut.partition(4, 4, List.of())).containsExactly(
                         List.of(0, 1, 2, 3),
@@ -510,7 +517,7 @@ class ConsTest {
 
         @Test
         void returnsEmptySeqForNegativeSizeN() {
-            var sut = ISeq.of(1, 2, 3);
+            var sut = sutFrom(1, 2, 3);
 
             assertThat(sut.partitionAll(-1)).isEmpty();
             assertThat(sut.partitionAll(-1, 10)).isEmpty();
@@ -522,7 +529,7 @@ class ConsTest {
 
         @Test
         void returnsInfiniteSeqOfEmptyListsForZeroSizeN() {
-            var sut = ISeq.of(1, 2, 3);
+            var sut = sutFrom(1, 2, 3);
 
             assertThat(sut.partitionAll(0).take(2)).containsExactly(
                     List.of(),
@@ -543,7 +550,7 @@ class ConsTest {
 
         @Test
         void returnsSeqOfListsOf1ItemEachAtOffsetsStepApart() {
-            var sut = ISeq.of(0, 1, 2, 3, 4);
+            var sut = sutFrom(0, 1, 2, 3, 4);
 
             assertThat(sut.partitionAll(1)).containsExactly(
                     List.of(0),
@@ -567,7 +574,7 @@ class ConsTest {
 
         @Test
         void returnsSeqOfListsOfNItemsEachAtOffsetsStepApart() {
-            var sut = ISeq.of(0, 1, 2, 3, 4, 5, 6, 7, 8);
+            var sut = sutFrom(0, 1, 2, 3, 4, 5, 6, 7, 8);
 
             assertThat(sut.partitionAll(3)).containsExactly(
                     List.of(0, 1, 2),
@@ -587,7 +594,7 @@ class ConsTest {
 
         @Test
         void returnsSeqOfOneEmptyListForStepGreaterThanOrEqualToSizeN() {
-            var sut = ISeq.of(1, 2, 3);
+            var sut = sutFrom(1, 2, 3);
 
             assertThat(sut.partitionAll(0, 3)).containsExactly(
                     List.of());
@@ -598,7 +605,7 @@ class ConsTest {
 
         @Test
         void returnsASlidingWindowIfStepIsLowerThanSizeN() {
-            var sut = ISeq.of(0, 1, 2, 3, 4, 5, 6);
+            var sut = sutFrom(0, 1, 2, 3, 4, 5, 6);
 
             assertThat(sut.partitionAll(3, 2).take(3)).containsExactly(
                     List.of(0, 1, 2),
@@ -608,7 +615,7 @@ class ConsTest {
 
         @Test
         void returnsAnIncompleteLastPartition() {
-            var sut = ISeq.of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);
+            var sut = sutFrom(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);
 
             assertThat(sut.partitionAll(4, 4)).containsExactly(
                     List.of(0, 1, 2, 3),
@@ -629,14 +636,14 @@ class ConsTest {
 
         @Test
         void returnsASeqWithTheIntermediateValuesOfTheReduction() {
-            var sut = ISeq.of("1", "2", "3");
+            var sut = sutFrom("1", "2", "3");
 
             assertThat(sut.reductions((a, b) -> a + b)).containsExactly("1", "12", "123");
         }
 
         @Test
         void returnsASeqWithTheIntermediateValuesOfTheReductionStartingWithInit() {
-            var sut = ISeq.of(1, 2, 3);
+            var sut = sutFrom(1, 2, 3);
 
             assertThat(sut.reductions("0", (a, b) -> a + b.toString())).containsExactly("0", "01", "012", "0123");
         }
@@ -648,7 +655,7 @@ class ConsTest {
 
         @Test
         void returnsNewSeqWithItemPrepended() {
-            var sut = ISeq.of(0, 1, 2);
+            var sut = sutFrom(0, 1, 2);
 
             var actual = sut.cons(-1);
 
@@ -659,7 +666,7 @@ class ConsTest {
 
         @Test
         void acceptsNullAsItem() {
-            var sut = ISeq.of(0, 1, 2);
+            var sut = sutFrom(0, 1, 2);
 
             var actual = sut.cons(null);
 
@@ -674,21 +681,21 @@ class ConsTest {
 
         @Test
         void returnsOptionalResultWhenValIsNotSupplied() {
-            var sut = ISeq.of(0, 1, 2, 3);
+            var sut = sutFrom(0, 1, 2, 3);
 
             assertThat(sut.reduce((a, b) -> a + b)).hasValue(6);
         }
 
         @Test
         void returnsResultWhenValIsSupplied() {
-            var sut = ISeq.of(1, 2, 3);
+            var sut = sutFrom(1, 2, 3);
 
             assertThat(sut.reduce(0, (a, b) -> a + b)).isEqualTo(6);
         }
 
         @Test
         void returnsResultOfDifferentTypeThanSeq() {
-            var sut = ISeq.of("a", "bb", "ccc", "dddd");
+            var sut = sutFrom("a", "bb", "ccc", "dddd");
 
             assertThat(sut.reduce(0, (acc, x) -> acc + x.length())).isEqualTo(10);
         }
@@ -698,7 +705,7 @@ class ConsTest {
     void runCallsProcForEveryItemPresent() {
         var proc = Mockito.<Consumer<Integer>>mock();
 
-        var sut = ISeq.of(0, 1, 2, 3, 4);
+        var sut = sutFrom(0, 1, 2, 3, 4);
 
         sut.run(proc);
 
@@ -715,26 +722,26 @@ class ConsTest {
 
         @Test
         void returnsSeqWithSingleItem() {
-            assertThat(ISeq.of(1).distinct()).containsExactly(1);
+            assertThat(sutFrom(1).distinct()).containsExactly(1);
         }
 
         @Test
         void returnsSeqThatAlreadyIsDistinct() {
-            var sut = ISeq.of(0, 1, 2, 3);
+            var sut = sutFrom(0, 1, 2, 3);
 
             assertThat(sut.distinct()).containsExactly(0, 1, 2, 3);
         }
 
         @Test
         void returnsSeqWithSingleItemForSeqWithIdenticalItems() {
-            var sut = ISeq.of("a", "a", "a", "a");
+            var sut = sutFrom("a", "a", "a", "a");
 
             assertThat(sut.distinct()).containsExactly("a");
         }
 
         @Test
         void returnsDistinctItemsInSameOrderAsEncounteredFirst() {
-            var sut = ISeq.of("a", "c", "a", "b", "b", "d", "f", "e", "g", "e");
+            var sut = sutFrom("a", "c", "a", "b", "b", "d", "f", "e", "g", "e");
 
             assertThat(sut.distinct()).containsExactly("a", "c", "b", "d", "f", "e", "g");
         }
@@ -745,19 +752,19 @@ class ConsTest {
 
         @Test
         void returnsSeqWithSingleItem() {
-            assertThat(ISeq.of(1).sorted()).isEqualTo(ISeq.of(1));
+            assertThat(sutFrom(1).sorted()).containsExactly(1);
         }
 
         @Test
         void returnsSeqWithAllItemsSortedUsingDefaultComparator() {
-            var sut = ISeq.of(10, 9, 7, 8);
+            var sut = sutFrom(10, 9, 7, 8);
 
             assertThat(sut.sorted()).containsExactly(7, 8, 9, 10);
         }
 
         @Test
         void returnsSeqWithAllItemsSortedUsingSuppliedComparator() {
-            var sut = ISeq.of(0, 1, 2, 3);
+            var sut = sutFrom(0, 1, 2, 3);
 
             assertThat(sut.sorted(Comparator.reverseOrder())).containsExactly(3, 2, 1, 0);
         }
@@ -765,7 +772,7 @@ class ConsTest {
 
     @Test
     void reverseReturnsReversedSeq() {
-        var sut = ISeq.of(10, 9, 7, 8);
+        var sut = sutFrom(10, 9, 7, 8);
 
         assertThat(sut.reverse()).containsExactly(8, 7, 9, 10);
     }
@@ -775,35 +782,35 @@ class ConsTest {
 
         @Test
         void returnsFalseIfNoneOfTheItemsMatchPred() {
-            var sut = ISeq.of(0, 1, 2, 3);
+            var sut = sutFrom(0, 1, 2, 3);
 
             assertThat(sut.take(10).some(x -> x < 0)).isFalse();
         }
 
         @Test
         void returnsTrueIfAllItemsMatchPred() {
-            var sut = ISeq.of(0, 1, 2, 3);
+            var sut = sutFrom(0, 1, 2, 3);
 
             assertThat(sut.some(x -> x >= 0)).isTrue();
         }
 
         @Test
         void returnsTrueIfFirstItemMatchesPred() {
-            var sut = ISeq.of(0, 1, 2, 3);
+            var sut = sutFrom(0, 1, 2, 3);
 
             assertThat(sut.some(x -> x == 0)).isTrue();
         }
 
         @Test
         void returnsTrueIfSomeItemMatchesPred() {
-            var sut = ISeq.of(0, 1, 2, 3);
+            var sut = sutFrom(0, 1, 2, 3);
 
             assertThat(sut.some(x -> x == 2)).isTrue();
         }
 
         @Test
         void returnsTrueIfLastItemMatchesPred() {
-            var sut = ISeq.of(0, 1, 2, 3);
+            var sut = sutFrom(0, 1, 2, 3);
 
             assertThat(sut.some(x -> x == 3)).isTrue();
         }
@@ -814,28 +821,28 @@ class ConsTest {
 
         @Test
         void returnsTrueIfAllItemsInSeqMatchPred() {
-            var sut = ISeq.of(1, 2, 3, 4);
+            var sut = sutFrom(1, 2, 3, 4);
 
             assertThat(sut.every(x -> x > 0)).isTrue();
         }
 
         @Test
         void returnsFalseIfFirstItemDoesNotMatchPred() {
-            var sut = ISeq.of(0, 1, 2, 3);
+            var sut = sutFrom(0, 1, 2, 3);
 
             assertThat(sut.every(x -> x > 0)).isFalse();
         }
 
         @Test
         void returnsFalseIfAnyItemDoesNotMatchPred() {
-            var sut = ISeq.of(1, 2, 3, 4);
+            var sut = sutFrom(1, 2, 3, 4);
 
             assertThat(sut.every(x -> x < 3)).isFalse();
         }
 
         @Test
         void returnsFalseIfLastItemDoesNotMatchPred() {
-            var sut = ISeq.of(1, 2, 3, 4);
+            var sut = sutFrom(1, 2, 3, 4);
 
             assertThat(sut.every(x -> x < 4)).isFalse();
         }
@@ -846,28 +853,28 @@ class ConsTest {
 
         @Test
         void returnsFalseIfFirstItemMatchesPred() {
-            var sut = ISeq.of(0, 1, 2);
+            var sut = sutFrom(0, 1, 2);
 
             assertThat(sut.notAny(x -> x == 0)).isFalse();
         }
 
         @Test
         void returnsFalseIfAnyItemMatchesPred() {
-            var sut = ISeq.of(0, 1, 2);
+            var sut = sutFrom(0, 1, 2);
 
             assertThat(sut.notAny(x -> x == 1)).isFalse();
         }
 
         @Test
         void returnsFalseIfAllItemsMatchPred() {
-            var sut = ISeq.of(1, 2, 3, 4);
+            var sut = sutFrom(1, 2, 3, 4);
 
             assertThat(sut.notAny(x -> x > 0)).isFalse();
         }
 
         @Test
         void returnsTrueIfNoItemMatchesPred() {
-            var sut = ISeq.of(0, 1, 2);
+            var sut = sutFrom(0, 1, 2);
 
             assertThat(sut.take(100).notAny(x -> x < 0)).isTrue();
         }
@@ -878,26 +885,26 @@ class ConsTest {
 
         @Test
         void returnsSingleItem() {
-            assertThat(ISeq.of(1).max(Comparator.naturalOrder())).hasValue(1);
+            assertThat(sutFrom(1).max(Comparator.naturalOrder())).hasValue(1);
         }
 
         @Test
         void returnsHighestNumber() {
-            var sut = ISeq.of(1, 2, 3, 4, 5, 6, 7, 8);
+            var sut = sutFrom(1, 2, 3, 4, 5, 6, 7, 8);
 
             assertThat(sut.max(Comparator.naturalOrder())).hasValue(8);
         }
 
         @Test
         void returnsLongestString() {
-            var sut = ISeq.of("x", "xx", "xxx", "xxxxx");
+            var sut = sutFrom("x", "xx", "xxx", "xxxxx");
 
             assertThat(sut.max(Comparator.comparingInt(x -> x.length()))).hasValue("xxxxx");
         }
 
         @Test
         void returnsTheLastOccurrenceOfLongestStringIfMoreThanOneItemFound() {
-            var sut = ISeq.of("x", "xx", "aaa", "x", "bbb");
+            var sut = sutFrom("x", "xx", "aaa", "x", "bbb");
 
             assertThat(sut.max(Comparator.comparingInt(x -> x.length()))).hasValue("bbb");
         }
@@ -908,26 +915,26 @@ class ConsTest {
 
         @Test
         void returnsSingleItem() {
-            assertThat(ISeq.of(1).min(Comparator.naturalOrder())).hasValue(1);
+            assertThat(sutFrom(1).min(Comparator.naturalOrder())).hasValue(1);
         }
 
         @Test
         void returnsLowestNumber() {
-            var sut = ISeq.of(-5, -4, -3, -2, -1, 0, 1, 2);
+            var sut = sutFrom(-5, -4, -3, -2, -1, 0, 1, 2);
 
             assertThat(sut.min(Comparator.naturalOrder())).hasValue(-5);
         }
 
         @Test
         void returnsShortestString() {
-            var sut = ISeq.of("xxxxxx", "xxxxx", "xxxx", "x", "xx", "xxx");
+            var sut = sutFrom("xxxxxx", "xxxxx", "xxxx", "x", "xx", "xxx");
 
             assertThat(sut.min(Comparator.comparingInt(x -> x.length()))).hasValue("x");
         }
 
         @Test
         void returnsTheLastOccurrenceOfShortestStringIfMoreThanOneItemFound() {
-            var sut = ISeq.of("a", "xx", "aaa", "x", "bbb", "b");
+            var sut = sutFrom("a", "xx", "aaa", "x", "bbb", "b");
 
             assertThat(sut.min(Comparator.comparingInt(x -> x.length()))).hasValue("b");
         }
@@ -938,26 +945,26 @@ class ConsTest {
 
         @Test
         void returnsSingleItem() {
-            assertThat(ISeq.of(1).maxKey(x -> Math.abs(x))).hasValue(1);
+            assertThat(sutFrom(1).maxKey(x -> Math.abs(x))).hasValue(1);
         }
 
         @Test
         void returnsHighestNumber() {
-            var sut = ISeq.of(1, 2, 3, 4, 5, 6);
+            var sut = sutFrom(1, 2, 3, 4, 5, 6);
 
             assertThat(sut.maxKey(x -> Math.abs(x))).hasValue(6);
         }
 
         @Test
         void returnsLongestString() {
-            var sut = ISeq.of("x", "xx", "xxx", "xxxx", "xxxxx", "xxxxxx");
+            var sut = sutFrom("x", "xx", "xxx", "xxxx", "xxxxx", "xxxxxx");
 
             assertThat(sut.maxKey(x -> x.length())).hasValue("xxxxxx");
         }
 
         @Test
         void returnsTheLastOccurrenceOfLongestStringIfMoreThanOneItemFound() {
-            var sut = ISeq.of("x", "xx", "aaa", "x", "bbb");
+            var sut = sutFrom("x", "xx", "aaa", "x", "bbb");
 
             assertThat(sut.maxKey(x -> x.length())).hasValue("bbb");
         }
@@ -968,26 +975,26 @@ class ConsTest {
 
         @Test
         void returnsSingleItem() {
-            assertThat(ISeq.of(1).minKey(x -> Math.abs(x))).hasValue(1);
+            assertThat(sutFrom(1).minKey(x -> Math.abs(x))).hasValue(1);
         }
 
         @Test
         void returnsLowestNumber() {
-            var sut = ISeq.of(-8, -7, -6, -5, -4, -3);
+            var sut = sutFrom(-8, -7, -6, -5, -4, -3);
 
             assertThat(sut.minKey(x -> x)).hasValue(-8);
         }
 
         @Test
         void returnsShortestString() {
-            var sut = ISeq.of("xxxxxx", "xxxxx", "xxxx", "x", "xx", "xxx");
+            var sut = sutFrom("xxxxxx", "xxxxx", "xxxx", "x", "xx", "xxx");
 
             assertThat(sut.minKey(x -> x.length())).hasValue("x");
         }
 
         @Test
         void returnsTheLastOccurrenceOfShortestStringIfMoreThanOneItemFound() {
-            var sut = ISeq.of("x", "xx", "aaa", "x", "bbb");
+            var sut = sutFrom("x", "xx", "aaa", "x", "bbb");
 
             assertThat(sut.minKey(x -> x.length())).hasValue("x");
         }
@@ -998,7 +1005,7 @@ class ConsTest {
 
         @Test
         void returnsValueAtIndex() {
-            var sut = ISeq.cons("", ISeq.cons("0", ISeq.cons("01", ISeq.cons("012", ISeq.of()))));
+            var sut = sutFrom("", "0", "01", "012");
 
             assertThat(sut.nth(0)).isEqualTo("");
             assertThat(sut.nth(1)).isEqualTo("0");
@@ -1008,7 +1015,7 @@ class ConsTest {
 
         @Test
         void returnsDefaultValue() {
-            var sut = ISeq.of("x");
+            var sut = sutFrom("x");
 
             assertThat(sut.nth(0, "y")).isEqualTo("x");
             assertThat(sut.nth(1, "y")).isEqualTo("y");
@@ -1018,7 +1025,7 @@ class ConsTest {
 
         @Test
         void throwsForNegativeIndex() {
-            var sut = ISeq.of(1);
+            var sut = sutFrom(1);
 
             assertThatExceptionOfType(IndexOutOfBoundsException.class)
                     .isThrownBy(() -> sut.nth(-1))
@@ -1027,7 +1034,7 @@ class ConsTest {
 
         @Test
         void throwsIfIndexNotPresent() {
-            var sut = ISeq.of(1);
+            var sut = sutFrom(1);
 
             assertThatExceptionOfType(IndexOutOfBoundsException.class)
                     .isThrownBy(() -> sut.nth(1))
@@ -1037,9 +1044,9 @@ class ConsTest {
 
     @Test
     void strReturnsConcatenatedStringRepresentationsOfAllItems() {
-        assertThat(ISeq.cons("", ISeq.cons("0", ISeq.cons("01", ISeq.cons("012", ISeq.of())))).str())
-                .isEqualTo("001012");
-        assertThat(ISeq.cons(new Object(), ISeq.cons(new Object(), ISeq.cons(new Object(), ISeq.of()))).str())
+        assertThat(sutFrom("", "0", "1", "2", "3").str())
+                .isEqualTo("0123");
+        assertThat(sutFrom(new Object(), new Object(), new Object()).str())
                 .matches("java\\.lang\\.Object@.+java\\.lang\\.Object@.+java\\.lang\\.Object@.+");
     }
 
@@ -1048,7 +1055,7 @@ class ConsTest {
 
         @Test
         void returnsOptionalOfValueAtIndex() {
-            var sut = ISeq.of("0", "01", "012", "0123");
+            var sut = sutFrom("0", "01", "012", "0123");
 
             assertThat(sut.find(0)).hasValue("0");
             assertThat(sut.find(1)).hasValue("01");
@@ -1058,12 +1065,12 @@ class ConsTest {
 
         @Test
         void returnsEmptyOptionalForNegativeIndex() {
-            assertThat(ISeq.of(1).find(-1)).isEmpty();
+            assertThat(sutFrom(1).find(-1)).isEmpty();
         }
 
         @Test
         void returnsEmptyOptionalIfIndexNotPresent() {
-            assertThat(ISeq.of(1).find(1)).isEmpty();
+            assertThat(sutFrom(1).find(1)).isEmpty();
         }
     }
 
@@ -1072,21 +1079,21 @@ class ConsTest {
 
         @Test
         void returnsOptionalOfHead() {
-            var sut = ISeq.of(0, 1, 2, 3, 4);
+            var sut = sutFrom(0, 1, 2, 3, 4);
 
             assertThat(sut.findFirst()).hasValue(0);
         }
 
         @Test
         void returnsEmptyOptionalWhenNoItemsMatchPred() {
-            var sut = ISeq.of(0, 1, 2, 3, 4);
+            var sut = sutFrom(0, 1, 2, 3, 4);
 
             assertThat(sut.findFirst(x -> x < 0)).isEmpty();
         }
 
         @Test
         void returnsOptionalOfFirstMatchingItem() {
-            var sut = ISeq.of(0, 1, 2, 3, 4);
+            var sut = sutFrom(0, 1, 2, 3, 4);
 
             assertThat(sut.findFirst(x -> x > 3)).hasValue(4);
         }
@@ -1094,7 +1101,7 @@ class ConsTest {
 
     @Test
     void forceReturnsCopyOfThisSeq() {
-        var sut = ISeq.of(1, 2, 3);
+        var sut = sutFrom(1, 2, 3);
         assertThat(sut.isRealized()).isTrue();
 
         var forced = sut.realize();
@@ -1108,7 +1115,7 @@ class ConsTest {
 
         @Test
         void returnsListContainingTheItemsInThisSeq() {
-            var sut = ISeq.of(0, 1, 2, 3);
+            var sut = sutFrom(0, 1, 2, 3);
 
             assertThat(sut.toList())
                     .isInstanceOf(List.class)
@@ -1121,7 +1128,7 @@ class ConsTest {
 
         @Test
         void returnsSetContainingTheUniqueItemsInThisSeq() {
-            var sut = ISeq.of(0, 1, 2, 3, 2, 1, 0, 4);
+            var sut = sutFrom(0, 1, 2, 3, 2, 1, 0, 4);
 
             assertThat(sut.toSet())
                     .isInstanceOf(Set.class)
@@ -1134,7 +1141,7 @@ class ConsTest {
 
         @Test
         void returnsMapForSeqOfEntries() {
-            var sut = ISeq.of("x", "xx", "xxx").map(x -> java.util.Map.entry(x.length(), x));
+            var sut = sutFrom("x", "xx", "xxx").map(x -> java.util.Map.entry(x.length(), x));
 
             var actual = sut.toMap();
 
@@ -1146,7 +1153,7 @@ class ConsTest {
 
         @Test
         void returnsMapForSeqOfEntriesWithLastValueWinningOnCollision() {
-            var sut = ISeq.of("a", "aa", "b", "bb").map(x -> java.util.Map.entry(x.length(), x));
+            var sut = sutFrom("a", "aa", "b", "bb").map(x -> java.util.Map.entry(x.length(), x));
 
             var actual = sut.toMap();
 
@@ -1157,7 +1164,7 @@ class ConsTest {
 
         @Test
         void throwsIfSeqIsNotOfTypeEntry() {
-            var sut = ISeq.of("x", "xx", "xxx");
+            var sut = sutFrom("x", "xx", "xxx");
 
             assertThatExceptionOfType(UnsupportedOperationException.class)
                     .isThrownBy(() -> sut.toMap())
@@ -1166,7 +1173,7 @@ class ConsTest {
 
         @Test
         void returnsMapBasedOnKeyAndValueMapper() {
-            var sut = ISeq.of("x", "xx", "xxx");
+            var sut = sutFrom("x", "xx", "xxx");
 
             var actual = sut.toMap(k -> k.length(), v -> v);
 
@@ -1178,7 +1185,7 @@ class ConsTest {
 
         @Test
         void throwsOnCollision() {
-            var sut = ISeq.of("a", "b");
+            var sut = sutFrom("a", "b");
 
             assertThatExceptionOfType(IllegalArgumentException.class)
                     .isThrownBy(() -> sut.toMap(k -> k.length(), v -> v))
@@ -1187,7 +1194,7 @@ class ConsTest {
 
         @Test
         void returnsMapBasedOnKeyAndValueMapperWithApplyingMergerOnCollision() {
-            var sut = ISeq.of("a", "b", "aa", "bb");
+            var sut = sutFrom("a", "b", "aa", "bb");
 
             var actual = sut.toMap(k -> k.length(), v -> v, (a, b) -> b);
 
@@ -1202,7 +1209,7 @@ class ConsTest {
 
         @Test
         void returnsIterator() {
-            var sut = ISeq.of(0, 1);
+            var sut = sutFrom(0, 1);
 
             var actual = sut.iterator();
 
@@ -1216,14 +1223,14 @@ class ConsTest {
 
     @Test
     void streamReturnsStream() {
-        var sut = ISeq.of(0, 1, 2);
+        var sut = sutFrom(0, 1, 2);
 
         assertThat(sut.stream()).containsExactly(0, 1, 2);
     }
 
     @Test
     void parallelStreamReturnsStream() {
-        var sut = ISeq.of(0, 1, 2);
+        var sut = sutFrom(0, 1, 2);
 
         assertThat(sut.parallelStream()).containsExactly(0, 1, 2);
     }
@@ -1232,7 +1239,7 @@ class ConsTest {
     void forEachCallsConsumerForEveryItemPresent() {
         var consumer = Mockito.<Consumer<Integer>>mock();
 
-        var sut = ISeq.of(0, 1, 2, 3, 4);
+        var sut = sutFrom(0, 1, 2, 3, 4);
 
         sut.forEach(consumer);
 
@@ -1246,14 +1253,14 @@ class ConsTest {
 
     @Test
     void sizeReturnsSizeOfSeq() {
-        var sut = ISeq.cons(0, ISeq.cons(1, ISeq.cons(2, ISeq.cons(3, ISeq.of()))));
+        var sut = sutFrom(0, 1, 2, 3);
 
         assertThat(sut.size()).isEqualTo(4);
     }
 
     @Test
     void isEmptyReturnsFalse() {
-        var sut = ISeq.of(1);
+        var sut = sutFrom(1);
 
         assertThat(sut.isEmpty()).isFalse();
     }
@@ -1263,7 +1270,7 @@ class ConsTest {
 
         @Test
         void returnsValueAtIndex() {
-            var sut = ISeq.cons("", ISeq.cons("0", ISeq.cons("01", ISeq.cons("012", ISeq.of()))));
+            var sut = sutFrom("", "0", "01", "012");
 
             assertThat(sut.get(0)).isEqualTo("");
             assertThat(sut.get(1)).isEqualTo("0");
@@ -1274,21 +1281,21 @@ class ConsTest {
         @Test
         void throwsForNegativeIndex() {
             assertThatExceptionOfType(IndexOutOfBoundsException.class)
-                    .isThrownBy(() -> ISeq.of(1).get(-1))
+                    .isThrownBy(() -> sutFrom(1).get(-1))
                     .withMessage("Index out of range: -1");
         }
 
         @Test
         void throwsIfIndexNotPresent() {
             assertThatExceptionOfType(IndexOutOfBoundsException.class)
-                    .isThrownBy(() -> ISeq.of(1).get(1))
+                    .isThrownBy(() -> sutFrom(1).get(1))
                     .withMessage("Index out of range: 1");
         }
     }
 
     @Test
     void toStringReturnsAllItems() {
-        var sut = ISeq.of(0, 1, 2, 3);
+        var sut = sutFrom(0, 1, 2, 3);
 
         assertThat(sut).hasToString("[0, 1, 2, 3]");
     }

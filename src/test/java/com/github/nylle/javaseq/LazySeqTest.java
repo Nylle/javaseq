@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -21,65 +22,65 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 class LazySeqTest {
 
-    private static <T> ISeq<T> iterate(T x, UnaryOperator<T> f) {
-        return new LazySeq<>(() -> new Cons<>(x, iterate(f.apply(x), f)));
+    private static <T> ISeq<T> recursive(T x, UnaryOperator<T> f) {
+        return new LazySeq<>(() -> new Cons<>(x, recursive(f.apply(x), f)));
     }
 
-    private static ISeq<Integer> range() {
-        return iterate(0, x -> x + 1);
+    private static ISeq<Integer> fromRange() {
+        return recursive(0, x -> x + 1);
     }
 
-    private static ISeq<Integer> range(int end) {
-        return range(0, end);
+    private static ISeq<Integer> fromRange(int end) {
+        return fromRange(0, end);
     }
 
-    private static ISeq<Integer> range(int start, int end) {
-        return iterate(start, x -> x + 1).takeWhile(x -> x < end);
+    private static ISeq<Integer> fromRange(int start, int end) {
+        return recursive(start, x -> x + 1).takeWhile(x -> x < end);
     }
 
-    private static <T> ISeq<T> sequence(Iterator<T> iterator) {
+    private static <T> ISeq<T> fromIterator(Iterator<T> iterator) {
         if (iterator.hasNext()) {
-            return new LazySeq<>(() -> new Cons<>(iterator.next(), sequence(iterator)));
+            return new LazySeq<>(() -> new Cons<>(iterator.next(), fromIterator(iterator)));
         }
-        return ISeq.of();
+        return Nil.empty();
     }
 
     @Nested
     class CanBeEmpty {
 
-        private static <T> ISeq<T> createEmpty() {
+        private static <T> ISeq<T> fromEmpty() {
             return new LazySeq<>(() -> Nil.empty());
         }
 
         @Test
         void firstReturnsNull() {
-            assertThat(createEmpty().first()).isNull();
+            assertThat(fromEmpty().first()).isNull();
         }
 
         @Test
         void secondReturnsNull() {
-            assertThat(createEmpty().second()).isNull();
+            assertThat(fromEmpty().second()).isNull();
         }
 
         @Test
         void restReturnsNil() {
-            assertThat(createEmpty().rest()).isEqualTo(Nil.empty());
+            assertThat(fromEmpty().rest()).isEqualTo(Nil.empty());
         }
 
         @Test
         void sizeReturnsZero() {
-            assertThat(createEmpty().size()).isZero();
+            assertThat(fromEmpty().size()).isZero();
         }
 
         @Test
         void isEmptyReturnsTrue() {
-            assertThat(createEmpty().isEmpty()).isTrue();
+            assertThat(fromEmpty().isEmpty()).isTrue();
         }
 
         @Test
         void getThrows() {
             assertThatExceptionOfType(IndexOutOfBoundsException.class)
-                    .isThrownBy(() -> createEmpty().get(0))
+                    .isThrownBy(() -> fromEmpty().get(0))
                     .withMessage("Index out of range: 0");
         }
 
@@ -89,13 +90,13 @@ class LazySeqTest {
             @Test
             void throwsIndexOutOfBoundsException() {
                 assertThatExceptionOfType(IndexOutOfBoundsException.class)
-                        .isThrownBy(() -> createEmpty().nth(0))
+                        .isThrownBy(() -> fromEmpty().nth(0))
                         .withMessage("Index out of range: 0");
             }
 
             @Test
             void returnsDefault() {
-                assertThat(createEmpty().nth(0, "x")).isEqualTo("x");
+                assertThat(fromEmpty().nth(0, "x")).isEqualTo("x");
             }
         }
 
@@ -104,17 +105,17 @@ class LazySeqTest {
 
             @Test
             void returnsNilWithNegativeItems() {
-                assertThat(createEmpty().take(-1)).isEqualTo(Nil.empty());
+                assertThat(fromEmpty().take(-1)).isEqualTo(Nil.empty());
             }
 
             @Test
             void returnsNilWithZeroItems() {
-                assertThat(createEmpty().take(0)).isEqualTo(Nil.empty());
+                assertThat(fromEmpty().take(0)).isEqualTo(Nil.empty());
             }
 
             @Test
             void returnsNilForMoreThanZeroItems() {
-                assertThat(createEmpty().take(3)).isEqualTo(Nil.empty());
+                assertThat(fromEmpty().take(3)).isEqualTo(Nil.empty());
             }
         }
 
@@ -123,23 +124,23 @@ class LazySeqTest {
 
             @Test
             void returnsNilWithNegativeItems() {
-                assertThat(createEmpty().drop(-1)).isEqualTo(Nil.empty());
+                assertThat(fromEmpty().drop(-1)).isEqualTo(Nil.empty());
             }
 
             @Test
             void returnsNilWithZeroItems() {
-                assertThat(createEmpty().drop(0)).isEqualTo(Nil.empty());
+                assertThat(fromEmpty().drop(0)).isEqualTo(Nil.empty());
             }
 
             @Test
             void returnsNilForMoreThanZeroItems() {
-                assertThat(createEmpty().drop(12)).isEqualTo(Nil.empty());
+                assertThat(fromEmpty().drop(12)).isEqualTo(Nil.empty());
             }
         }
 
         @Test
         void filterReturnsNil() {
-            assertThat(createEmpty().filter(x -> x != null)).isEqualTo(Nil.empty());
+            assertThat(fromEmpty().filter(x -> x != null)).isEqualTo(Nil.empty());
         }
 
         @Nested
@@ -148,18 +149,18 @@ class LazySeqTest {
 
             @Test
             void returnsNil() {
-                assertThat(CanBeEmpty.<Integer>createEmpty().map(x -> x * 100)).isEqualTo(Nil.empty());
+                assertThat(CanBeEmpty.<Integer>fromEmpty().map(x -> x * 100)).isEqualTo(Nil.empty());
             }
 
             @Test
             void returnsNilWhenMappingWithOtherColl() {
-                assertThat(CanBeEmpty.<Integer>createEmpty().map(ISeq.<Integer>of(), (a, b) -> a + b)).isEqualTo(Nil.empty());
-                assertThat(CanBeEmpty.<Integer>createEmpty().map(ISeq.of(1, 2), (a, b) -> a + b)).isEqualTo(Nil.empty());
-                assertThat(CanBeEmpty.<Integer>createEmpty().map(Stream.of(1, 2), (a, b) -> a + b)).isEqualTo(Nil.empty());
-                assertThat(CanBeEmpty.<Integer>createEmpty().map(ISeq.of(1, 2).iterator(), (a, b) -> a + b)).isEqualTo(Nil.empty());
-                assertThat(CanBeEmpty.<Integer>createEmpty().map(List.of(1, 2), (a, b) -> a + b)).isEqualTo(Nil.empty());
-                assertThat(CanBeEmpty.<Integer>createEmpty().map(new Integer[]{1, 2}, (a, b) -> a + b)).isEqualTo(Nil.empty());
-                assertThat(CanBeEmpty.<String>createEmpty().map("", (a, b) -> a + b)).isEqualTo(Nil.empty());
+                assertThat(CanBeEmpty.<Integer>fromEmpty().map(Nil.<Integer>empty(), (a, b) -> a + b)).isEqualTo(Nil.empty());
+                assertThat(CanBeEmpty.<Integer>fromEmpty().map(ISeq.of(1, 2), (a, b) -> a + b)).isEqualTo(Nil.empty());
+                assertThat(CanBeEmpty.<Integer>fromEmpty().map(Stream.of(1, 2), (a, b) -> a + b)).isEqualTo(Nil.empty());
+                assertThat(CanBeEmpty.<Integer>fromEmpty().map(List.of(1, 2).iterator(), (a, b) -> a + b)).isEqualTo(Nil.empty());
+                assertThat(CanBeEmpty.<Integer>fromEmpty().map(List.of(1, 2), (a, b) -> a + b)).isEqualTo(Nil.empty());
+                assertThat(CanBeEmpty.<Integer>fromEmpty().map(new Integer[]{1, 2}, (a, b) -> a + b)).isEqualTo(Nil.empty());
+                assertThat(CanBeEmpty.<String>fromEmpty().map("", (a, b) -> a + b)).isEqualTo(Nil.empty());
             }
         }
 
@@ -168,24 +169,24 @@ class LazySeqTest {
 
             @Test
             void returnsNil() {
-                assertThat(createEmpty().mapcat(x -> ISeq.of(x, x))).isEqualTo(Nil.empty());
+                assertThat(fromEmpty().mapcat(x -> List.of(x, x))).isEqualTo(Nil.empty());
             }
 
             @Test
             void returnsNilWhenMappingWithOtherColl() {
-                assertThat(createEmpty().mapcat(Nil.<Integer>empty(), (a, b) -> List.of(a, b))).isEqualTo(Nil.empty());
-                assertThat(createEmpty().mapcat(ISeq.of(1, 2), (a, b) -> List.of(a, b))).isEqualTo(Nil.empty());
+                assertThat(fromEmpty().mapcat(Nil.<Integer>empty(), (a, b) -> List.of(a, b))).isEqualTo(Nil.empty());
+                assertThat(fromEmpty().mapcat(List.of(1, 2), (a, b) -> List.of(a, b))).isEqualTo(Nil.empty());
             }
         }
 
         @Test
         void takeWhileReturnsNil() {
-            assertThat(createEmpty().takeWhile(x -> true)).isEqualTo(Nil.empty());
+            assertThat(fromEmpty().takeWhile(x -> true)).isEqualTo(Nil.empty());
         }
 
         @Test
         void dropWhileReturnsNil() {
-            assertThat(createEmpty().dropWhile(x -> true)).isEqualTo(Nil.empty());
+            assertThat(fromEmpty().dropWhile(x -> true)).isEqualTo(Nil.empty());
         }
 
         @Nested
@@ -193,23 +194,23 @@ class LazySeqTest {
 
             @Test
             void returnsNilForZeroSizeN() {
-                assertThat(createEmpty().partition(0)).isEqualTo(Nil.empty());
-                assertThat(createEmpty().partition(0, 2)).isEqualTo(Nil.empty());
-                assertThat(createEmpty().partition(0, 2, List.of(1))).isEqualTo(Nil.empty());
+                assertThat(fromEmpty().partition(0)).isEqualTo(Nil.empty());
+                assertThat(fromEmpty().partition(0, 2)).isEqualTo(Nil.empty());
+                assertThat(fromEmpty().partition(0, 2, List.of(1))).isEqualTo(Nil.empty());
             }
 
             @Test
             void returnsNilForNegativeSizeN() {
-                assertThat(createEmpty().partition(-1)).isEqualTo(Nil.empty());
-                assertThat(createEmpty().partition(-1, 2)).isEqualTo(Nil.empty());
-                assertThat(createEmpty().partition(-1, 2, List.of(1))).isEqualTo(Nil.empty());
+                assertThat(fromEmpty().partition(-1)).isEqualTo(Nil.empty());
+                assertThat(fromEmpty().partition(-1, 2)).isEqualTo(Nil.empty());
+                assertThat(fromEmpty().partition(-1, 2, List.of(1))).isEqualTo(Nil.empty());
             }
 
             @Test
             void returnsNil() {
-                assertThat(createEmpty().partition(3)).isEqualTo(Nil.empty());
-                assertThat(createEmpty().partition(3, 2)).isEqualTo(Nil.empty());
-                assertThat(createEmpty().partition(3, 3, List.of(1, 2, 3))).isEqualTo(Nil.empty());
+                assertThat(fromEmpty().partition(3)).isEqualTo(Nil.empty());
+                assertThat(fromEmpty().partition(3, 2)).isEqualTo(Nil.empty());
+                assertThat(fromEmpty().partition(3, 3, List.of(1, 2, 3))).isEqualTo(Nil.empty());
             }
         }
 
@@ -218,20 +219,20 @@ class LazySeqTest {
 
             @Test
             void returnsNilForZeroSizeN() {
-                assertThat(createEmpty().partitionAll(0)).isEqualTo(Nil.empty());
-                assertThat(createEmpty().partitionAll(0, 2)).isEqualTo(Nil.empty());
+                assertThat(fromEmpty().partitionAll(0)).isEqualTo(Nil.empty());
+                assertThat(fromEmpty().partitionAll(0, 2)).isEqualTo(Nil.empty());
             }
 
             @Test
             void returnsNilForNegativeSizeN() {
-                assertThat(createEmpty().partitionAll(-1)).isEqualTo(Nil.empty());
-                assertThat(createEmpty().partitionAll(-1, 2)).isEqualTo(Nil.empty());
+                assertThat(fromEmpty().partitionAll(-1)).isEqualTo(Nil.empty());
+                assertThat(fromEmpty().partitionAll(-1, 2)).isEqualTo(Nil.empty());
             }
 
             @Test
             void returnsNil() {
-                assertThat(createEmpty().partitionAll(3)).isEqualTo(Nil.empty());
-                assertThat(createEmpty().partitionAll(3, 2)).isEqualTo(Nil.empty());
+                assertThat(fromEmpty().partitionAll(3)).isEqualTo(Nil.empty());
+                assertThat(fromEmpty().partitionAll(3, 2)).isEqualTo(Nil.empty());
             }
         }
 
@@ -240,18 +241,18 @@ class LazySeqTest {
 
             @Test
             void returnsNil() {
-                assertThat(CanBeEmpty.<Integer>createEmpty().reductions((a, b) -> a + b)).isEqualTo(Nil.empty());
+                assertThat(CanBeEmpty.<Integer>fromEmpty().reductions((a, b) -> a + b)).isEqualTo(Nil.empty());
             }
 
             @Test
             void returnsSeqOfInit() {
-                assertThat(CanBeEmpty.<String>createEmpty().reductions("a", (a, b) -> a + b)).containsExactly("a");
+                assertThat(CanBeEmpty.<String>fromEmpty().reductions("a", (a, b) -> a + b)).containsExactly("a");
             }
         }
 
         @Test
         void consReturnsNewSeqWithItemPrepended() {
-            var actual = CanBeEmpty.<String>createEmpty().cons("x");
+            var actual = CanBeEmpty.<String>fromEmpty().cons("x");
 
             assertThat(actual.first()).isEqualTo("x");
             assertThat(actual.rest()).isEmpty();
@@ -262,84 +263,84 @@ class LazySeqTest {
 
             @Test
             void returnsEmptyOptional() {
-                assertThat(CanBeEmpty.<Integer>createEmpty().reduce((a, b) -> a + b)).isEmpty();
+                assertThat(CanBeEmpty.<Integer>fromEmpty().reduce((a, b) -> a + b)).isEmpty();
             }
 
             @Test
             void returnsVal() {
-                assertThat(CanBeEmpty.<Integer>createEmpty().reduce(0, (a, b) -> a + b)).isEqualTo(0);
+                assertThat(CanBeEmpty.<Integer>fromEmpty().reduce(0, (a, b) -> a + b)).isEqualTo(0);
             }
         }
 
         @Test
         void distinctReturnsNil() {
-            assertThat(createEmpty().distinct()).isEqualTo(Nil.empty());
+            assertThat(fromEmpty().distinct()).isEqualTo(Nil.empty());
         }
 
         @Test
         void sortedReturnsNil() {
-            assertThat(createEmpty().sorted()).isEqualTo(Nil.empty());
-            assertThat(CanBeEmpty.<Integer>createEmpty().sorted(Comparator.naturalOrder())).isEqualTo(Nil.empty());
+            assertThat(fromEmpty().sorted()).isEqualTo(Nil.empty());
+            assertThat(CanBeEmpty.<Integer>fromEmpty().sorted(Comparator.naturalOrder())).isEqualTo(Nil.empty());
         }
 
         @Test
         void someReturnsFalse() {
-            assertThat(CanBeEmpty.<Integer>createEmpty().some(x -> true)).isFalse();
+            assertThat(CanBeEmpty.<Integer>fromEmpty().some(x -> true)).isFalse();
         }
 
         @Test
         void everyReturnsTrue() {
-            assertThat(CanBeEmpty.<Integer>createEmpty().every(x -> false)).isTrue();
+            assertThat(CanBeEmpty.<Integer>fromEmpty().every(x -> false)).isTrue();
         }
 
         @Test
         void notAnyReturnsTrue() {
-            assertThat(CanBeEmpty.<Integer>createEmpty().every(x -> false)).isTrue();
+            assertThat(CanBeEmpty.<Integer>fromEmpty().every(x -> false)).isTrue();
         }
 
         @Test
         void isRealizedReturnsFalse() {
-            assertThat(createEmpty().isRealized()).isFalse();
+            assertThat(fromEmpty().isRealized()).isFalse();
         }
 
         @Test
         void maxReturnsEmptyOptional() {
-            assertThat(CanBeEmpty.<Integer>createEmpty().max(Comparator.naturalOrder())).isEmpty();
+            assertThat(CanBeEmpty.<Integer>fromEmpty().max(Comparator.naturalOrder())).isEmpty();
         }
 
         @Test
         void minReturnsEmptyOptional() {
-            assertThat(CanBeEmpty.<Integer>createEmpty().min(Comparator.naturalOrder())).isEmpty();
+            assertThat(CanBeEmpty.<Integer>fromEmpty().min(Comparator.naturalOrder())).isEmpty();
         }
 
         @Test
         void maxKeyReturnsEmptyOptional() {
-            assertThat(CanBeEmpty.<Integer>createEmpty().maxKey(x -> Math.abs(x))).isEmpty();
+            assertThat(CanBeEmpty.<Integer>fromEmpty().maxKey(x -> Math.abs(x))).isEmpty();
         }
 
         @Test
         void minKeyReturnsEmptyOptional() {
-            assertThat(CanBeEmpty.<Integer>createEmpty().minKey(x -> Math.abs(x))).isEmpty();
+            assertThat(CanBeEmpty.<Integer>fromEmpty().minKey(x -> Math.abs(x))).isEmpty();
         }
 
         @Test
         void findReturnsEmptyOptional() {
-            assertThat(createEmpty().find(-1)).isEmpty();
-            assertThat(createEmpty().find(0)).isEmpty();
-            assertThat(createEmpty().find(1)).isEmpty();
+            assertThat(fromEmpty().find(-1)).isEmpty();
+            assertThat(fromEmpty().find(0)).isEmpty();
+            assertThat(fromEmpty().find(1)).isEmpty();
         }
 
         @Test
         void findFirstReturnsEmptyOptional() {
-            assertThat(createEmpty().findFirst()).isEmpty();
-            assertThat(createEmpty().findFirst(x -> true)).isEmpty();
+            assertThat(fromEmpty().findFirst()).isEmpty();
+            assertThat(fromEmpty().findFirst(x -> true)).isEmpty();
         }
 
         @Test
         void forEachDoesNothing() {
             var consumer = Mockito.<Consumer<Integer>>mock();
 
-            CanBeEmpty.<Integer>createEmpty().forEach(consumer);
+            CanBeEmpty.<Integer>fromEmpty().forEach(consumer);
 
             verifyNoInteractions(consumer);
         }
@@ -348,14 +349,14 @@ class LazySeqTest {
         void runDoesNothing() {
             var proc = Mockito.<Consumer<Integer>>mock();
 
-            CanBeEmpty.<Integer>createEmpty().run(proc);
+            CanBeEmpty.<Integer>fromEmpty().run(proc);
 
             verifyNoInteractions(proc);
         }
 
         @Test
         void realizeReturnsEmpty() {
-            var sut = CanBeEmpty.<String>createEmpty();
+            var sut = CanBeEmpty.<String>fromEmpty();
 
             assertThat(sut.isRealized()).isFalse();
 
@@ -369,49 +370,49 @@ class LazySeqTest {
 
         @Test
         void iteratorReturnsEmptyIterator() {
-            assertThat(createEmpty().iterator().hasNext()).isFalse();
+            assertThat(fromEmpty().iterator().hasNext()).isFalse();
         }
 
         @Test
         void streamReturnsEmptyStream() {
-            assertThat(createEmpty().stream()).isEmpty();
+            assertThat(fromEmpty().stream()).isEmpty();
         }
 
         @Test
         void parallelStreamReturnsEmptyStream() {
-            assertThat(createEmpty().parallelStream()).isEmpty();
+            assertThat(fromEmpty().parallelStream()).isEmpty();
         }
 
         @Test
         void toMapReturnsEmptyMap() {
-            assertThat(createEmpty().toMap()).isEmpty();
-            assertThat(createEmpty().toMap(k -> k, v -> v)).isEmpty();
-            assertThat(createEmpty().toMap(k -> k, v -> v, (a, b) -> a)).isEmpty();
+            assertThat(fromEmpty().toMap()).isEmpty();
+            assertThat(fromEmpty().toMap(k -> k, v -> v)).isEmpty();
+            assertThat(fromEmpty().toMap(k -> k, v -> v, (a, b) -> a)).isEmpty();
         }
 
         @Test
         void toListReturnsEmptyList() {
-            assertThat(createEmpty().toList())
+            assertThat(fromEmpty().toList())
                     .isInstanceOf(List.class)
                     .isEmpty();
         }
 
         @Test
         void toSetReturnsEmptySet() {
-            assertThat(createEmpty().toSet())
+            assertThat(fromEmpty().toSet())
                     .isInstanceOf(Set.class)
                     .isEmpty();
         }
 
         @Test
         void toStringReturnsEmptyBrackets() {
-            assertThat(createEmpty()).hasToString("[]");
+            assertThat(fromEmpty()).hasToString("[]");
         }
     }
 
     @Test
     void firstReturnsFirstItem() {
-        var sut = iterate(0, x -> x + 1);
+        var sut = recursive(0, x -> x + 1);
 
         assertThat(sut.first()).isEqualTo(0);
     }
@@ -421,14 +422,14 @@ class LazySeqTest {
 
         @Test
         void returnsSecondItem() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.second()).isEqualTo(1);
         }
 
         @Test
         void returnsNullIfSeqHasOnlyOneElement() {
-            var sut = range(1);
+            var sut = fromRange(1);
 
             assertThat(sut.second()).isNull();
         }
@@ -436,7 +437,7 @@ class LazySeqTest {
 
     @Test
     void restReturnsSeqWithItemsExceptFirst() {
-        var sut = iterate(0, x -> x + 1);
+        var sut = recursive(0, x -> x + 1);
 
         var rest = sut.rest();
 
@@ -448,7 +449,7 @@ class LazySeqTest {
 
     @Test
     void isEmptyReturnsFalse() {
-        var sut = iterate("", x -> x + x.length());
+        var sut = recursive("", x -> x + x.length());
 
         assertThat(sut.isEmpty()).isFalse();
     }
@@ -458,14 +459,14 @@ class LazySeqTest {
 
         @Test
         void returnsFalseForUnrealisedLazySeq() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.isRealized()).isFalse();
         }
 
         @Test
         void returnsTrueIfFirstItemWasAccessed() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.isRealized()).isFalse();
 
@@ -476,7 +477,7 @@ class LazySeqTest {
 
         @Test
         void returnsTrueIfRestWasAccessed() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.isRealized()).isFalse();
 
@@ -487,7 +488,7 @@ class LazySeqTest {
 
         @Test
         void returnsTrueWhenAllItemsWereAccessed() {
-            var sut = range(1, 4);
+            var sut = fromRange(1, 4);
 
             sut.forEach(x -> {
             });
@@ -501,21 +502,21 @@ class LazySeqTest {
 
         @Test
         void doesNotRealizeSeqUnlessAccessed() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.filter(x -> x > 0).isRealized()).isFalse();
         }
 
         @Test
         void returnsNilWhenNoItemsMatch() {
-            var sut = iterate(0, x -> x + 1).take(10);
+            var sut = recursive(0, x -> x + 1).take(10);
 
             assertThat(sut.filter(x -> x < 0)).isEmpty();
         }
 
         @Test
         void returnsMatchingItems() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.filter(x -> x > 100).take(3)).containsExactly(101, 102, 103);
         }
@@ -527,37 +528,37 @@ class LazySeqTest {
 
         @Test
         void doesNotRealizeSeqUnlessAccessed() {
-            var sut = iterate("x", x -> x + "x");
+            var sut = recursive("x", x -> x + "x");
 
             assertThat(sut.map(x -> x.length()).isRealized()).isFalse();
         }
 
         @Test
         void returnsSingleMapResult() {
-            var sut = iterate("x", x -> x + "x");
+            var sut = recursive("x", x -> x + "x");
 
-            assertThat(sut.map(x -> x.length()).take(1)).isEqualTo(ISeq.of(1));
+            assertThat(sut.map(x -> x.length()).take(1)).containsExactly(1);
         }
 
         @Test
         void returnsAllMapResults() {
-            var sut = iterate("x", x -> x + "x");
+            var sut = recursive("x", x -> x + "x");
 
-            assertThat(sut.map(x -> x.length()).take(3)).isEqualTo(ISeq.of(1, 2, 3));
+            assertThat(sut.map(x -> x.length()).take(3)).containsExactly(1, 2, 3);
         }
 
         @Test
         void returnsInfiniteMapResults() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.map(x -> x * 100).take(3)).containsExactly(0, 100, 200);
         }
 
         @Test
         void returnsInfiniteSeqWithInfiniteSeqs() {
-            var sut = iterate(0, i -> i + 1);
+            var sut = recursive(0, i -> i + 1);
 
-            var actual = sut.map(x -> iterate(x, i -> i + x)).take(4);
+            var actual = sut.map(x -> recursive(x, i -> i + x)).take(4);
 
             assertThat(actual).hasSize(4);
             assertThat(actual.nth(0).take(3)).containsExactly(0, 0, 0);
@@ -571,27 +572,27 @@ class LazySeqTest {
 
             @Test
             void doesNotRealizeSeqUnlessAccessed() {
-                var sut = iterate("x", x -> x + "x");
+                var sut = recursive("x", x -> x + "x");
 
-                assertThat(sut.map(ISeq.of("a", "b", "c"), (a, b) -> (a + b).length()).isRealized()).isFalse();
+                assertThat(sut.map(List.of("a", "b", "c"), (a, b) -> (a + b).length()).isRealized()).isFalse();
             }
 
             @Test
             void returnsEmptySeqWhenProvidingEmptyOther() {
-                assertThat(range(1, 4).map(ISeq.<Integer>of(), (a, b) -> a + b)).isEmpty();
-                assertThat(range(1, 4).map(ISeq.<Integer>of().iterator(), (a, b) -> a + b)).isEmpty();
-                assertThat(range(1, 4).map(List.<Integer>of(), (a, b) -> a + b)).isEmpty();
-                assertThat(range(1, 4).map(Stream.<Integer>of(), (a, b) -> a + b)).isEmpty();
-                assertThat(range(1, 4).map(new Integer[0], (a, b) -> a + b)).isEmpty();
-                assertThat(range(1, 4).map("", (a, b) -> "" + a + b)).isEmpty();
+                assertThat(fromRange(1, 4).map(Nil.<Integer>empty(), (a, b) -> a + b)).isEmpty();
+                assertThat(fromRange(1, 4).map(List.<Integer>of().iterator(), (a, b) -> a + b)).isEmpty();
+                assertThat(fromRange(1, 4).map(List.<Integer>of(), (a, b) -> a + b)).isEmpty();
+                assertThat(fromRange(1, 4).map(Stream.<Integer>of(), (a, b) -> a + b)).isEmpty();
+                assertThat(fromRange(1, 4).map(new Integer[0], (a, b) -> a + b)).isEmpty();
+                assertThat(fromRange(1, 4).map("", (a, b) -> "" + a + b)).isEmpty();
             }
 
             @Test
             void returnsANewSeqWithTheItemsOfBothInitialSeqsAreCombinedUsingF() {
-                var sut = range(1, 4);
+                var sut = fromRange(1, 4);
 
                 assertThat(sut.map(ISeq.of("a", "b", "c"), (a, b) -> a + b)).containsExactly("1a", "2b", "3c");
-                assertThat(sut.map(ISeq.of("a", "b", "c").iterator(), (a, b) -> a + b)).containsExactly("1a", "2b", "3c");
+                assertThat(sut.map(List.of("a", "b", "c").iterator(), (a, b) -> a + b)).containsExactly("1a", "2b", "3c");
                 assertThat(sut.map(List.of("a", "b", "c"), (a, b) -> a + b)).containsExactly("1a", "2b", "3c");
                 assertThat(sut.map(Stream.of("a", "b", "c"), (a, b) -> a + b)).containsExactly("1a", "2b", "3c");
                 assertThat(sut.map(new String[]{"a", "b", "c"}, (a, b) -> a + b)).containsExactly("1a", "2b", "3c");
@@ -600,13 +601,13 @@ class LazySeqTest {
 
             @Test
             void ignoresRemainingItemsIfOneOfTheSeqsIsExhausted() {
-                var sut = range(1, 4);
+                var sut = fromRange(1, 4);
 
                 assertThat(sut.map(ISeq.of("a", "b"), (a, b) -> a + b)).containsExactly("1a", "2b");
                 assertThat(sut.map(ISeq.of("a", "b", "c", "d"), (a, b) -> a + b)).containsExactly("1a", "2b", "3c");
 
-                assertThat(sut.map(ISeq.of("a", "b").iterator(), (a, b) -> a + b)).containsExactly("1a", "2b");
-                assertThat(sut.map(ISeq.of("a", "b", "c", "d").iterator(), (a, b) -> a + b)).containsExactly("1a", "2b", "3c");
+                assertThat(sut.map(List.of("a", "b").iterator(), (a, b) -> a + b)).containsExactly("1a", "2b");
+                assertThat(sut.map(List.of("a", "b", "c", "d").iterator(), (a, b) -> a + b)).containsExactly("1a", "2b", "3c");
 
                 assertThat(sut.map(List.of("a", "b"), (a, b) -> a + b)).containsExactly("1a", "2b");
                 assertThat(sut.map(List.of("a", "b", "c", "d"), (a, b) -> a + b)).containsExactly("1a", "2b", "3c");
@@ -623,8 +624,8 @@ class LazySeqTest {
 
             @Test
             void returnsInfiniteLazySeqIfOtherIsInfinite() {
-                var sut = iterate(0, x -> x + 1);
-                var other = iterate(0, x -> x + 1);
+                var sut = recursive(0, x -> x + 1);
+                var other = recursive(0, x -> x + 1);
 
                 assertThat(sut.map(other, (a, b) -> a + b).take(4)).containsExactly(0, 2, 4, 6);
             }
@@ -636,44 +637,44 @@ class LazySeqTest {
 
         @Test
         void doesNotRealizeSeqUnlessAccessed() {
-            var sut = ISeq.of(range(0, 3), range(3, 6));
+            var sut = ISeq.of(fromRange(0, 3), fromRange(3, 6));
 
             assertThat(sut.mapcat(x -> x).isRealized()).isFalse();
         }
 
         @Test
         void returnsFlattenedSeq() {
-            var sut = ISeq.of(range(0, 3), range(3, 6));
+            var sut = ISeq.of(fromRange(0, 3), fromRange(3, 6));
 
             assertThat(sut.mapcat(x -> x)).containsExactly(0, 1, 2, 3, 4, 5);
         }
 
         @Test
         void returnsLazySeqWithMappingResultsConcatenated() {
-            var sut = iterate(8, x -> x + 1).map(x -> x.toString());
+            var sut = recursive(8, x -> x + 1).map(x -> x.toString());
 
-            assertThat(sut.mapcat(x -> ISeq.sequence(x.split(""))).take(8)).containsExactly("8", "9", "1", "0", "1", "1", "1", "2");
+            assertThat(sut.mapcat(x -> Arrays.asList(x.split(""))).take(8)).containsExactly("8", "9", "1", "0", "1", "1", "1", "2");
         }
 
         @Test
         void ignoresEmptyResults() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
-            assertThat(sut.mapcat(x -> x == 0 ? ISeq.of() : ISeq.of(x, x)).take(6)).containsExactly(1, 1, 2, 2, 3, 3);
+            assertThat(sut.mapcat(x -> x == 0 ? Nil.empty() : ISeq.of(x, x)).take(6)).containsExactly(1, 1, 2, 2, 3, 3);
         }
 
         @Test
         void isLazy() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.mapcat(x -> ISeq.of(x, x)).take(6)).containsExactly(0, 0, 1, 1, 2, 2);
         }
 
         @Test
         void returnsInfiniteLazySeqIfMappingResultIsInfinite() {
-            var sut = iterate("x", x -> x + "x");
+            var sut = recursive("x", x -> x + "x");
 
-            assertThat(sut.mapcat(x -> iterate("Y", y -> y + "Y")).take(4)).containsExactly("Y", "YY", "YYY", "YYYY");
+            assertThat(sut.mapcat(x -> recursive("Y", y -> y + "Y")).take(4)).containsExactly("Y", "YY", "YYY", "YYYY");
         }
 
         @Nested
@@ -681,29 +682,38 @@ class LazySeqTest {
 
             @Test
             void doesNotRealizeSeqUnlessAccessed() {
-                var sut = range(1, 4);
+                var sut = fromRange(1, 4);
 
+                assertThat(sut.mapcat(List.of("a", "b", "c"), (a, b) -> List.of(a + b, a + b)).isRealized()).isFalse();
                 assertThat(sut.mapcat(ISeq.of("a", "b", "c"), (a, b) -> ISeq.of(a + b, a + b)).isRealized()).isFalse();
             }
 
             @Test
             void returnsEmptySeqWhenProvidingEmptyOther() {
-                var sut = range(1, 4);
+                var sut = fromRange(1, 4);
 
+                assertThat(sut.mapcat(List.<Integer>of(), (a, b) -> List.of(a + b, a + b))).isEmpty();
                 assertThat(sut.mapcat(ISeq.<Integer>of(), (a, b) -> ISeq.of(a + b, a + b))).isEmpty();
             }
 
             @Test
             void returnsNewSeqWithTheItemsOfBothSeqsCombinedUsingF() {
-                var sut = range(1, 4);
+                var sut = fromRange(1, 4);
 
+                assertThat(sut.mapcat(List.of("a", "b", "c"), (a, b) -> List.of(a + b, a + b)))
+                        .containsExactly("1a", "1a", "2b", "2b", "3c", "3c");
                 assertThat(sut.mapcat(ISeq.of("a", "b", "c"), (a, b) -> ISeq.of(a + b, a + b)))
                         .containsExactly("1a", "1a", "2b", "2b", "3c", "3c");
             }
 
             @Test
             void ignoresRemainingItemsIfOneOfTheSeqsIsExhausted() {
-                var sut = range(1, 4);
+                var sut = fromRange(1, 4);
+
+                assertThat(sut.mapcat(List.of("a", "b"), (a, b) -> List.of(a + b, a + b)))
+                        .containsExactly("1a", "1a", "2b", "2b");
+                assertThat(sut.mapcat(List.of("a", "b", "c", "d"), (a, b) -> List.of(a + b, a + b)))
+                        .containsExactly("1a", "1a", "2b", "2b", "3c", "3c");
 
                 assertThat(sut.mapcat(ISeq.of("a", "b"), (a, b) -> ISeq.of(a + b, a + b)))
                         .containsExactly("1a", "1a", "2b", "2b");
@@ -713,26 +723,28 @@ class LazySeqTest {
 
             @Test
             void returnsInfiniteLazySeqIfOtherIsInfinite() {
-                var sut = iterate(0, x -> x + 1);
-                var infiniteOther = iterate(0, x -> x + 1);
+                var sut = recursive(0, x -> x + 1);
+                var infiniteOther = recursive(0, x -> x + 1);
 
+                assertThat(sut.mapcat(infiniteOther, (a, b) -> List.of(a + b, a + b)).take(8))
+                        .containsExactly(0, 0, 2, 2, 4, 4, 6, 6);
                 assertThat(sut.mapcat(infiniteOther, (a, b) -> ISeq.of(a + b, a + b)).take(8))
                         .containsExactly(0, 0, 2, 2, 4, 4, 6, 6);
             }
 
             @Test
             void returnsInfiniteLazySeqIfMappingResultIsInfinite() {
-                var sut = iterate("x", x -> x + "x");
-                var other = iterate("a", x -> x + "b");
+                var sut = recursive("x", x -> x + "x");
+                var other = recursive("a", x -> x + "b");
 
-                assertThat(sut.mapcat(other, (a, b) -> iterate("Y", y -> y + a + b)).take(4)).containsExactly("Y", "Yxa", "Yxaxa", "Yxaxaxa");
+                assertThat(sut.mapcat(other, (a, b) -> recursive("Y", y -> y + a + b)).take(4)).containsExactly("Y", "Yxa", "Yxaxa", "Yxaxaxa");
             }
         }
     }
 
     @Test
     void sizeReturnsNumberOfItemsInFiniteLazySeq() {
-        var sut = iterate(0, x -> x + 1).take(4);
+        var sut = recursive(0, x -> x + 1).take(4);
 
         assertThat(sut.size()).isEqualTo(4);
     }
@@ -742,7 +754,7 @@ class LazySeqTest {
 
         @Test
         void returnsValueAtIndex() {
-            var sut = iterate("", x -> x + x.length());
+            var sut = recursive("", x -> x + x.length());
 
             assertThat(sut.get(0)).isEqualTo("");
             assertThat(sut.get(1)).isEqualTo("0");
@@ -752,7 +764,7 @@ class LazySeqTest {
 
         @Test
         void throwsForNegativeIndex() {
-            var sut = iterate(0, x -> x + 1).take(1);
+            var sut = recursive(0, x -> x + 1).take(1);
 
             assertThatExceptionOfType(IndexOutOfBoundsException.class)
                     .isThrownBy(() -> sut.get(-1))
@@ -761,7 +773,7 @@ class LazySeqTest {
 
         @Test
         void throwsIfIndexNotPresent() {
-            var sut = iterate(0, x -> x + 1).take(1);
+            var sut = recursive(0, x -> x + 1).take(1);
 
             assertThatExceptionOfType(IndexOutOfBoundsException.class)
                     .isThrownBy(() -> sut.get(1))
@@ -774,7 +786,7 @@ class LazySeqTest {
 
         @Test
         void returnsValueAtIndex() {
-            var sut = iterate("", x -> x + x.length());
+            var sut = recursive("", x -> x + x.length());
 
             assertThat(sut.nth(0)).isEqualTo("");
             assertThat(sut.nth(1)).isEqualTo("0");
@@ -784,7 +796,7 @@ class LazySeqTest {
 
         @Test
         void returnsDefaultValueIfIndexNotPresent() {
-            var sut = iterate("", x -> x + x.length()).take(1);
+            var sut = recursive("", x -> x + x.length()).take(1);
 
             assertThat(sut.nth(0, "x")).isEqualTo("");
             assertThat(sut.nth(1, "x")).isEqualTo("x");
@@ -794,7 +806,7 @@ class LazySeqTest {
 
         @Test
         void throwsForNegativeIndex() {
-            var sut = iterate("", x -> x + x.length()).take(1);
+            var sut = recursive("", x -> x + x.length()).take(1);
 
             assertThatExceptionOfType(IndexOutOfBoundsException.class)
                     .isThrownBy(() -> sut.nth(-1))
@@ -803,7 +815,7 @@ class LazySeqTest {
 
         @Test
         void throwsIfIndexNotPresent() {
-            var sut = iterate("", x -> x + x.length()).take(1);
+            var sut = recursive("", x -> x + x.length()).take(1);
 
             assertThatExceptionOfType(IndexOutOfBoundsException.class)
                     .isThrownBy(() -> sut.nth(1))
@@ -816,28 +828,28 @@ class LazySeqTest {
 
         @Test
         void doesNotRealizeSeqUnlessAccessed() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.take(3).isRealized()).isFalse();
         }
 
         @Test
         void returnsNilForNegativeItems() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.take(-1)).isEqualTo(Nil.empty());
         }
 
         @Test
         void returnsNilForZeroItems() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.take(0)).isEqualTo(Nil.empty());
         }
 
         @Test
         void returnsConsForMoreThanZeroItems() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.take(3))
                     .isExactlyInstanceOf(LazySeq.class)
@@ -850,42 +862,42 @@ class LazySeqTest {
 
         @Test
         void doesNotRealizeSeqUnlessAccessed() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.drop(3).isRealized()).isFalse();
         }
 
         @Test
         void returnsUnchangedSeqWithNegativeItemsToDrop() {
-            var sut = iterate(1, x -> x + 1).take(4);
+            var sut = recursive(1, x -> x + 1).take(4);
 
             assertThat(sut.drop(-1)).containsExactly(1, 2, 3, 4);
         }
 
         @Test
         void returnsUnchangedSeqWithZeroItemsToDrop() {
-            var sut = iterate(1, x -> x + 1).take(4);
+            var sut = recursive(1, x -> x + 1).take(4);
 
             assertThat(sut.drop(0)).containsExactly(1, 2, 3, 4);
         }
 
         @Test
         void returnsSeqOfAllButTheFirstNItems() {
-            var sut = iterate(1, x -> x + 1).take(4);
+            var sut = recursive(1, x -> x + 1).take(4);
 
             assertThat(sut.drop(2)).containsExactly(3, 4);
         }
 
         @Test
         void returnsEmptySeqIfMoreItemsAreDroppedThanPresent() {
-            var sut = iterate(1, x -> x + 1).take(4);
+            var sut = recursive(1, x -> x + 1).take(4);
 
             assertThat(sut.drop(5)).isEmpty();
         }
 
         @Test
         void isLazy() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.drop(100).take(2)).containsExactly(100, 101);
         }
@@ -896,29 +908,29 @@ class LazySeqTest {
 
         @Test
         void doesNotRealizeSeqUnlessAccessed() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.takeWhile(x -> x < 3).isRealized()).isFalse();
         }
 
         @Test
         void returnsEmptySeqWhenFirstItemDoesNotMatch() {
-            assertThat(iterate(0, x -> x + 1).takeWhile(x -> x > 0)).isEmpty();
+            assertThat(recursive(0, x -> x + 1).takeWhile(x -> x > 0)).isEmpty();
         }
 
         @Test
         void returnsSeqWithFirstItemMatching() {
-            assertThat(iterate(0, x -> x + 1).takeWhile(x -> x < 1)).containsExactly(0);
+            assertThat(recursive(0, x -> x + 1).takeWhile(x -> x < 1)).containsExactly(0);
         }
 
         @Test
         void returnsSeqWithFirstAndSubsequentItemsMatching() {
-            assertThat(iterate(0, x -> x + 1).takeWhile(x -> x < 3)).containsExactly(0, 1, 2);
+            assertThat(recursive(0, x -> x + 1).takeWhile(x -> x < 3)).containsExactly(0, 1, 2);
         }
 
         @Test
         void returnsSeqWithAllItemsMatching() {
-            assertThat(iterate(0, x -> x + 1).takeWhile(x -> true).take(4)).containsExactly(0, 1, 2, 3);
+            assertThat(recursive(0, x -> x + 1).takeWhile(x -> true).take(4)).containsExactly(0, 1, 2, 3);
         }
     }
 
@@ -927,24 +939,24 @@ class LazySeqTest {
 
         @Test
         void doesNotRealizeSeqUnlessAccessed() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.dropWhile(x -> x < 2).isRealized()).isFalse();
         }
 
         @Test
         void returnsEmptySeqWhenAllItemsMatch() {
-            assertThat(range(1, 5).dropWhile(x -> x > 0)).isEmpty();
+            assertThat(fromRange(1, 5).dropWhile(x -> x > 0)).isEmpty();
         }
 
         @Test
         void returnsSeqWithItemsThatDoNotMatch() {
-            assertThat(iterate(0, x -> x + 1).dropWhile(x -> x < 2).take(4)).containsExactly(2, 3, 4, 5);
+            assertThat(recursive(0, x -> x + 1).dropWhile(x -> x < 2).take(4)).containsExactly(2, 3, 4, 5);
         }
 
         @Test
         void returnsEntireSeqWhenFirstItemDoesNotMatch() {
-            assertThat(iterate(0, x -> x + 1).dropWhile(x -> x > 2).take(4)).containsExactly(0, 1, 2, 3);
+            assertThat(recursive(0, x -> x + 1).dropWhile(x -> x > 2).take(4)).containsExactly(0, 1, 2, 3);
         }
     }
 
@@ -953,14 +965,14 @@ class LazySeqTest {
 
         @Test
         void doesNotRealizeSeqUnlessAccessed() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.partition(3).isRealized()).isFalse();
         }
 
         @Test
         void returnsEmptySeqForNegativeSizeN() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.partition(-1)).isEmpty();
             assertThat(sut.partition(-1, 10)).isEmpty();
@@ -972,7 +984,7 @@ class LazySeqTest {
 
         @Test
         void returnsInfiniteSeqOfEmptyListsForZeroSizeN() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.partition(0).take(2)).containsExactly(
                     List.of(),
@@ -993,7 +1005,7 @@ class LazySeqTest {
 
         @Test
         void returnsSeqOfListsOfOneItemEachAtOffsetsStepApart() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.partition(1).take(3)).containsExactly(
                     List.of(0),
@@ -1013,7 +1025,7 @@ class LazySeqTest {
 
         @Test
         void returnsSeqOfListsOfNItemsEachAtOffsetsStepApart() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.partition(3).take(3)).containsExactly(
                     List.of(0, 1, 2),
@@ -1033,7 +1045,7 @@ class LazySeqTest {
 
         @Test
         void dropsItemsThatDoNotMakeACompleteLastPartition() {
-            var sut = iterate(0, x -> x + 1).take(14);
+            var sut = recursive(0, x -> x + 1).take(14);
 
             assertThat(sut.partition(4)).containsExactly(
                     List.of(0, 1, 2, 3),
@@ -1053,7 +1065,7 @@ class LazySeqTest {
 
         @Test
         void returnsSeqOfOneEmptyListForStepGreaterThanOrEqualToSizeN() {
-            var sut = range(1, 4);
+            var sut = fromRange(1, 4);
 
             assertThat(sut.partition(0, 3)).containsExactly(List.of());
             assertThat(sut.partition(0, 4)).containsExactly(List.of());
@@ -1061,7 +1073,7 @@ class LazySeqTest {
 
         @Test
         void returnsASlidingWindowIfStepIsLowerThanSizeN() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.partition(3, 2).take(3)).containsExactly(
                     List.of(0, 1, 2),
@@ -1074,7 +1086,7 @@ class LazySeqTest {
 
             @Test
             void fillsIncompleteLastPartitionWithItemsFromPad() {
-                var sut = iterate(0, x -> x + 1).take(14);
+                var sut = recursive(0, x -> x + 1).take(14);
 
                 assertThat(sut.partition(4, 4, List.of(-1, -2, -3, -4))).containsExactly(
                         List.of(0, 1, 2, 3),
@@ -1091,7 +1103,7 @@ class LazySeqTest {
 
             @Test
             void returnsAnIncompleteLastPartitionIfItemsInPadAreFewerThanRequired() {
-                var sut = iterate(0, x -> x + 1).take(14);
+                var sut = recursive(0, x -> x + 1).take(14);
 
                 assertThat(sut.partition(4, 4, List.of())).containsExactly(
                         List.of(0, 1, 2, 3),
@@ -1113,14 +1125,14 @@ class LazySeqTest {
 
         @Test
         void doesNotRealizeSeqUnlessAccessed() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.partitionAll(3).isRealized()).isFalse();
         }
 
         @Test
         void returnsEmptySeqForNegativeSizeN() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.partitionAll(-1)).isEmpty();
             assertThat(sut.partitionAll(-1, 10)).isEmpty();
@@ -1132,7 +1144,7 @@ class LazySeqTest {
 
         @Test
         void returnsInfiniteSeqOfEmptyListsForZeroSizeN() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.partitionAll(0).take(2)).containsExactly(
                     List.of(),
@@ -1153,7 +1165,7 @@ class LazySeqTest {
 
         @Test
         void returnsSeqOfListsOf1ItemEachAtOffsetsStepApart() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.partitionAll(1).take(3)).containsExactly(
                     List.of(0),
@@ -1173,7 +1185,7 @@ class LazySeqTest {
 
         @Test
         void returnsSeqOfListsOfNItemsEachAtOffsetsStepApart() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.partitionAll(3).take(3)).containsExactly(
                     List.of(0, 1, 2),
@@ -1193,7 +1205,7 @@ class LazySeqTest {
 
         @Test
         void returnsSeqOfOneEmptyListForStepGreaterThanOrEqualToSizeN() {
-            var sut = range(1, 4);
+            var sut = fromRange(1, 4);
 
             assertThat(sut.partitionAll(0, 3)).containsExactly(List.of());
             assertThat(sut.partitionAll(0, 4)).containsExactly(List.of());
@@ -1201,7 +1213,7 @@ class LazySeqTest {
 
         @Test
         void returnsASlidingWindowIfStepIsLowerThanSizeN() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.partitionAll(3, 2).take(3)).containsExactly(
                     List.of(0, 1, 2),
@@ -1211,7 +1223,7 @@ class LazySeqTest {
 
         @Test
         void returnsAnIncompleteLastPartition() {
-            var sut = iterate(0, x -> x + 1).take(14);
+            var sut = recursive(0, x -> x + 1).take(14);
 
             assertThat(sut.partitionAll(4, 4)).containsExactly(
                     List.of(0, 1, 2, 3),
@@ -1232,7 +1244,7 @@ class LazySeqTest {
 
         @Test
         void doesNotRealizeSeqUnlessAccessed() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.reductions((a, b) -> a + b).isRealized()).isFalse();
 
@@ -1242,14 +1254,14 @@ class LazySeqTest {
 
         @Test
         void returnsASeqWithTheIntermediateValuesOfTheReduction() {
-            var sut = iterate(1, x -> x + 1);
+            var sut = recursive(1, x -> x + 1);
 
             assertThat(sut.reductions((a, b) -> a + b).take(3)).containsExactly(1, 3, 6);
         }
 
         @Test
         void returnsASeqWithTheIntermediateValuesOfTheReductionStartingWithInit() {
-            var sut = iterate(1, x -> x + 1);
+            var sut = recursive(1, x -> x + 1);
 
             assertThat(sut.reductions(0, (a, b) -> a + b).take(4)).containsExactly(0, 1, 3, 6);
         }
@@ -1261,7 +1273,7 @@ class LazySeqTest {
 
         @Test
         void returnsNewSeqWithItemPrepended() {
-            var sut = range();
+            var sut = fromRange();
 
             var actual = sut.cons(-1);
 
@@ -1272,7 +1284,7 @@ class LazySeqTest {
 
         @Test
         void acceptsNullAsItem() {
-            var sut = range();
+            var sut = fromRange();
 
             var actual = sut.cons(null);
 
@@ -1287,7 +1299,7 @@ class LazySeqTest {
 
         @Test
         void returnsEmptyOptionalForLessThanTwoItemsWhenValIsNotSupplied() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.take(0).reduce((a, b) -> a + b)).isEmpty();
             assertThat(sut.take(1).reduce((a, b) -> a + b)).isEmpty();
@@ -1295,7 +1307,7 @@ class LazySeqTest {
 
         @Test
         void returnsOptionalResultWhenValIsNotSupplied() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.take(0).reduce((a, b) -> a + b)).isEmpty();
             assertThat(sut.take(1).reduce((a, b) -> a + b)).isEmpty();
@@ -1305,7 +1317,7 @@ class LazySeqTest {
 
         @Test
         void returnsResultWhenValIsSupplied() {
-            var sut = iterate(1, x -> x + 1);
+            var sut = recursive(1, x -> x + 1);
 
             assertThat(sut.take(1).reduce(0, (a, b) -> a + b)).isEqualTo(1);
             assertThat(sut.take(2).reduce(0, (a, b) -> a + b)).isEqualTo(3);
@@ -1314,7 +1326,7 @@ class LazySeqTest {
 
         @Test
         void returnsResultOfDifferentTypeThanSeq() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.take(1).reduce("", (acc, x) -> acc + x.toString())).isEqualTo("0");
             assertThat(sut.take(2).reduce("", (acc, x) -> acc + x.toString())).isEqualTo("01");
@@ -1328,26 +1340,26 @@ class LazySeqTest {
 
         @Test
         void doesNotRealizeSeqUnlessAccessed() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.distinct().isRealized()).isFalse();
         }
 
         @Test
         void returnsSeqWithSingleItem() {
-            assertThat(range(1).distinct()).containsExactly(0);
+            assertThat(fromRange(1).distinct()).containsExactly(0);
         }
 
         @Test
         void returnsSeqThatAlreadyIsDistinct() {
-            var sut = iterate(0, x -> x + 1).take(4);
+            var sut = recursive(0, x -> x + 1).take(4);
 
             assertThat(sut.distinct().take(4)).containsExactly(0, 1, 2, 3);
         }
 
         @Test
         void returnsSeqWithSingleItemForSeqWithIdenticalItems() {
-            var sut = iterate("a", x -> x);
+            var sut = recursive("a", x -> x);
 
             assertThat(sut.take(10).distinct()).containsExactly("a");
             assertThat(sut.distinct().take(1)).containsExactly("a");
@@ -1355,7 +1367,7 @@ class LazySeqTest {
 
         @Test
         void returnsDistinctItemsInSameOrderAsEncounteredFirst() {
-            var sut = sequence(List.of("a", "c", "a", "b", "b", "d", "f", "e", "g", "e").iterator());
+            var sut = fromIterator(List.of("a", "c", "a", "b", "b", "d", "f", "e", "g", "e").iterator());
 
             assertThat(sut.distinct().toList()).containsExactly("a", "c", "b", "d", "f", "e", "g");
         }
@@ -1366,19 +1378,19 @@ class LazySeqTest {
 
         @Test
         void returnsSeqWithSingleItem() {
-            assertThat(range(1).sorted()).isEqualTo(ISeq.of(0));
+            assertThat(fromRange(1).sorted()).isEqualTo(ISeq.of(0));
         }
 
         @Test
         void returnsSeqWithAllItemsSortedUsingDefaultComparator() {
-            var sut = iterate(10, x -> x - 1);
+            var sut = recursive(10, x -> x - 1);
 
             assertThat(sut.take(4).sorted()).containsExactly(7, 8, 9, 10);
         }
 
         @Test
         void returnsSeqWithAllItemsSortedUsingSuppliedComparator() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.take(4).sorted(Comparator.reverseOrder())).containsExactly(3, 2, 1, 0);
         }
@@ -1386,7 +1398,7 @@ class LazySeqTest {
 
     @Test
     void reverseReturnsReversedSeq() {
-        var sut = range(5);
+        var sut = fromRange(5);
 
         assertThat(sut.reverse()).containsExactly(4, 3, 2, 1, 0);
     }
@@ -1396,35 +1408,35 @@ class LazySeqTest {
 
         @Test
         void returnsFalseIfNoneOfTheItemsMatchPred() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.take(10).some(x -> x < 0)).isFalse();
         }
 
         @Test
         void returnsTrueIfAllItemsMatchPred() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.take(10).some(x -> x >= 0)).isTrue();
         }
 
         @Test
         void returnsTrueIfFirstItemInInfiniteSeqMatchesPred() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.some(x -> x == 0)).isTrue();
         }
 
         @Test
         void returnsTrueIfSomeItemInInfiniteSeqMatchesPred() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.some(x -> x == 5)).isTrue();
         }
 
         @Test
         void returnsTrueIfLastItemMatchesPred() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.take(10).some(x -> x == 9)).isTrue();
         }
@@ -1435,28 +1447,28 @@ class LazySeqTest {
 
         @Test
         void returnsTrueIfAllItemsInSeqMatchPred() {
-            var sut = iterate(1, x -> x + 1);
+            var sut = recursive(1, x -> x + 1);
 
             assertThat(sut.take(100).every(x -> x > 0)).isTrue();
         }
 
         @Test
         void returnsFalseIfFirstItemInInfiniteSeqDoesNotMatchPred() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.every(x -> x > 0)).isFalse();
         }
 
         @Test
         void returnsFalseIfAnyItemInInfiniteSeqDoesNotMatchPred() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.every(x -> x < 100)).isFalse();
         }
 
         @Test
         void returnsFalseIfLastItemInInfiniteSeqDoesNotMatchPred() {
-            var sut = iterate(1, x -> x + 1);
+            var sut = recursive(1, x -> x + 1);
 
             assertThat(sut.take(100).every(x -> x < 100)).isFalse();
         }
@@ -1467,28 +1479,28 @@ class LazySeqTest {
 
         @Test
         void returnsFalseIfFirstItemMatchesPred() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.notAny(x -> x == 0)).isFalse();
         }
 
         @Test
         void returnsFalseIfAnyItemMatchesPred() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.notAny(x -> x == 100)).isFalse();
         }
 
         @Test
         void returnsFalseIfAllItemsMatchPred() {
-            var sut = iterate(1, x -> x + 1);
+            var sut = recursive(1, x -> x + 1);
 
             assertThat(sut.notAny(x -> x > 0)).isFalse();
         }
 
         @Test
         void returnsTrueIfNoItemMatchesPred() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.take(100).notAny(x -> x < 0)).isTrue();
         }
@@ -1499,26 +1511,26 @@ class LazySeqTest {
 
         @Test
         void returnsSingleItem() {
-            assertThat(range(1).max(Comparator.naturalOrder())).hasValue(0);
+            assertThat(fromRange(1).max(Comparator.naturalOrder())).hasValue(0);
         }
 
         @Test
         void returnsHighestNumber() {
-            var sut = iterate(1, x -> x + 1);
+            var sut = recursive(1, x -> x + 1);
 
             assertThat(sut.take(100).max(Comparator.naturalOrder())).hasValue(100);
         }
 
         @Test
         void returnsLongestString() {
-            var sut = iterate("x", x -> x + "x");
+            var sut = recursive("x", x -> x + "x");
 
             assertThat(sut.take(6).max(Comparator.comparingInt(x -> x.length()))).hasValue("xxxxxx");
         }
 
         @Test
         void returnsTheLastOccurrenceOfLongestStringIfMoreThanOneItemFound() {
-            var sut = sequence(List.of("x", "xx", "aaa", "x", "bbb").iterator());
+            var sut = fromIterator(List.of("x", "xx", "aaa", "x", "bbb").iterator());
 
             assertThat(sut.max(Comparator.comparingInt(x -> x.length()))).hasValue("bbb");
         }
@@ -1529,26 +1541,26 @@ class LazySeqTest {
 
         @Test
         void returnsSingleItem() {
-            assertThat(range(1).min(Comparator.naturalOrder())).hasValue(0);
+            assertThat(fromRange(1).min(Comparator.naturalOrder())).hasValue(0);
         }
 
         @Test
         void returnsLowestNumber() {
-            var sut = iterate(-1, x -> x - 1);
+            var sut = recursive(-1, x -> x - 1);
 
             assertThat(sut.take(100).min(Comparator.naturalOrder())).hasValue(-100);
         }
 
         @Test
         void returnsShortestString() {
-            var sut = sequence(List.of("xxxxxx", "xxxxx", "xxxx", "x", "xx", "xxx").iterator());
+            var sut = fromIterator(List.of("xxxxxx", "xxxxx", "xxxx", "x", "xx", "xxx").iterator());
 
             assertThat(sut.min(Comparator.comparingInt(x -> x.length()))).hasValue("x");
         }
 
         @Test
         void returnsTheLastOccurrenceOfShortestStringIfMoreThanOneItemFound() {
-            var sut = sequence(List.of("a", "xx", "aaa", "x", "bbb", "b").iterator());
+            var sut = fromIterator(List.of("a", "xx", "aaa", "x", "bbb", "b").iterator());
 
             assertThat(sut.min(Comparator.comparingInt(x -> x.length()))).hasValue("b");
         }
@@ -1559,26 +1571,26 @@ class LazySeqTest {
 
         @Test
         void returnsSingleItem() {
-            assertThat(range(1).maxKey(x -> Math.abs(x))).hasValue(0);
+            assertThat(fromRange(1).maxKey(x -> Math.abs(x))).hasValue(0);
         }
 
         @Test
         void returnsHighestNumber() {
-            var sut = iterate(1, x -> x + 1);
+            var sut = recursive(1, x -> x + 1);
 
             assertThat(sut.take(100).maxKey(x -> Math.abs(x))).hasValue(100);
         }
 
         @Test
         void returnsLongestString() {
-            var sut = iterate("x", x -> x + "x");
+            var sut = recursive("x", x -> x + "x");
 
             assertThat(sut.take(6).maxKey(x -> x.length())).hasValue("xxxxxx");
         }
 
         @Test
         void returnsTheLastOccurrenceOfLongestStringIfMoreThanOneItemFound() {
-            var sut = sequence(List.of("x", "xx", "aaa", "x", "bbb").iterator());
+            var sut = fromIterator(List.of("x", "xx", "aaa", "x", "bbb").iterator());
 
             assertThat(sut.maxKey(x -> x.length())).hasValue("bbb");
         }
@@ -1589,26 +1601,26 @@ class LazySeqTest {
 
         @Test
         void returnsSingleItem() {
-            assertThat(range(1).minKey(x -> Math.abs(x))).hasValue(0);
+            assertThat(fromRange(1).minKey(x -> Math.abs(x))).hasValue(0);
         }
 
         @Test
         void returnsLowestNumber() {
-            var sut = iterate(-1, x -> x - 1);
+            var sut = recursive(-1, x -> x - 1);
 
             assertThat(sut.take(100).minKey(x -> x)).hasValue(-100);
         }
 
         @Test
         void returnsShortestString() {
-            var sut = sequence(List.of("xxxxxx", "xxxxx", "xxxx", "x", "xx", "xxx").iterator());
+            var sut = fromIterator(List.of("xxxxxx", "xxxxx", "xxxx", "x", "xx", "xxx").iterator());
 
             assertThat(sut.minKey(x -> x.length())).hasValue("x");
         }
 
         @Test
         void returnsTheLastOccurrenceOfShortestStringIfMoreThanOneItemFound() {
-            var sut = sequence(List.of("x", "xx", "aaa", "x", "bbb").iterator());
+            var sut = fromIterator(List.of("x", "xx", "aaa", "x", "bbb").iterator());
 
             assertThat(sut.minKey(x -> x.length())).hasValue("x");
         }
@@ -1616,9 +1628,9 @@ class LazySeqTest {
 
     @Test
     void strReturnsConcatenatedStringRepresentationsOfAllItems() {
-        assertThat(range(7).str()).isEqualTo("0123456");
+        assertThat(fromRange(7).str()).isEqualTo("0123456");
 
-        assertThat(sequence(List.of(new Object(), new Object()).iterator()).str())
+        assertThat(fromIterator(List.of(new Object(), new Object()).iterator()).str())
                 .matches("java\\.lang\\.Object@.+java\\.lang\\.Object@.+");
     }
 
@@ -1627,7 +1639,7 @@ class LazySeqTest {
 
         @Test
         void returnsOptionalOfValueAtIndex() {
-            var sut = iterate("", x -> x + x.length());
+            var sut = recursive("", x -> x + x.length());
 
             assertThat(sut.find(0)).hasValue("");
             assertThat(sut.find(1)).hasValue("0");
@@ -1637,12 +1649,12 @@ class LazySeqTest {
 
         @Test
         void returnsEmptyOptionalForNegativeIndex() {
-            assertThat(range(1).find(-1)).isEmpty();
+            assertThat(fromRange(1).find(-1)).isEmpty();
         }
 
         @Test
         void returnsEmptyOptionalIfIndexNotPresent() {
-            assertThat(range(1).find(1)).isEmpty();
+            assertThat(fromRange(1).find(1)).isEmpty();
         }
     }
 
@@ -1651,21 +1663,21 @@ class LazySeqTest {
 
         @Test
         void returnsOptionalOfHead() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.findFirst()).hasValue(0);
         }
 
         @Test
         void returnsEmptyOptionalWhenNoItemsMatchPred() {
-            var sut = iterate(0, x -> x + 1).take(10);
+            var sut = recursive(0, x -> x + 1).take(10);
 
             assertThat(sut.findFirst(x -> x < 0)).isEmpty();
         }
 
         @Test
         void returnsOptionalOfFirstMatchingItem() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.findFirst(x -> x > 100)).hasValue(101);
         }
@@ -1676,7 +1688,7 @@ class LazySeqTest {
 
         @Test
         void realizesThisSeqAndReturnsIt() {
-            var sut = range(4).map(x -> x.toString());
+            var sut = fromRange(4).map(x -> x.toString());
             assertThat(sut.isRealized()).isFalse();
 
             var forced = sut.realize();
@@ -1691,7 +1703,7 @@ class LazySeqTest {
 
         @Test
         void returnsFullyRealizedList() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.isRealized()).isFalse();
             assertThat(sut.take(4).toList())
@@ -1705,7 +1717,7 @@ class LazySeqTest {
     void forEachCallsConsumerForEveryItemPresent() {
         var consumer = Mockito.<Consumer<Integer>>mock();
 
-        var sut = iterate(0, x -> x + 1);
+        var sut = recursive(0, x -> x + 1);
 
         sut.take(5).forEach(consumer);
 
@@ -1721,7 +1733,7 @@ class LazySeqTest {
     void runCallsProcForEveryItemPresent() {
         var proc = Mockito.<Consumer<Integer>>mock();
 
-        var sut = iterate(0, x -> x + 1);
+        var sut = recursive(0, x -> x + 1);
 
         sut.take(5).run(proc);
 
@@ -1739,7 +1751,7 @@ class LazySeqTest {
 
         @Test
         void returnsIterator() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             var actual = sut.take(2).iterator();
 
@@ -1752,7 +1764,7 @@ class LazySeqTest {
 
         @Test
         void returnsInfiniteIterator() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             var actual = sut.iterator();
 
@@ -1766,14 +1778,14 @@ class LazySeqTest {
 
     @Test
     void streamReturnsStream() {
-        var sut = iterate(0, x -> x + 1);
+        var sut = recursive(0, x -> x + 1);
 
         assertThat(sut.stream().limit(3)).containsExactly(0, 1, 2);
     }
 
     @Test
     void parallelStreamReturnsStream() {
-        var sut = iterate(0, x -> x + 1);
+        var sut = recursive(0, x -> x + 1);
 
         assertThat(sut.parallelStream().limit(3)).containsExactly(0, 1, 2);
     }
@@ -1783,7 +1795,7 @@ class LazySeqTest {
 
         @Test
         void returnsMapForSeqOfEntries() {
-            var sut = iterate("x", x -> x + "x").map(x -> java.util.Map.entry(x.length(), x)).take(3);
+            var sut = recursive("x", x -> x + "x").map(x -> java.util.Map.entry(x.length(), x)).take(3);
 
             var actual = sut.toMap();
 
@@ -1795,7 +1807,7 @@ class LazySeqTest {
 
         @Test
         void returnsMapForSeqOfEntriesWithLastValueWinningOnCollision() {
-            var sut = sequence(List.of("a", "aa", "b", "bb").iterator()).map(x -> java.util.Map.entry(x.length(), x));
+            var sut = fromIterator(List.of("a", "aa", "b", "bb").iterator()).map(x -> java.util.Map.entry(x.length(), x));
 
             var actual = sut.toMap();
 
@@ -1806,7 +1818,7 @@ class LazySeqTest {
 
         @Test
         void throwsIfSeqIsNotOfTypeEntry() {
-            var sut = iterate("x", x -> x + "x").take(3);
+            var sut = recursive("x", x -> x + "x").take(3);
 
             assertThatExceptionOfType(UnsupportedOperationException.class)
                     .isThrownBy(() -> sut.toMap())
@@ -1815,7 +1827,7 @@ class LazySeqTest {
 
         @Test
         void returnsMapBasedOnKeyAndValueMapper() {
-            var sut = iterate("x", x -> x + "x");
+            var sut = recursive("x", x -> x + "x");
 
             var actual = sut.take(3).toMap(k -> k.length(), v -> v);
 
@@ -1827,7 +1839,7 @@ class LazySeqTest {
 
         @Test
         void throwsOnCollision() {
-            var sut = sequence(List.of("a", "b").iterator());
+            var sut = fromIterator(List.of("a", "b").iterator());
 
             assertThatExceptionOfType(IllegalArgumentException.class)
                     .isThrownBy(() -> sut.toMap(k -> k.length(), v -> v))
@@ -1836,7 +1848,7 @@ class LazySeqTest {
 
         @Test
         void returnsMapBasedOnKeyAndValueMapperWithApplyingMergerOnCollision() {
-            var sut = sequence(List.of("a", "b", "aa", "bb").iterator());
+            var sut = fromIterator(List.of("a", "b", "aa", "bb").iterator());
 
             var actual = sut.toMap(k -> k.length(), v -> v, (a, b) -> b);
 
@@ -1851,14 +1863,14 @@ class LazySeqTest {
 
         @Test
         void returnsFirstItemOnlyInSeq() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             assertThat(sut).hasToString("[0, ?]");
         }
 
         @Test
         void returnsRealisedItemsInSeq() {
-            var sut = iterate(0, x -> x + 1);
+            var sut = recursive(0, x -> x + 1);
 
             sut.get(2);
 
@@ -1867,7 +1879,7 @@ class LazySeqTest {
 
         @Test
         void returnsAllItemsInFullyRealisedSeq() {
-            var sut = iterate(0, x -> x + 1).take(4);
+            var sut = recursive(0, x -> x + 1).take(4);
 
             sut.forEach(x -> {
             });

@@ -126,7 +126,7 @@ public class NilTest {
             assertThat(Nil.<Integer>empty().map(Nil.<Integer>empty(), (a, b) -> a + b)).isEqualTo(Nil.empty());
             assertThat(Nil.<Integer>empty().map(ISeq.of(1, 2), (a, b) -> a + b)).isEqualTo(Nil.empty());
             assertThat(Nil.<Integer>empty().map(Stream.of(1, 2), (a, b) -> a + b)).isEqualTo(Nil.empty());
-            assertThat(Nil.<Integer>empty().map(ISeq.of(1, 2).iterator(), (a, b) -> a + b)).isEqualTo(Nil.empty());
+            assertThat(Nil.<Integer>empty().map(List.of(1, 2).iterator(), (a, b) -> a + b)).isEqualTo(Nil.empty());
             assertThat(Nil.<Integer>empty().map(List.of(1, 2), (a, b) -> a + b)).isEqualTo(Nil.empty());
             assertThat(Nil.<Integer>empty().map(new Integer[]{1, 2}, (a, b) -> a + b)).isEqualTo(Nil.empty());
             assertThat(Nil.<Integer>empty().map("", (a, b) -> a + b)).isEqualTo(Nil.empty());
