@@ -354,7 +354,7 @@ public abstract class ASeq<T> extends AbstractList<T> implements ISeq<T> {
         var entries = this
                 .map(x -> Map.entry(k.apply(x), v.apply(x)))
                 .reduce(
-                        ISeq.<Map.Entry<K, V>>of(),
+                        Fn.<Map.Entry<K, V>>nil(),
                         (acc, x) -> acc
                                 .filter(y -> !x.getKey().equals(y.getKey()))
                                 .cons(acc.findFirst(y -> y.getKey().equals(x.getKey())).map(y -> Map.entry(x.getKey(), m.apply(y.getValue(), x.getValue()))).orElse(x)));

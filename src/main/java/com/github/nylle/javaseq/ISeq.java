@@ -11,7 +11,6 @@ import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
@@ -26,17 +25,9 @@ public interface ISeq<T> extends List<T> {
     static <T> ISeq<T> of(T... xs) {
         var result = ISeq.<T>of();
         for(var i = xs.length-1; i >= 0; i--) {
-            result = ISeq.cons(xs[i], result);
+            result = Fn.cons(xs[i], result);
         }
         return result;
-    }
-
-    static <T> ISeq<T> cons(T x, ISeq<T> seq) {
-        return Fn.cons(x, seq);
-    }
-
-    static <T> ISeq<T> lazySeq(Supplier<ISeq<T>> f) {
-        return Fn.lazySeq(f);
     }
 
     static <T> ISeq<T> sequence(T[] coll) {
@@ -55,21 +46,16 @@ public interface ISeq<T> extends List<T> {
         return Fn.seq(coll);
     }
 
-    static <K, V> ISeq<Map.Entry<K, V>> sequence(Map<K, V> coll) {
+    static ISeq<Character> sequence(CharSequence coll) {
         return Fn.seq(coll);
     }
 
-    static ISeq<Character> sequence(CharSequence coll) {
+    static <K, V> ISeq<Map.Entry<K, V>> sequence(Map<K, V> coll) {
         return Fn.seq(coll);
     }
 
     static <T> ISeq<T> iterate(T x, UnaryOperator<T> f) {
         return Fn.iterate(x, f);
-    }
-
-    @SafeVarargs
-    static <T> ISeq<T> concat(Iterable<T>... colls) {
-        return Fn.concat(colls);
     }
 
     static ISeq<Integer> range() {

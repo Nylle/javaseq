@@ -40,7 +40,7 @@ class ChunkedConsTest {
 
         @Test
         void returnsNullIfSeqHasOnlyOneElement() {
-            var sut = new ChunkedCons<>(arrayChunk(1), ISeq.of());
+            var sut = new ChunkedCons<>(arrayChunk(1), Nil.empty());
 
             assertThat(sut.second()).isNull();
         }
@@ -88,7 +88,7 @@ class ChunkedConsTest {
 
         @Test
         void returnsSingleMapResult() {
-            var sut = new ChunkedCons<>(arrayChunk("xxx"), ISeq.of());
+            var sut = new ChunkedCons<>(arrayChunk("xxx"), Nil.empty());
 
             assertThat(sut.map(x -> x.length())).containsExactly(3);
         }
@@ -120,7 +120,7 @@ class ChunkedConsTest {
             void returnsEmptySeqWhenProvidingEmptyOther() {
                 var sut = new ChunkedCons<>(arrayChunk("xxx", "ab"), ISeq.of("baz", "foobar"));
 
-                assertThat(sut.map(ISeq.<Integer>of(), (a, b) -> a + b)).isEmpty();
+                assertThat(sut.map(Nil.empty(), (a, b) -> a + b)).isEmpty();
                 assertThat(sut.map(List.<Integer>of().iterator(), (a, b) -> a + b)).isEmpty();
                 assertThat(sut.map(List.<Integer>of(), (a, b) -> a + b)).isEmpty();
                 assertThat(sut.map(Stream.<Integer>of(), (a, b) -> a + b)).isEmpty();
@@ -564,7 +564,7 @@ class ChunkedConsTest {
 
         @Test
         void returnsSingleItem() {
-            var sut = new ChunkedCons<>(arrayChunk(1), ISeq.of());
+            var sut = new ChunkedCons<>(arrayChunk(1), Nil.empty());
 
             assertThat(sut.max(Comparator.naturalOrder())).hasValue(1);
         }
@@ -596,7 +596,7 @@ class ChunkedConsTest {
 
         @Test
         void returnsSingleItem() {
-            var sut = new ChunkedCons<>(arrayChunk(1), ISeq.of());
+            var sut = new ChunkedCons<>(arrayChunk(1), Nil.empty());
 
             assertThat(sut.min(Comparator.naturalOrder())).hasValue(1);
         }
@@ -640,7 +640,7 @@ class ChunkedConsTest {
 
         @Test
         void returnsDefaultValue() {
-            var sut = new ChunkedCons<>(arrayChunk("x"), ISeq.of());
+            var sut = new ChunkedCons<>(arrayChunk("x"), Nil.empty());
 
             assertThat(sut.nth(0, "y")).isEqualTo("x");
             assertThat(sut.nth(1, "y")).isEqualTo("y");

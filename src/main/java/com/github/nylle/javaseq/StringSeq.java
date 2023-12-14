@@ -37,7 +37,7 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
 
     @Override
     public ISeq<Character> rest() {
-        return index + 1 < length ? new StringSeq(str, index + 1) : ISeq.of();
+        return index + 1 < length ? new StringSeq(str, index + 1) : Fn.nil();
     }
 
     @Override
@@ -58,7 +58,7 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
     @Override
     public <R> ISeq<R> map(Function<? super Character, ? extends R> f) {
         return Fn.lazySeq(() -> {
-            var acc = ISeq.<R>of();
+            var acc = Fn.<R>nil();
             var start = length - 1;
             for (int i = start; i >= index; i--) {
                 acc = Fn.cons(f.apply(str.charAt(i)), acc);
@@ -76,7 +76,7 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
     public ISeq<Character> take(long n) {
         return Fn.lazySeq(() -> {
             if (n <= 0) {
-                return ISeq.of();
+                return Fn.nil();
             }
             int end = (int) n + index;
             if (end >= length) {
@@ -94,7 +94,7 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
             }
             int end = (int) n + index;
             if (end >= length) {
-                return ISeq.of();
+                return Fn.nil();
             }
             return new StringSeq(str, end);
         });
@@ -119,7 +119,7 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
             if (!acc.isEmpty()) {
                 return new StringSeq(acc.toString(), 0);
             }
-            return ISeq.of();
+            return Fn.nil();
         });
     }
 
@@ -137,7 +137,7 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
             if (end < length - 1) {
                 return new StringSeq(str, end);
             }
-            return ISeq.of();
+            return Fn.nil();
         });
     }
 
@@ -185,7 +185,7 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
         if (!acc.isEmpty()) {
             return new StringSeq(acc.toString(), 0);
         }
-        return ISeq.of();
+        return Fn.nil();
     }
 
     @Override

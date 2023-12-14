@@ -22,14 +22,14 @@ class ConsTest {
     private static <T> ISeq<T> sutFrom(T... items) {
         ISeq<T> cons = Nil.empty();
         for (int i = items.length - 1; i >= 0; i--) {
-            cons = ISeq.cons(items[i], cons);
+            cons = new Cons<>(items[i], cons);
         }
         return cons;
     }
 
     @Test
     void firstReturnsFirstItem() {
-        var sut = ISeq.cons(0, ISeq.cons(1, ISeq.cons(2, ISeq.cons(3, ISeq.of()))));
+        var sut = new Cons<>(0, new Cons<>(1, new Cons<>(2, new Cons<>(3, Nil.empty()))));
 
         assertThat(sut.first()).isEqualTo(0);
     }
@@ -39,14 +39,14 @@ class ConsTest {
 
         @Test
         void returnsSecondItem() {
-            var sut = ISeq.cons(1, ISeq.cons(2, ISeq.cons(3, ISeq.of())));
+            var sut = new Cons<>(1, new Cons<>(2, new Cons<>(3, Nil.empty())));
 
             assertThat(sut.second()).isEqualTo(2);
         }
 
         @Test
         void returnsNullIfSeqHasOnlyOneElement() {
-            var sut = ISeq.cons(1, ISeq.of());
+            var sut = new Cons<>(1, Nil.empty());
 
             assertThat(sut.second()).isNull();
         }
@@ -54,7 +54,7 @@ class ConsTest {
 
     @Test
     void restReturnsSeqWithItemsExceptFirst() {
-        var sut = ISeq.cons(0, ISeq.cons(1, ISeq.cons(2, ISeq.cons(3, ISeq.of()))));
+        var sut = new Cons<>(0, new Cons<>(1, new Cons<>(2, new Cons<>(3, Nil.empty()))));
 
         var rest = sut.rest();
 
@@ -186,7 +186,7 @@ class ConsTest {
 
             @Test
             void returnsEmptySeqWhenProvidingEmptyOther() {
-                assertThat(sutFrom(1, 2, 3).map(ISeq.<Integer>of(), (a, b) -> a + b)).isEmpty();
+                assertThat(sutFrom(1, 2, 3).map(Nil.<Integer>empty(), (a, b) -> a + b)).isEmpty();
                 assertThat(sutFrom(1, 2, 3).map(Collections.<Integer>emptyIterator(), (a, b) -> a + b)).isEmpty();
                 assertThat(sutFrom(1, 2, 3).map(List.<Integer>of(), (a, b) -> a + b)).isEmpty();
                 assertThat(sutFrom(1, 2, 3).map(Stream.<Integer>of(), (a, b) -> a + b)).isEmpty();

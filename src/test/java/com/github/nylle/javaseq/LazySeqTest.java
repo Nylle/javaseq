@@ -693,7 +693,7 @@ class LazySeqTest {
                 var sut = fromRange(1, 4);
 
                 assertThat(sut.mapcat(List.<Integer>of(), (a, b) -> List.of(a + b, a + b))).isEmpty();
-                assertThat(sut.mapcat(ISeq.<Integer>of(), (a, b) -> ISeq.of(a + b, a + b))).isEmpty();
+                assertThat(sut.mapcat(Nil.<Integer>empty(), (a, b) -> ISeq.of(a + b, a + b))).isEmpty();
             }
 
             @Test

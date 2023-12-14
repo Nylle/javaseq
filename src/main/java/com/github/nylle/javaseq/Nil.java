@@ -9,7 +9,7 @@ class Nil<T> extends ASeq<T> implements ISeq<T> {
 	private static final Nil<?> NIL = new Nil<>();
 
 	@SuppressWarnings("unchecked")
-	public static <T> Nil<T> empty() {
+	static <T> Nil<T> empty() {
 		return (Nil<T>) NIL;
 	}
 

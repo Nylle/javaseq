@@ -94,7 +94,7 @@ public class ChunkedCons<T> extends ASeq<T> implements ISeq<T> {
                 return new ChunkedCons<>(chunk, rest.take(n - chunkSize));
             }
 
-            var acc = ISeq.<T>of();
+            var acc = Fn.<T>nil();
             for (int i = (int) n - 1; i >= 0; i--) {
                 acc = acc.cons(nth(i));
             }

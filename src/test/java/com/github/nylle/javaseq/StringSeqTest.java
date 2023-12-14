@@ -66,7 +66,7 @@ class StringSeqTest {
 
         assertThat(sut.rest().first()).isEqualTo('a');
         assertThat(sut.rest().rest().first()).isEqualTo('r');
-        assertThat(sut.rest().rest().rest()).isEqualTo(ISeq.of());
+        assertThat(sut.rest().rest().rest()).isEqualTo(Nil.empty());
     }
 
     @Test
