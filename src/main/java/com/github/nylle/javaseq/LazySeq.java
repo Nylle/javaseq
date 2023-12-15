@@ -14,9 +14,16 @@ class LazySeq<T> extends ASeq<T> implements ISeq<T> {
         if (!isRealized()) {
             synchronized (this) {
                 if (!isRealized()) {
-                    seq = fn.get();
+                    seq = unwrap(fn.get());
                 }
             }
+        }
+        return seq;
+    }
+
+    private ISeq<T> unwrap(ISeq<T> seq) {
+        while(seq instanceof LazySeq) {
+            seq = ((LazySeq<T>) seq).seq();
         }
         return seq;
     }
@@ -33,7 +40,7 @@ class LazySeq<T> extends ASeq<T> implements ISeq<T> {
 
     @Override
     public boolean isEmpty() {
-        return seq().isEmpty();
+        return seq() instanceof Nil;
     }
 
     @Override
