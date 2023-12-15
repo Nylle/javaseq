@@ -31,7 +31,7 @@ public abstract class ASeq<T> extends AbstractList<T> implements ISeq<T> {
         return Fn.lazySeq(() -> {
             if (!isEmpty()) {
                 return pred.test(first())
-                        ? Fn.lazySeq(() -> rest().filter(pred)).cons(first())
+                        ? Fn.cons(first(), rest().filter(pred))
                         : rest().filter(pred);
             }
             return Fn.nil();
@@ -395,6 +395,11 @@ public abstract class ASeq<T> extends AbstractList<T> implements ISeq<T> {
     @Override
     public T get(final int index) {
         return nth(index);
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return false;
     }
 
     @Override
