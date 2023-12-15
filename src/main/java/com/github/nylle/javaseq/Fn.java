@@ -23,9 +23,9 @@ public class Fn {
     }
 
     private static final int CHUNK_SIZE = 32;
-    static <T> ISeq<T> chunkIteratorSeq(Iterator<T> iterator) {
+    static <T> ISeq<T> chunkIteratorSeq(final Iterator<T> iterator) {
         if(iterator.hasNext()) {
-            return new LazySeq<>(() -> {
+            return lazySeq(() -> {
                 T[] arr = (T[]) new Object[CHUNK_SIZE];
                 int n = 0;
                 while(iterator.hasNext() && n < CHUNK_SIZE) {
@@ -100,6 +100,7 @@ public class Fn {
 
     public static <T> ISeq<T> seq(Iterator<T> coll) {
         if (coll != null && coll.hasNext()) {
+//            return chunkIteratorSeq(coll);
             return lazySeq(() -> cons(coll.next(), seq(coll)));
         }
         return nil();

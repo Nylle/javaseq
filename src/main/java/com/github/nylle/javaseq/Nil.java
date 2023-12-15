@@ -54,7 +54,7 @@ class Nil<T> extends ASeq<T> implements ISeq<T> {
 	}
 
 	@Override
-	public ISeq<T> realize() {
+	public ISeq<T> seq() {
 		return this;
 	}
 

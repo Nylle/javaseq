@@ -2,7 +2,6 @@ package com.github.nylle.javaseq;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -248,11 +247,6 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
     @Override
     public int size() {
         return length - index;
-    }
-
-    @Override
-    public Iterator<Character> iterator() {
-        return toList().iterator();
     }
 
     @Override
