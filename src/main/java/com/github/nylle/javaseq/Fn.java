@@ -42,7 +42,7 @@ public class Fn {
     public static <T> Set<T> conj(Set<T> coll, T x) {
         var result = new HashSet<>(coll);
         result.add(x);
-        return result;
+        return Set.copyOf(result);
     }
 
     // creation

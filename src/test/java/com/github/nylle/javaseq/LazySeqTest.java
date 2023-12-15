@@ -744,9 +744,10 @@ class LazySeqTest {
 
     @Test
     void sizeReturnsNumberOfItemsInFiniteLazySeq() {
-        var sut = recursive(0, x -> x + 1).take(4);
+        var size = 100_000;
+        var sut = recursive(0, x -> x + 1).take(size);
 
-        assertThat(sut.size()).isEqualTo(4);
+        assertThat(sut.size()).isEqualTo(size);
     }
 
     @Nested

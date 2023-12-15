@@ -116,7 +116,7 @@ public abstract class ASeq<T> extends AbstractList<T> implements ISeq<T> {
 
     public ISeq<T> take(long n) {
         return Fn.lazySeq(() -> {
-            if (!isEmpty() && n > 0) {
+            if (n > 0 && !isEmpty()) {
                 return n == 1
                         ? ISeq.of(first())
                         : rest().take(n - 1).cons(first());
@@ -399,7 +399,13 @@ public abstract class ASeq<T> extends AbstractList<T> implements ISeq<T> {
 
     @Override
     public int size() {
-        return 1 + rest().size();
+        var i = 0;
+        ISeq<T> seq = this;
+        while (!seq.isEmpty()) {
+            i++;
+            seq = seq.drop(1);
+        }
+        return i;
     }
 
     @Override
