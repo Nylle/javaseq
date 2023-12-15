@@ -22,6 +22,13 @@ class ChunkedConsTest {
     }
 
     @Test
+    void canContainNull() {
+        var sut = new ChunkedCons<>(arrayChunk(1, 2, 3, null), ISeq.of(4, 5, 6));
+
+        assertThat(sut).containsExactly(1, 2, 3, null, 4, 5, 6);
+    }
+
+    @Test
     void firstReturnsFirstItem() {
         var sut = new ChunkedCons<>(arrayChunk(1, 2, 3), ISeq.of(4, 5, 6));
 
@@ -707,14 +714,33 @@ class ChunkedConsTest {
         verifyNoMoreInteractions(proc);
     }
 
-    @Test
-    void toListReturnsAllItems() {
-        var sut = new ChunkedCons<>(arrayChunk(1, 2, 3), ISeq.of(4, 5, 6));
+    @Nested
+    class ToList {
 
-        assertThat(sut.toList())
-                .isInstanceOf(List.class)
-                .containsExactly(1, 2, 3, 4, 5, 6);
+        @Test
+        void throwsWhenChunkContainsNull() {
+            var sut = new ChunkedCons<>(arrayChunk(1, 2, 3, null), ISeq.of(4, 5, 6));
+
+            assertThatExceptionOfType(NullPointerException.class).isThrownBy(() -> sut.toList());
+        }
+
+        @Test
+        void throwsWhenRestContainsNull() {
+            var sut = new ChunkedCons<>(arrayChunk(1, 2, 3), ISeq.of(4, 5, 6, null));
+
+            assertThatExceptionOfType(NullPointerException.class).isThrownBy(() -> sut.toList());
+        }
+
+        @Test
+        void returnsAllItems() {
+            var sut = new ChunkedCons<>(arrayChunk(1, 2, 3), ISeq.of(4, 5, 6));
+
+            assertThat(sut.toList())
+                    .isInstanceOf(List.class)
+                    .containsExactly(1, 2, 3, 4, 5, 6);
+        }
     }
+
 
     @Test
     void toSetReturnsUniqueItems() {

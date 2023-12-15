@@ -248,6 +248,6 @@ public class ChunkedCons<T> extends ASeq<T> implements ISeq<T> {
             acc.add(chunk.nth(i));
         }
         acc.addAll(rest.toList());
-        return acc;
+        return List.copyOf(acc);
     }
 }
