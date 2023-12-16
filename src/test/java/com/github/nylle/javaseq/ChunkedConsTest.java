@@ -635,24 +635,29 @@ class ChunkedConsTest {
 
         @Test
         void returnsValueAtIndex() {
-            var sut = new ChunkedCons<>(arrayChunk("", "0", "01"), ISeq.of("012", "0123", "01234"));
+            var sut = new ChunkedCons<>(arrayChunk("", null, "1"), ISeq.of("2", null, "4"));
 
             assertThat(sut.nth(0)).isEqualTo("");
-            assertThat(sut.nth(1)).isEqualTo("0");
-            assertThat(sut.nth(2)).isEqualTo("01");
-            assertThat(sut.nth(3)).isEqualTo("012");
-            assertThat(sut.nth(4)).isEqualTo("0123");
-            assertThat(sut.nth(5)).isEqualTo("01234");
+            assertThat(sut.nth(1)).isEqualTo(null);
+            assertThat(sut.nth(2)).isEqualTo("1");
+            assertThat(sut.nth(3)).isEqualTo("2");
+            assertThat(sut.nth(4)).isEqualTo(null);
+            assertThat(sut.nth(5)).isEqualTo("4");
         }
 
         @Test
         void returnsDefaultValue() {
-            var sut = new ChunkedCons<>(arrayChunk("x"), Nil.empty());
+            var sut = new ChunkedCons<>(arrayChunk("0", null, "2"), ISeq.of("3", null, "4"));
 
-            assertThat(sut.nth(0, "y")).isEqualTo("x");
-            assertThat(sut.nth(1, "y")).isEqualTo("y");
-            assertThat(sut.nth(2, "y")).isEqualTo("y");
-            assertThat(sut.nth(3, "y")).isEqualTo("y");
+            assertThat(sut.nth(-1, "X")).isEqualTo("X");
+            assertThat(sut.nth(0, "X")).isEqualTo("0");
+            assertThat(sut.nth(1, "X")).isEqualTo(null);
+            assertThat(sut.nth(2, "X")).isEqualTo("2");
+            assertThat(sut.nth(3, "X")).isEqualTo("3");
+            assertThat(sut.nth(4, "X")).isEqualTo(null);
+            assertThat(sut.nth(5, "X")).isEqualTo("4");
+            assertThat(sut.nth(6, "X")).isEqualTo("X");
+            assertThat(sut.nth(7, "X")).isEqualTo("X");
         }
 
         @Test

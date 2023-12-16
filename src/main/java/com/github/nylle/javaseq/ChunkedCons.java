@@ -228,6 +228,19 @@ public class ChunkedCons<T> extends ASeq<T> implements ISeq<T> {
     }
 
     @Override
+    public T nth(int index) {
+        if(index < 0) throw new IndexOutOfBoundsException(index);
+        if(index < chunkSize) {
+            return chunk.nth(index);
+        }
+        try {
+            return rest.nth(index - chunkSize);
+        } catch(IndexOutOfBoundsException ex) {
+            throw new IndexOutOfBoundsException(index);
+        }
+    }
+
+    @Override
     public T nth(int index, T notFound) {
         if(index < 0) return notFound;
         if(index < chunkSize) {

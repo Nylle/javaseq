@@ -993,22 +993,24 @@ class ASeqTest {
 
         @Test
         void returnsValueAtIndex() {
-            var sut = TestSeq.from("", "0", "01", "012");
+            var sut = TestSeq.from("", "0", null, "012");
 
             assertThat(sut.nth(0)).isEqualTo("");
             assertThat(sut.nth(1)).isEqualTo("0");
-            assertThat(sut.nth(2)).isEqualTo("01");
+            assertThat(sut.nth(2)).isNull();
             assertThat(sut.nth(3)).isEqualTo("012");
         }
 
         @Test
         void returnsDefaultValue() {
-            var sut = TestSeq.from("x");
+            var sut = TestSeq.from("a", null, "c");
 
-            assertThat(sut.nth(0, "y")).isEqualTo("x");
-            assertThat(sut.nth(1, "y")).isEqualTo("y");
-            assertThat(sut.nth(2, "y")).isEqualTo("y");
-            assertThat(sut.nth(3, "y")).isEqualTo("y");
+            assertThat(sut.nth(-1, "x")).isEqualTo("x");
+            assertThat(sut.nth(0, "x")).isEqualTo("a");
+            assertThat(sut.nth(1, "x")).isNull();
+            assertThat(sut.nth(2, "x")).isEqualTo("c");
+            assertThat(sut.nth(3, "x")).isEqualTo("x");
+            assertThat(sut.nth(4, "x")).isEqualTo("x");
         }
 
         @Test

@@ -14,13 +14,14 @@ import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public abstract class ASeq<T> extends AbstractList<T> implements ISeq<T> {
 
     public T second() {
-        return nth(1, null);
+        return nth(1, (T)null);
     }
 
     public ISeq<T> cons(T x) {
@@ -309,21 +310,23 @@ public abstract class ASeq<T> extends AbstractList<T> implements ISeq<T> {
     }
 
     public T nth(int index) {
-        var result = nth(index, null);
-        if (result == null) {
+        return nth(index, () -> {
             throw new IndexOutOfBoundsException(index);
-        }
-        return result;
+        });
     }
 
     public T nth(int index, T notFound) {
+        return nth(index, () -> notFound);
+    }
+
+    private T nth(int index, Supplier<T> notFound) {
         if (index < 0 || isEmpty()) {
-            return notFound;
+            return notFound.get();
         }
         ISeq<T> s = this;
         for (int i = index; i > 0; --i) {
             if (s.rest().isEmpty()) {
-                return notFound;
+                return notFound.get();
             }
             s = s.rest();
         }
@@ -345,7 +348,7 @@ public abstract class ASeq<T> extends AbstractList<T> implements ISeq<T> {
     }
 
     public Optional<T> find(int i) {
-        return Optional.ofNullable(nth(i, null));
+        return Optional.ofNullable(nth(i, (T)null));
     }
 
     public Optional<T> findFirst() {
