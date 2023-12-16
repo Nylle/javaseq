@@ -218,15 +218,6 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
     }
 
     @Override
-    public Character nth(int index) {
-        var result = nth(index, null);
-        if(result == null) {
-            throw new IndexOutOfBoundsException(index);
-        }
-        return result;
-    }
-
-    @Override
     public Character nth(int index, Character notFound) {
         if(index >= this.index && index < length) {
             return str.charAt(index);

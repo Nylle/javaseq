@@ -1,32 +1,26 @@
 package com.github.nylle.javaseq;
 
-import java.lang.reflect.Array;
+import java.util.AbstractList;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.Spliterator;
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.IntFunction;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
-import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public abstract class ASeq<T> implements ISeq<T> {
+public abstract class ASeq<T> extends AbstractList<T> implements ISeq<T> {
 
     public T second() {
-        return nth(1, (T)null);
+        return nth(1, null);
     }
 
     public ISeq<T> cons(T x) {
@@ -315,23 +309,21 @@ public abstract class ASeq<T> implements ISeq<T> {
     }
 
     public T nth(int index) {
-        return nth(index, () -> {
+        var result = nth(index, null);
+        if (result == null) {
             throw new IndexOutOfBoundsException(index);
-        });
+        }
+        return result;
     }
 
     public T nth(int index, T notFound) {
-        return nth(index, () -> notFound);
-    }
-
-    private T nth(int index, Supplier<T> notFound) {
         if (index < 0 || isEmpty()) {
-            return notFound.get();
+            return notFound;
         }
         ISeq<T> s = this;
         for (int i = index; i > 0; --i) {
             if (s.rest().isEmpty()) {
-                return notFound.get();
+                return notFound;
             }
             s = s.rest();
         }
@@ -353,7 +345,7 @@ public abstract class ASeq<T> implements ISeq<T> {
     }
 
     public Optional<T> find(int i) {
-        return Optional.ofNullable(nth(i, (T)null));
+        return Optional.ofNullable(nth(i, null));
     }
 
     public Optional<T> findFirst() {
@@ -401,16 +393,14 @@ public abstract class ASeq<T> implements ISeq<T> {
         return this;
     }
 
-
-    // java.lang.Iterable
+    // Iterable
 
     @Override
     public void forEach(Consumer<? super T> action) {
         run(action);
     }
 
-
-    // java.util.List
+    // List
 
     @Override
     public T get(final int index) {
@@ -432,144 +422,7 @@ public abstract class ASeq<T> implements ISeq<T> {
         return new SeqIterator<>(this);
     }
 
-    @Override
-    public List<T> subList(int fromIndex, int toIndex){
-        return toList().subList(fromIndex, toIndex);
-    }
-
-    @Override
-    public Object[] toArray(){
-        int len = count();
-        if(len == 0) {
-            return new Object[0];
-        }
-        var result = new Object[len];
-        for(int i = 0; i < len; i++) {
-            result[i] = nth(i);
-        }
-        return result;
-    }
-
-    @Override
-    public <U> U[] toArray(U[] a) {
-        var result = a;
-        int len = count();
-        if (len > result.length) {
-            result = (U[]) Array.newInstance(a.getClass().getComponentType(), len);
-        }
-        for(int i = 0; i < len; i++) {
-            result[i] = (U)nth(i);
-        }
-        return result;
-    }
-
-    @Override
-    public T set(int index, T element){
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean add(T t) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void add(int index, T element) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean addAll(Collection<? extends T> c) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean addAll(int index, Collection<? extends T> c) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean remove(Object o) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public T remove(int index){
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean removeAll(Collection<?> c) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean retainAll(Collection<?> c) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void replaceAll(UnaryOperator<T> operator) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void sort(Comparator<? super T> c) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Spliterator<T> spliterator() {
-        return ((Iterable<T>) () -> iterator()).spliterator();
-    }
-
-    @Override
-    public boolean containsAll(Collection<?> c) {
-        for(Object o : c) {
-            if(!contains(o)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    @Override
-    public void clear() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public int indexOf(Object o){
-        for (int i = 0; i < count(); i++) {
-            if(o.equals(nth(i))) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    @Override
-    public int lastIndexOf(Object o) {
-        return toList().lastIndexOf(o);
-    }
-
-    @Override
-    public ListIterator<T> listIterator() {
-        return toList().listIterator();
-    }
-
-    @Override
-    public ListIterator<T> listIterator(int index) {
-        return toList().listIterator(index);
-    }
-
-
-    // java.util.Collection
-
-    @Override
-    public boolean contains(Object o){
-        return toList().contains(o);
-    }
+    // Collection
 
     @Override
     public Stream<T> stream() {
@@ -581,18 +434,7 @@ public abstract class ASeq<T> implements ISeq<T> {
         return stream();
     }
 
-    @Override
-    public <U> U[] toArray(IntFunction<U[]> generator) {
-        return toArray(generator.apply(size()));
-    }
-
-    @Override
-    public boolean removeIf(Predicate<? super T> filter) {
-        throw new UnsupportedOperationException();
-    }
-
-
-    // java.lang.Object
+    // Object
 
     @Override
     public String toString() {
