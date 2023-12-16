@@ -8,6 +8,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ConsTest {
 
     private static <T> ISeq<T> sutFrom(T... items) {
+        if(items.length < 1) {
+            throw new IllegalArgumentException("Cons can not be empty.");
+        }
         ISeq<T> cons = Nil.empty();
         for (int i = items.length - 1; i >= 0; i--) {
             cons = new Cons<>(items[i], cons);
@@ -53,13 +56,7 @@ class ConsTest {
     }
 
     @Test
-    void seqReturnsRealizedSeq() {
-        var sut = sutFrom(1, 2, 3);
-        assertThat(sut.isRealized()).isTrue();
-
-        var forced = sut.seq();
-        assertThat(sut.isRealized()).isTrue();
-        assertThat(forced).isSameAs(sut);
-        assertThat(forced.isRealized()).isTrue();
+    void isEmptyReturnsFalse() {
+        assertThat(sutFrom(1).isEmpty()).isFalse();
     }
 }
