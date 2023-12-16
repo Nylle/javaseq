@@ -10,8 +10,7 @@ class LazySeq<T> extends ASeq<T> implements ISeq<T> {
         this.fn = f;
     }
 
-    @Override
-    public ISeq<T> seq() {
+    private ISeq<T> seq() {
         if (!isRealized()) {
             synchronized (this) {
                 if (!isRealized()) {
@@ -23,8 +22,8 @@ class LazySeq<T> extends ASeq<T> implements ISeq<T> {
     }
 
     private ISeq<T> unwrap(ISeq<T> seq) {
-        while(seq instanceof LazySeq) {
-            seq = seq.seq();
+        while(seq instanceof LazySeq<T> s) {
+            seq = s.seq();
         }
         return seq;
     }

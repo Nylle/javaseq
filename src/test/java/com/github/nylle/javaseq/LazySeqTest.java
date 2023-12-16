@@ -355,12 +355,12 @@ class LazySeqTest {
         }
 
         @Test
-        void seqReturnsEmpty() {
+        void forceReturnsEmpty() {
             var sut = CanBeEmpty.<String>fromEmpty();
 
             assertThat(sut.isRealized()).isFalse();
 
-            var forced = sut.seq();
+            var forced = sut.force();
 
             assertThat(sut).isEmpty();
             assertThat(sut.isRealized()).isTrue();
@@ -1684,15 +1684,14 @@ class LazySeqTest {
     }
 
     @Nested
-    @DisplayName("seq")
-    class SeqTest {
+    class Force {
 
         @Test
         void realizesThisSeqAndReturnsIt() {
             var sut = fromRange(4).map(x -> x.toString());
             assertThat(sut.isRealized()).isFalse();
 
-            var forced = sut.seq();
+            var forced = sut.force();
             assertThat(sut.isRealized()).isTrue();
             assertThat(forced.isRealized()).isTrue();
         }

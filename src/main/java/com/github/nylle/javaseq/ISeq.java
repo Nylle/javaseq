@@ -176,7 +176,7 @@ public interface ISeq<T> extends List<T> {
 
     Optional<T> findFirst(Predicate<? super T> pred);
 
-    ISeq<T> seq();
+    ISeq<T> force();
 
     <K, V> Map<K, V> toMap(Function<T, K> k, Function<T, V> v);
 

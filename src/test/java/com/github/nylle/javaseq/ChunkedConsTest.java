@@ -741,7 +741,6 @@ class ChunkedConsTest {
         }
     }
 
-
     @Test
     void toSetReturnsUniqueItems() {
         var sut = new ChunkedCons<>(arrayChunk(1, 2, 2), ISeq.of(6, 3, 6));

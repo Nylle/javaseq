@@ -37,6 +37,11 @@ public class NilTest {
     }
 
     @Test
+    void forceReturnsNil() {
+        assertThat(Nil.empty().force()).isEqualTo(Nil.empty());
+    }
+
+    @Test
     void isEmptyReturnsTrue() {
         assertThat(Nil.empty().isEmpty()).isTrue();
     }

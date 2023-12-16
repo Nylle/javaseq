@@ -48,7 +48,7 @@ class ASeqTest {
 
         @Override
         public boolean isRealized() {
-            return false;
+            return rest.isRealized();
         }
     }
 
@@ -1282,5 +1282,15 @@ class ASeqTest {
         var sut = new TestSeq<>(0, ISeq.of(null, null));
 
         assertThatExceptionOfType(NullPointerException.class).isThrownBy(() -> sut.toList());
+    }
+
+    @Test
+    void forceReturnsFullyRealizedSeq() {
+        var sut = new TestSeq<>(0, TestSeq.from(1, 2, 3, 4));
+
+        var actual = sut.force();
+
+        assertThat(actual).containsExactly(0, 1, 2, 3, 4);
+        assertThat(actual.isRealized()).isTrue();
     }
 }
