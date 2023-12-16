@@ -690,11 +690,11 @@ class ChunkedConsTest {
     }
 
     @Test
-    void sizeReturnsSizeOfSeq() {
+    void countReturnsSizeOfSeq() {
         var sut = new ChunkedCons<>(arrayChunk(1, 2, 3), ISeq.of(4, 5, 6));
 
-        assertThat(sut.size()).isEqualTo(6);
-        assertThat(sut.rest().size()).isEqualTo(5);
+        assertThat(sut.count()).isEqualTo(6);
+        assertThat(sut.rest().count()).isEqualTo(5);
     }
 
     @Test

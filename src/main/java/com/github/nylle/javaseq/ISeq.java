@@ -170,6 +170,8 @@ public interface ISeq<T> extends List<T> {
 
     String str();
 
+    int count();
+
     Optional<T> find(int i);
 
     Optional<T> findFirst();

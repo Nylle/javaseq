@@ -32,8 +32,8 @@ public class NilTest {
     }
 
     @Test
-    void sizeReturnsZero() {
-        assertThat(Nil.empty().size()).isZero();
+    void countReturnsZero() {
+        assertThat(Nil.empty().count()).isZero();
     }
 
     @Test

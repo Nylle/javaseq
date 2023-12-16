@@ -237,8 +237,8 @@ public class ChunkedCons<T> extends ASeq<T> implements ISeq<T> {
     }
 
     @Override
-    public int size() {
-        return chunkSize + rest.size();
+    public int count() {
+        return chunkSize + rest.count();
     }
 
     @Override

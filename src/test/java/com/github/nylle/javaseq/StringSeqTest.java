@@ -1039,9 +1039,9 @@ class StringSeqTest {
     }
 
     @Test
-    void sizeReturnsStringLength() {
-        assertThat(sutFromString("foo").size()).isEqualTo(3);
-        assertThat(sutFromString("xfoo").rest().size()).isEqualTo(3);
+    void countReturnsStringLength() {
+        assertThat(sutFromString("foo").count()).isEqualTo(3);
+        assertThat(sutFromString("xfoo").rest().count()).isEqualTo(3);
     }
 
     @Test

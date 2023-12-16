@@ -68,8 +68,8 @@ class LazySeqTest {
         }
 
         @Test
-        void sizeReturnsZero() {
-            assertThat(fromEmpty().size()).isZero();
+        void countReturnsZero() {
+            assertThat(fromEmpty().count()).isZero();
         }
 
         @Test
@@ -742,11 +742,11 @@ class LazySeqTest {
     }
 
     @Test
-    void sizeReturnsNumberOfItemsInFiniteLazySeq() {
-        var size = 100_000;
-        var sut = recursive(0, x -> x + 1).take(size);
+    void countReturnsNumberOfItemsInFiniteLazySeq() {
+        var cnt = 100_000;
+        var sut = recursive(0, x -> x + 1).take(cnt);
 
-        assertThat(sut.size()).isEqualTo(size);
+        assertThat(sut.count()).isEqualTo(cnt);
     }
 
     @Nested

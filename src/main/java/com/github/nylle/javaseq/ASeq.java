@@ -334,6 +334,16 @@ public abstract class ASeq<T> extends AbstractList<T> implements ISeq<T> {
         return reduce("", (a, b) -> a + b);
     }
 
+    public int count() {
+        var i = 0;
+        ISeq<T> seq = this;
+        while (!seq.isEmpty()) {
+            i++;
+            seq = seq.drop(1);
+        }
+        return i;
+    }
+
     public Optional<T> find(int i) {
         return Optional.ofNullable(nth(i, null));
     }
@@ -404,13 +414,7 @@ public abstract class ASeq<T> extends AbstractList<T> implements ISeq<T> {
 
     @Override
     public int size() {
-        var i = 0;
-        ISeq<T> seq = this;
-        while (!seq.isEmpty()) {
-            i++;
-            seq = seq.drop(1);
-        }
-        return i;
+        return count();
     }
 
     @Override

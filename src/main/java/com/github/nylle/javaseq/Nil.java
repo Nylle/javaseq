@@ -49,7 +49,7 @@ class Nil<T> extends ASeq<T> implements ISeq<T> {
 	}
 
 	@Override
-	public int size() {
+	public int count() {
 		return 0;
 	}
 

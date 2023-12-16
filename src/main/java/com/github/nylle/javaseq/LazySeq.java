@@ -44,8 +44,8 @@ class LazySeq<T> extends ASeq<T> implements ISeq<T> {
     }
 
     @Override
-    public int size() {
-        return seq().size();
+    public int count() {
+        return seq().count();
     }
 
     @Override

@@ -1229,10 +1229,10 @@ class ASeqTest {
     }
 
     @Test
-    void sizeReturnsSizeOfSeq() {
+    void countReturnsSizeOfSeq() {
         var sut = TestSeq.from(0, 1, 2, 3);
 
-        assertThat(sut.size()).isEqualTo(4);
+        assertThat(sut.count()).isEqualTo(4);
     }
 
     @Test
@@ -1268,6 +1268,13 @@ class ASeqTest {
                     .isThrownBy(() -> TestSeq.from(1).get(1))
                     .withMessage("Index out of range: 1");
         }
+    }
+
+    @Test
+    void sizeReturnsSizeOfSeq() {
+        var sut = TestSeq.from(0, 1, 2, 3);
+
+        assertThat(sut.size()).isEqualTo(4);
     }
 
     @Test
