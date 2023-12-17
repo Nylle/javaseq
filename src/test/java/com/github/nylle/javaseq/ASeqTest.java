@@ -1289,6 +1289,44 @@ class ASeqTest {
             assertThat(sut.subList(1, 4)).containsExactly(1, 2, 3);
         }
 
+        @Nested
+        class ToArray {
+
+            @Test
+            void returnsObjectArrayWithAllItemsInThisSeq() {
+                var sut = TestSeq.from("0", "1", "2", "3");
+
+                var actual = sut.toArray();
+
+                assertThat(actual)
+                        .isExactlyInstanceOf(Object[].class)
+                        .containsExactly("0", "1", "2", "3");
+            }
+
+            @Test
+            void returnsEmptyArrayForNil() {
+                assertThat(Nil.empty().toArray()).isEmpty();
+            }
+
+            @Test
+            void returnsSuppliedArrayFilledWithAllItemsInThisSeq() {
+                var sut = TestSeq.from("0", "1", "2", "3");
+
+                assertThat(sut.toArray(new String[4]))
+                        .isExactlyInstanceOf(String[].class)
+                        .containsExactly("0", "1", "2", "3");
+            }
+
+            @Test
+            void returnsNewArrayFilledWithAllItemsInThisSeqIfSuppliedArrayIsTooSmall() {
+                var sut = TestSeq.from("0", "1", "2", "3");
+
+                assertThat(sut.toArray(new String[2]))
+                        .isExactlyInstanceOf(String[].class)
+                        .containsExactly("0", "1", "2", "3");
+            }
+        }
+
         @Test
         void spliteratorReturnsSpliteratorForAllItemsInThisSeq() {
             var sut = TestSeq.from("0", "1", "2", "3");
@@ -1442,6 +1480,30 @@ class ASeqTest {
             var sut = TestSeq.from(0, 1, 2);
 
             assertThat(sut.parallelStream()).containsExactly(0, 1, 2);
+        }
+
+        @Nested
+        class ToArray {
+
+            @Test
+            void returnsTypedArrayWithAllItemsInThisSeq() {
+                var sut = TestSeq.from("0", "1", "2", "3");
+
+                var actual = sut.toArray(size -> new String[size]);
+
+                assertThat(actual)
+                        .isExactlyInstanceOf(String[].class)
+                        .containsExactly("0", "1", "2", "3");
+            }
+
+            @Test
+            void returnsEmptyArrayForNil() {
+                var actual = Nil.<String>empty().toArray(size -> new String[size]);
+
+                assertThat(actual)
+                        .isExactlyInstanceOf(String[].class)
+                        .isEmpty();
+            }
         }
 
         @Test
