@@ -268,21 +268,32 @@ class StringSeqTest {
 
         @Test
         void returnsValueAtIndex() {
-            var sut = sutFromString("foo");
+            var sut = sutFromString("xfoo");
 
-            assertThat(sut.nth(0)).isEqualTo('f');
-            assertThat(sut.nth(1)).isEqualTo('o');
+            assertThat(sut.nth(0)).isEqualTo('x');
+            assertThat(sut.nth(1)).isEqualTo('f');
             assertThat(sut.nth(2)).isEqualTo('o');
+            assertThat(sut.nth(3)).isEqualTo('o');
+
+            assertThat(sut.drop(1).nth(0)).isEqualTo('f');
+            assertThat(sut.drop(1).nth(1)).isEqualTo('o');
+            assertThat(sut.drop(1).nth(2)).isEqualTo('o');
         }
 
         @Test
         void returnsDefaultValue() {
-            var sut = sutFromString("foo");
+            var sut = sutFromString("xfoo");
 
-            assertThat(sut.nth(0, 'x')).isEqualTo('f');
-            assertThat(sut.nth(1, 'x')).isEqualTo('o');
-            assertThat(sut.nth(2, 'x')).isEqualTo('o');
-            assertThat(sut.nth(3, 'x')).isEqualTo('x');
+            assertThat(sut.nth(0, 'Y')).isEqualTo('x');
+            assertThat(sut.nth(1, 'Y')).isEqualTo('f');
+            assertThat(sut.nth(2, 'Y')).isEqualTo('o');
+            assertThat(sut.nth(3, 'Y')).isEqualTo('o');
+            assertThat(sut.nth(4, 'Y')).isEqualTo('Y');
+
+            assertThat(sut.drop(1).nth(0, 'Y')).isEqualTo('f');
+            assertThat(sut.drop(1).nth(1, 'Y')).isEqualTo('o');
+            assertThat(sut.drop(1).nth(2, 'Y')).isEqualTo('o');
+            assertThat(sut.drop(1).nth(3, 'Y')).isEqualTo('Y');
         }
 
         @Test
@@ -296,10 +307,14 @@ class StringSeqTest {
 
         @Test
         void throwsIfIndexNotPresent() {
-            var sut = sutFromString("0");
+            var sut = sutFromString("01");
 
             assertThatExceptionOfType(IndexOutOfBoundsException.class)
-                    .isThrownBy(() -> sut.nth(1))
+                    .isThrownBy(() -> sut.nth(2))
+                    .withMessage("Index out of range: 2");
+
+            assertThatExceptionOfType(IndexOutOfBoundsException.class)
+                    .isThrownBy(() -> sut.drop(1).nth(1))
                     .withMessage("Index out of range: 1");
         }
     }

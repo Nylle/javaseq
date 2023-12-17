@@ -73,30 +73,26 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
 
     @Override
     public ISeq<Character> take(long n) {
-        return Fn.lazySeq(() -> {
-            if (n <= 0) {
-                return Fn.nil();
-            }
-            int end = (int) n + index;
-            if (end >= length) {
-                return this;
-            }
-            return new StringSeq(str.subSequence(index, end), 0);
-        });
+        if (n <= 0) {
+            return Fn.nil();
+        }
+        int end = (int) n + index;
+        if (end >= length) {
+            return this;
+        }
+        return new StringSeq(str.subSequence(index, end), 0);
     }
 
     @Override
     public ISeq<Character> drop(long n) {
-        return Fn.lazySeq(() -> {
-            if (n <= 0) {
-                return this;
-            }
-            int end = (int) n + index;
-            if (end >= length) {
-                return Fn.nil();
-            }
-            return new StringSeq(str, end);
-        });
+        if (n <= 0) {
+            return this;
+        }
+        int end = (int) n + index;
+        if (end >= length) {
+            return Fn.nil();
+        }
+        return new StringSeq(str, end);
     }
 
     @Override
@@ -125,7 +121,7 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
     @Override
     public ISeq<Character> dropWhile(Predicate<? super Character> pred) {
         return Fn.lazySeq(() -> {
-            var end = length-1;
+            var end = length - 1;
             for (int i = index; i < length; i++) {
                 if (pred.test(str.charAt(i))) {
                     continue;
@@ -175,7 +171,7 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
         var acc = new StringBuilder();
         for (int i = index; i < length; i++) {
             var step = str.charAt(i);
-            if(seen.contains(step)) {
+            if (seen.contains(step)) {
                 continue;
             }
             acc.append(step);
@@ -189,8 +185,8 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
 
     @Override
     public boolean some(Predicate<? super Character> pred) {
-        for(int i = index; i < length; i++) {
-            if(pred.test(str.charAt(i))) {
+        for (int i = index; i < length; i++) {
+            if (pred.test(str.charAt(i))) {
                 return true;
             }
         }
@@ -199,8 +195,8 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
 
     @Override
     public boolean every(Predicate<? super Character> pred) {
-        for(int i = index; i < length; i++) {
-            if(!pred.test(str.charAt(i))) {
+        for (int i = index; i < length; i++) {
+            if (!pred.test(str.charAt(i))) {
                 return false;
             }
         }
@@ -210,7 +206,7 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
     @Override
     public Optional<Character> max(Comparator<? super Character> comp) {
         var max = str.charAt(index);
-        for(int i = index + 1; i < length; i++) {
+        for (int i = index + 1; i < length; i++) {
             var next = str.charAt(i);
             max = comp.compare(max, next) > 0 ? max : next;
         }
@@ -220,7 +216,7 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
     @Override
     public Character nth(int index) {
         var result = nth(index, null);
-        if(result == null) {
+        if (result == null) {
             throw new IndexOutOfBoundsException(index);
         }
         return result;
@@ -228,8 +224,10 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
 
     @Override
     public Character nth(int index, Character notFound) {
-        if(index >= this.index && index < length) {
-            return str.charAt(index);
+        var i = this.index + index;
+
+        if (i >= this.index && i < length) {
+            return str.charAt(i);
         }
         return notFound;
     }
@@ -242,7 +240,7 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
     @Override
     public List<Character> toList() {
         var acc = new ArrayList<Character>();
-        for(int i = index; i < length; i++) {
+        for (int i = index; i < length; i++) {
             acc.add(str.charAt(i));
         }
         return List.copyOf(acc);
