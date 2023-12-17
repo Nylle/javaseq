@@ -2,6 +2,7 @@ package com.github.nylle.javaseq;
 
 import java.util.AbstractList;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -15,6 +16,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -396,14 +398,16 @@ public abstract class ASeq<T> extends AbstractList<T> implements ISeq<T> {
         return this;
     }
 
-    // Iterable
+
+    // java.lang.Iterable
 
     @Override
     public void forEach(Consumer<? super T> action) {
         run(action);
     }
 
-    // List
+
+    // java.util.List
 
     @Override
     public T get(final int index) {
@@ -425,7 +429,68 @@ public abstract class ASeq<T> extends AbstractList<T> implements ISeq<T> {
         return new SeqIterator<>(this);
     }
 
-    // Collection
+    @Override
+    public T set(int index, T element){
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean add(T t) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void add(int index, T element) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean addAll(Collection<? extends T> c) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean addAll(int index, Collection<? extends T> c) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean remove(Object o) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public T remove(int index){
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean removeAll(Collection<?> c) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean retainAll(Collection<?> c) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void replaceAll(UnaryOperator<T> operator) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void sort(Comparator<? super T> c) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void clear() {
+        throw new UnsupportedOperationException();
+    }
+
+
+    // java.util.Collection
 
     @Override
     public Stream<T> stream() {
@@ -437,7 +502,13 @@ public abstract class ASeq<T> extends AbstractList<T> implements ISeq<T> {
         return stream();
     }
 
-    // Object
+    @Override
+    public boolean removeIf(Predicate<? super T> filter) {
+        throw new UnsupportedOperationException();
+    }
+
+
+    // java.lang.Object
 
     @Override
     public String toString() {

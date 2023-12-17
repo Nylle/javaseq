@@ -1201,20 +1201,6 @@ class ASeqTest {
     }
 
     @Test
-    void streamReturnsStream() {
-        var sut = TestSeq.from(0, 1, 2);
-
-        assertThat(sut.stream()).containsExactly(0, 1, 2);
-    }
-
-    @Test
-    void parallelStreamReturnsStream() {
-        var sut = TestSeq.from(0, 1, 2);
-
-        assertThat(sut.parallelStream()).containsExactly(0, 1, 2);
-    }
-
-    @Test
     void forEachCallsConsumerForEveryItemPresent() {
         var consumer = Mockito.<Consumer<Integer>>mock();
 
@@ -1238,55 +1224,6 @@ class ASeqTest {
     }
 
     @Test
-    void isEmptyReturnsFalse() {
-        var sut = TestSeq.from(1);
-
-        assertThat(sut.isEmpty()).isFalse();
-    }
-
-    @Nested
-    class Get {
-
-        @Test
-        void returnsValueAtIndex() {
-            var sut = TestSeq.from("", "0", "01", "012");
-
-            assertThat(sut.get(0)).isEqualTo("");
-            assertThat(sut.get(1)).isEqualTo("0");
-            assertThat(sut.get(2)).isEqualTo("01");
-            assertThat(sut.get(3)).isEqualTo("012");
-        }
-
-        @Test
-        void throwsForNegativeIndex() {
-            assertThatExceptionOfType(IndexOutOfBoundsException.class)
-                    .isThrownBy(() -> TestSeq.from(1).get(-1))
-                    .withMessage("Index out of range: -1");
-        }
-
-        @Test
-        void throwsIfIndexNotPresent() {
-            assertThatExceptionOfType(IndexOutOfBoundsException.class)
-                    .isThrownBy(() -> TestSeq.from(1).get(1))
-                    .withMessage("Index out of range: 1");
-        }
-    }
-
-    @Test
-    void sizeReturnsSizeOfSeq() {
-        var sut = TestSeq.from(0, 1, 2, 3);
-
-        assertThat(sut.size()).isEqualTo(4);
-    }
-
-    @Test
-    void toStringReturnsAllItems() {
-        var sut = TestSeq.from(0, 1, 2, 3);
-
-        assertThat(sut).hasToString("[0, 1, 2, 3]");
-    }
-
-    @Test
     void toListThrowsForNullValue() {
         var sut = new TestSeq<>(0, ISeq.of(null, null));
 
@@ -1301,5 +1238,165 @@ class ASeqTest {
 
         assertThat(actual).containsExactly(0, 1, 2, 3, 4);
         assertThat(actual.isRealized()).isTrue();
+    }
+
+    @Nested
+    class ListTest {
+
+        @Test
+        void isEmptyReturnsFalse() {
+            var sut = TestSeq.from(1);
+
+            assertThat(sut.isEmpty()).isFalse();
+        }
+
+        @Nested
+        class Get {
+
+            @Test
+            void returnsValueAtIndex() {
+                var sut = TestSeq.from("", "0", "01", "012");
+
+                assertThat(sut.get(0)).isEqualTo("");
+                assertThat(sut.get(1)).isEqualTo("0");
+                assertThat(sut.get(2)).isEqualTo("01");
+                assertThat(sut.get(3)).isEqualTo("012");
+            }
+
+            @Test
+            void throwsForNegativeIndex() {
+                assertThatExceptionOfType(IndexOutOfBoundsException.class)
+                        .isThrownBy(() -> TestSeq.from(1).get(-1))
+                        .withMessage("Index out of range: -1");
+            }
+
+            @Test
+            void throwsIfIndexNotPresent() {
+                assertThatExceptionOfType(IndexOutOfBoundsException.class)
+                        .isThrownBy(() -> TestSeq.from(1).get(1))
+                        .withMessage("Index out of range: 1");
+            }
+        }
+
+        @Test
+        void sizeReturnsSizeOfSeq() {
+            var sut = TestSeq.from(0, 1, 2, 3);
+
+            assertThat(sut.size()).isEqualTo(4);
+        }
+
+        @Test
+        void setThrows() {
+            var sut = TestSeq.from("0", "1", "2", "3");
+            assertThatExceptionOfType(UnsupportedOperationException.class)
+                    .isThrownBy(() -> sut.set(4, "4"));
+        }
+
+        @Test
+        void addThrows() {
+            var sut = TestSeq.from("0", "1", "2", "3");
+
+            assertThatExceptionOfType(UnsupportedOperationException.class)
+                    .isThrownBy(() -> sut.add("4"));
+            assertThatExceptionOfType(UnsupportedOperationException.class)
+                    .isThrownBy(() -> sut.add(4, "4"));
+        }
+
+        @Test
+        void addAllThrows() {
+            var sut = TestSeq.from("0", "1", "2", "3");
+
+            assertThatExceptionOfType(UnsupportedOperationException.class)
+                    .isThrownBy(() -> sut.addAll(List.of("4", "5")));
+            assertThatExceptionOfType(UnsupportedOperationException.class)
+                    .isThrownBy(() -> sut.addAll(1, List.of("4", "5")));
+        }
+
+        @Test
+        void removeThrows() {
+            var sut = TestSeq.from("0", "1", "2", "3");
+
+            assertThatExceptionOfType(UnsupportedOperationException.class)
+                    .isThrownBy(() -> sut.remove(2));
+            assertThatExceptionOfType(UnsupportedOperationException.class)
+                    .isThrownBy(() -> sut.remove("2"));
+        }
+
+        @Test
+        void removeAllThrows() {
+            var sut = TestSeq.from("0", "1", "2", "3");
+
+            assertThatExceptionOfType(UnsupportedOperationException.class)
+                    .isThrownBy(() -> sut.removeAll(List.of("1", "2")));
+        }
+
+        @Test
+        void retainAllThrows() {
+            var sut = TestSeq.from("0", "1", "2", "3");
+
+            assertThatExceptionOfType(UnsupportedOperationException.class)
+                    .isThrownBy(() -> sut.retainAll(List.of("1", "2")));
+        }
+
+        @Test
+        void replaceAllThrows() {
+            var sut = TestSeq.from("0", "1", "2", "3");
+
+            assertThatExceptionOfType(UnsupportedOperationException.class)
+                    .isThrownBy(() -> sut.replaceAll(x -> x.toUpperCase()));
+        }
+
+        @Test
+        void sortThrows() {
+            var sut = TestSeq.from("0", "1", "2", "3");
+
+            assertThatExceptionOfType(UnsupportedOperationException.class)
+                    .isThrownBy(() -> sut.sort(Comparator.reverseOrder()));
+        }
+
+        @Test
+        void clearThrows() {
+            var sut = TestSeq.from("0", "1", "2", "3");
+
+            assertThatExceptionOfType(UnsupportedOperationException.class)
+                    .isThrownBy(() -> sut.clear());
+        }
+    }
+
+    @Nested
+    class CollectionTest {
+
+        @Test
+        void streamReturnsStream() {
+            var sut = TestSeq.from(0, 1, 2);
+
+            assertThat(sut.stream()).containsExactly(0, 1, 2);
+        }
+
+        @Test
+        void parallelStreamReturnsStream() {
+            var sut = TestSeq.from(0, 1, 2);
+
+            assertThat(sut.parallelStream()).containsExactly(0, 1, 2);
+        }
+
+        @Test
+        void removeIfThrows() {
+            var sut = TestSeq.from("0", "1", "2", "3");
+
+            assertThatExceptionOfType(UnsupportedOperationException.class)
+                    .isThrownBy(() -> sut.removeIf(x -> x.equals("1")));
+        }
+    }
+
+    @Nested
+    class ObjectTest {
+
+        @Test
+        void toStringReturnsAllItems() {
+            var sut = TestSeq.from(0, 1, 2, 3);
+
+            assertThat(sut).hasToString("[0, 1, 2, 3]");
+        }
     }
 }
