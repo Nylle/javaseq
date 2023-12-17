@@ -7,9 +7,11 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.Spliterator;
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
@@ -430,6 +432,11 @@ public abstract class ASeq<T> extends AbstractList<T> implements ISeq<T> {
     }
 
     @Override
+    public List<T> subList(int fromIndex, int toIndex){
+        return toList().subList(fromIndex, toIndex);
+    }
+
+    @Override
     public T set(int index, T element){
         throw new UnsupportedOperationException();
     }
@@ -485,8 +492,28 @@ public abstract class ASeq<T> extends AbstractList<T> implements ISeq<T> {
     }
 
     @Override
+    public Spliterator<T> spliterator() {
+        return ((Iterable<T>) () -> iterator()).spliterator();
+    }
+
+    @Override
     public void clear() {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int lastIndexOf(Object o) {
+        return toList().lastIndexOf(o);
+    }
+
+    @Override
+    public ListIterator<T> listIterator() {
+        return toList().listIterator();
+    }
+
+    @Override
+    public ListIterator<T> listIterator(int index) {
+        return toList().listIterator(index);
     }
 
 

@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -1183,21 +1184,28 @@ class ASeqTest {
         }
     }
 
-    @Nested
-    class Iterator {
+    @Test
+    void toListThrowsForNullValue() {
+        var sut = new TestSeq<>(0, ISeq.of(null, null));
 
-        @Test
-        void returnsIterator() {
-            var sut = TestSeq.from(0, 1);
+        assertThatExceptionOfType(NullPointerException.class).isThrownBy(() -> sut.toList());
+    }
 
-            var actual = sut.iterator();
+    @Test
+    void forceReturnsFullyRealizedSeq() {
+        var sut = new TestSeq<>(0, TestSeq.from(1, 2, 3, 4));
 
-            assertThat(actual.hasNext()).isTrue();
-            assertThat(actual.next()).isEqualTo(0);
-            assertThat(actual.hasNext()).isTrue();
-            assertThat(actual.next()).isEqualTo(1);
-            assertThat(actual.hasNext()).isFalse();
-        }
+        var actual = sut.force();
+
+        assertThat(actual).containsExactly(0, 1, 2, 3, 4);
+        assertThat(actual.isRealized()).isTrue();
+    }
+
+    @Test
+    void countReturnsSizeOfSeq() {
+        var sut = TestSeq.from(0, 1, 2, 3);
+
+        assertThat(sut.count()).isEqualTo(4);
     }
 
     @Test
@@ -1216,39 +1224,8 @@ class ASeqTest {
         verifyNoMoreInteractions(consumer);
     }
 
-    @Test
-    void countReturnsSizeOfSeq() {
-        var sut = TestSeq.from(0, 1, 2, 3);
-
-        assertThat(sut.count()).isEqualTo(4);
-    }
-
-    @Test
-    void toListThrowsForNullValue() {
-        var sut = new TestSeq<>(0, ISeq.of(null, null));
-
-        assertThatExceptionOfType(NullPointerException.class).isThrownBy(() -> sut.toList());
-    }
-
-    @Test
-    void forceReturnsFullyRealizedSeq() {
-        var sut = new TestSeq<>(0, TestSeq.from(1, 2, 3, 4));
-
-        var actual = sut.force();
-
-        assertThat(actual).containsExactly(0, 1, 2, 3, 4);
-        assertThat(actual.isRealized()).isTrue();
-    }
-
     @Nested
     class ListTest {
-
-        @Test
-        void isEmptyReturnsFalse() {
-            var sut = TestSeq.from(1);
-
-            assertThat(sut.isEmpty()).isFalse();
-        }
 
         @Nested
         class Get {
@@ -1279,10 +1256,73 @@ class ASeqTest {
         }
 
         @Test
+        void isEmptyReturnsFalse() {
+            var sut = TestSeq.from(1);
+
+            assertThat(sut.isEmpty()).isFalse();
+        }
+
+        @Test
         void sizeReturnsSizeOfSeq() {
             var sut = TestSeq.from(0, 1, 2, 3);
 
             assertThat(sut.size()).isEqualTo(4);
+        }
+
+        @Test
+        void iteratorReturnsIterator() {
+            var sut = TestSeq.from(0, 1);
+
+            var actual = sut.iterator();
+
+            assertThat(actual.hasNext()).isTrue();
+            assertThat(actual.next()).isEqualTo(0);
+            assertThat(actual.hasNext()).isTrue();
+            assertThat(actual.next()).isEqualTo(1);
+            assertThat(actual.hasNext()).isFalse();
+        }
+
+        @Test
+        void subListReturnsItemsFromIndexToIndex() {
+            var sut = TestSeq.from(0, 1, 2, 3, 4, 5);
+
+            assertThat(sut.subList(1, 4)).containsExactly(1, 2, 3);
+        }
+
+        @Test
+        void spliteratorReturnsSpliteratorForAllItemsInThisSeq() {
+            var sut = TestSeq.from("0", "1", "2", "3");
+
+            var actual = sut.spliterator();
+
+            assertThat(StreamSupport.stream(actual, false)).containsExactly("0", "1", "2", "3");
+        }
+
+        @Test
+        void lastIndexOfReturnsIndexOfLastOccurrenceOfSuppliedObject() {
+            var sut = TestSeq.from("a", "b", "c", "a", "d");
+
+            assertThat(sut.lastIndexOf("a")).isEqualTo(3);
+            assertThat(sut.lastIndexOf("e")).isEqualTo(-1);
+        }
+
+        @Test
+        void listIteratorReturnsIteratorForTheListRepresentationOfThisSeq() {
+            var sut = TestSeq.from("0", "1", "2");
+
+            var all = sut.listIterator();
+            assertThat(all.hasNext()).isTrue();
+            assertThat(all.next()).isEqualTo("0");
+            assertThat(all.hasNext()).isTrue();
+            assertThat(all.next()).isEqualTo("1");
+            assertThat(all.hasNext()).isTrue();
+            assertThat(all.next()).isEqualTo("2");
+            assertThat(all.hasNext()).isFalse();
+
+            var fromIndex = sut.listIterator(2);
+            assertThat(fromIndex.hasNext()).isTrue();
+            assertThat(fromIndex.next()).isEqualTo("2");
+            assertThat(fromIndex.hasNext()).isFalse();
         }
 
         @Test
