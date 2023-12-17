@@ -1,13 +1,10 @@
 package com.github.nylle.javaseq;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -16,16 +13,12 @@ import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.IntFunction;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public abstract class ASeq<T> implements ISeq<T> {
-
-    private volatile List<T> cachedList;
+public abstract class ASeq<T> extends AList<T> implements ISeq<T> {
 
     public T second() {
         return nth(1, (T)null);
@@ -391,14 +384,7 @@ public abstract class ASeq<T> implements ISeq<T> {
     }
 
     public List<T> toList() {
-        if (cachedList == null) {
-            synchronized (this) {
-                if (cachedList == null) {
-                    cachedList = List.copyOf(this.force());
-                }
-            }
-        }
-        return cachedList;
+        return List.copyOf(this.force());
     }
 
     public Set<T> toSet() {
@@ -442,180 +428,12 @@ public abstract class ASeq<T> implements ISeq<T> {
     }
 
     @Override
-    public List<T> subList(int fromIndex, int toIndex){
-        return toList().subList(fromIndex, toIndex);
-    }
-
-    @Override
-    public T set(int index, T element){
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean add(T t) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void add(int index, T element) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean addAll(Collection<? extends T> c) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean addAll(int index, Collection<? extends T> c) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean remove(Object o) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public T remove(int index){
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean removeAll(Collection<?> c) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean retainAll(Collection<?> c) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void replaceAll(UnaryOperator<T> operator) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void sort(Comparator<? super T> c) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public Spliterator<T> spliterator() {
         return ((Iterable<T>) () -> iterator()).spliterator();
     }
 
-    @Override
-    public boolean containsAll(Collection<?> c) {
-        return toList().containsAll(c);
-    }
-
-    @Override
-    public void clear() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public int indexOf(Object o){
-        return toList().indexOf(o);
-    }
-
-    @Override
-    public int lastIndexOf(Object o) {
-        return toList().lastIndexOf(o);
-    }
-
-    @Override
-    public ListIterator<T> listIterator() {
-        return toList().listIterator();
-    }
-
-    @Override
-    public ListIterator<T> listIterator(int index) {
-        return toList().listIterator(index);
-    }
-
-    @Override
-    public Object[] toArray() {
-        Object[] r = new Object[size()];
-        Iterator<T> it = iterator();
-        for (int i = 0; i < r.length; i++) {
-            if (! it.hasNext())
-                return Arrays.copyOf(r, i);
-            r[i] = it.next();
-        }
-        return it.hasNext() ? finishToArray(r, it) : r;
-    }
-
-    @Override
-    public <U> U[] toArray(U[] a) {
-        int size = size();
-        U[] r = a.length >= size ? a : (U[])java.lang.reflect.Array.newInstance(a.getClass().getComponentType(), size);
-        Iterator<T> it = iterator();
-
-        for (int i = 0; i < r.length; i++) {
-            if (! it.hasNext()) {
-                if (a == r) {
-                    r[i] = null;
-                } else if (a.length < i) {
-                    return Arrays.copyOf(r, i);
-                } else {
-                    System.arraycopy(r, 0, a, 0, i);
-                    if (a.length > i) {
-                        a[i] = null;
-                    }
-                }
-                return a;
-            }
-            r[i] = (U)it.next();
-        }
-        return it.hasNext() ? finishToArray(r, it) : r;
-    }
-
-    private static final int SOFT_MAX_ARRAY_LENGTH = Integer.MAX_VALUE - 8;
-
-    @SuppressWarnings("unchecked")
-    private static <T> T[] finishToArray(T[] r, Iterator<?> it) {
-        int len = r.length;
-        int i = len;
-        while (it.hasNext()) {
-            if (i == len) {
-                len = newLength(len, 1, (len >> 1) + 1);
-                r = Arrays.copyOf(r, len);
-            }
-            r[i++] = (T)it.next();
-        }
-        return (i == len) ? r : Arrays.copyOf(r, i);
-    }
-
-    private static int newLength(int oldLength, int minGrowth, int prefGrowth) {
-        int prefLength = oldLength + Math.max(minGrowth, prefGrowth);
-        if (0 < prefLength && prefLength <= SOFT_MAX_ARRAY_LENGTH) {
-            return prefLength;
-        } else {
-            return hugeLength(oldLength, minGrowth);
-        }
-    }
-
-    private static int hugeLength(int oldLength, int minGrowth) {
-        int minLength = oldLength + minGrowth;
-        if (minLength < 0) {
-            throw new OutOfMemoryError("Required array length " + oldLength + " + " + minGrowth + " is too large");
-        } else if (minLength <= SOFT_MAX_ARRAY_LENGTH) {
-            return SOFT_MAX_ARRAY_LENGTH;
-        } else {
-            return minLength;
-        }
-    }
-
 
     // java.util.Collection
-
-    @Override
-    public boolean contains(Object o){
-        return toList().contains(o);
-    }
 
     @Override
     public Stream<T> stream() {
@@ -625,16 +443,6 @@ public abstract class ASeq<T> implements ISeq<T> {
     @Override
     public Stream<T> parallelStream() {
         return stream();
-    }
-
-    @Override
-    public boolean removeIf(Predicate<? super T> filter) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public <U> U[] toArray(IntFunction<U[]> generator) {
-        return toArray(generator.apply(0));
     }
 
 
