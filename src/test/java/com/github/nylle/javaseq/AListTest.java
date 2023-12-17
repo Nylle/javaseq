@@ -25,7 +25,7 @@ class AListTest {
         }
 
         @Override
-        List<T> toList() {
+        List<T> reify() {
             return list;
         }
 

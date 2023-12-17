@@ -384,11 +384,11 @@ public abstract class ASeq<T> extends AList<T> implements ISeq<T> {
     }
 
     public List<T> toList() {
-        return List.copyOf(this.force());
+        return reify();
     }
 
     public Set<T> toSet() {
-        return Set.copyOf(this.force());
+        return Set.copyOf(force());
     }
 
     public ISeq<T> force() {
@@ -396,6 +396,12 @@ public abstract class ASeq<T> extends AList<T> implements ISeq<T> {
         return this;
     }
 
+    // AList
+
+    @Override
+    List<T> reify() {
+        return List.copyOf(force());
+    }
 
     // java.lang.Iterable
 

@@ -12,20 +12,7 @@ import java.util.function.UnaryOperator;
 
 public abstract class AList<T> implements List<T> {
 
-    private volatile List<T> cached;
-
-    private List<T> reify() {
-        if (cached == null) {
-            synchronized (this) {
-                if (cached == null) {
-                    cached = toList();
-                }
-            }
-        }
-        return cached;
-    }
-
-    abstract List<T> toList();
+    abstract List<T> reify();
 
     public abstract int size();
 
