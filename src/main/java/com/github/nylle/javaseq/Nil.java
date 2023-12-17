@@ -54,11 +54,6 @@ class Nil<T> extends ASeq<T> implements ISeq<T> {
 	}
 
 	@Override
-	public ISeq<T> force() {
-		return this;
-	}
-
-	@Override
 	public boolean equals(Object o) {
 		return o instanceof Nil;
 	}

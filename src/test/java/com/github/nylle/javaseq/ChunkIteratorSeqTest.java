@@ -44,7 +44,7 @@ class ChunkIteratorSeqTest {
     void canHandleLargeCollections() {
         assertThat(fromRange().take(1_000_000).reduce((a, b) -> a + b)).hasValue(1783293664);
 
-        var large = 10_000;
+        var large = 1_000_000;
         assertThat(fromRange().take(large).toList()).hasSize(large);
     }
 
@@ -1321,20 +1321,6 @@ class ChunkIteratorSeqTest {
             var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.findFirst(x -> x > 100)).hasValue(101);
-        }
-    }
-
-    @Nested
-    class Force {
-
-        @Test
-        void realizesThisSeqAndReturnsIt() {
-            var sut = fromRange(4).map(x -> x.toString());
-            assertThat(sut.isRealized()).isFalse();
-
-            var forced = sut.force();
-            assertThat(sut.isRealized()).isTrue();
-            assertThat(forced.isRealized()).isTrue();
         }
     }
 

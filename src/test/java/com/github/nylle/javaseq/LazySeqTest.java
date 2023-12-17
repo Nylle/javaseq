@@ -355,19 +355,6 @@ class LazySeqTest {
         }
 
         @Test
-        void forceReturnsEmpty() {
-            var sut = CanBeEmpty.<String>fromEmpty();
-
-            assertThat(sut.isRealized()).isFalse();
-
-            var forced = sut.force();
-
-            assertThat(sut).isEmpty();
-            assertThat(sut.isRealized()).isTrue();
-            assertThat(forced.isRealized()).isTrue();
-        }
-
-        @Test
         void iteratorReturnsEmptyIterator() {
             assertThat(fromEmpty().iterator().hasNext()).isFalse();
         }
@@ -1680,20 +1667,6 @@ class LazySeqTest {
             var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.findFirst(x -> x > 100)).hasValue(101);
-        }
-    }
-
-    @Nested
-    class Force {
-
-        @Test
-        void realizesThisSeqAndReturnsIt() {
-            var sut = fromRange(4).map(x -> x.toString());
-            assertThat(sut.isRealized()).isFalse();
-
-            var forced = sut.force();
-            assertThat(sut.isRealized()).isTrue();
-            assertThat(forced.isRealized()).isTrue();
         }
     }
 

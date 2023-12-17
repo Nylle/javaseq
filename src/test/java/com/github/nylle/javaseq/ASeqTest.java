@@ -1192,16 +1192,6 @@ class ASeqTest {
     }
 
     @Test
-    void forceReturnsFullyRealizedSeq() {
-        var sut = new TestSeq<>(0, TestSeq.from(1, 2, 3, 4));
-
-        var actual = sut.force();
-
-        assertThat(actual).containsExactly(0, 1, 2, 3, 4);
-        assertThat(actual.isRealized()).isTrue();
-    }
-
-    @Test
     void countReturnsSizeOfSeq() {
         var sut = TestSeq.from(0, 1, 2, 3);
 
