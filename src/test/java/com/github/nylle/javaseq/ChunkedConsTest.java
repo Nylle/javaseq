@@ -148,27 +148,27 @@ class ChunkedConsTest {
             }
 
             @Test
-            void ignoresRemainingItemsIfOneOfTheSeqsIsExhausted() {
+            void ignoresRemainingItemsIfSeqIsExhausted() {
+                var sut = new ChunkedCons<>(arrayChunk(1, 2), new ChunkedCons<>(arrayChunk(3), Nil.empty()));
+
+                assertThat(sut.map(ISeq.of("a", "b", "c", "d"), (a, b) -> a + b)).containsExactly("1a", "2b", "3c");
+                assertThat(sut.map(List.of("a", "b", "c", "d").iterator(), (a, b) -> a + b)).containsExactly("1a", "2b", "3c");
+                assertThat(sut.map(List.of("a", "b", "c", "d"), (a, b) -> a + b)).containsExactly("1a", "2b", "3c");
+                assertThat(sut.map(Stream.of("a", "b", "c", "d"), (a, b) -> a + b)).containsExactly("1a", "2b", "3c");
+                assertThat(sut.map(new String[]{"a", "b", "c", "d"}, (a, b) -> a + b)).containsExactly("1a", "2b", "3c");
+                assertThat(sut.map("abcd", (a, b) -> "" + a + b)).containsExactly("1a", "2b", "3c");
+            }
+
+            @Test
+            void ignoresRemainingItemsIfOtherCollIsExhausted() {
                 var sut = new ChunkedCons<>(arrayChunk(1, 2), ISeq.of(3));
 
                 assertThat(sut.map(ISeq.of("a", "b"), (a, b) -> a + b)).containsExactly("1a", "2b");
-                assertThat(sut.map(ISeq.of("a", "b", "c", "d"), (a, b) -> a + b)).containsExactly("1a", "2b", "3c");
-
                 assertThat(sut.map(List.of("a", "b").iterator(), (a, b) -> a + b)).containsExactly("1a", "2b");
-                assertThat(sut.map(List.of("a", "b", "c", "d").iterator(), (a, b) -> a + b)).containsExactly("1a", "2b", "3c");
-
                 assertThat(sut.map(List.of("a", "b"), (a, b) -> a + b)).containsExactly("1a", "2b");
-                assertThat(sut.map(List.of("a", "b", "c", "d"), (a, b) -> a + b)).containsExactly("1a", "2b", "3c");
-
                 assertThat(sut.map(Stream.of("a", "b"), (a, b) -> a + b)).containsExactly("1a", "2b");
-                assertThat(sut.map(Stream.of("a", "b", "c", "d"), (a, b) -> a + b)).containsExactly("1a", "2b", "3c");
-
                 assertThat(sut.map(new String[]{"a", "b"}, (a, b) -> a + b)).containsExactly("1a", "2b");
-                assertThat(sut.map(new String[]{"a", "b", "c", "d"}, (a, b) -> a + b)).containsExactly("1a", "2b", "3c");
-
                 assertThat(sut.map("ab", (a, b) -> "" + a + b)).containsExactly("1a", "2b");
-                assertThat(sut.map("abcd", (a, b) -> "" + a + b)).containsExactly("1a", "2b", "3c");
-
                 assertThat(sut.map(ISeq.iterate(0, x -> x + 1), (a, b) -> a + b)).containsExactly(1, 3, 5);
             }
 
