@@ -24,6 +24,8 @@ import java.util.stream.StreamSupport;
 
 public abstract class ASeq<T> extends AbstractList<T> implements ISeq<T> {
 
+    private volatile List<T> cachedList;
+
     public T second() {
         return nth(1, (T)null);
     }
@@ -388,7 +390,14 @@ public abstract class ASeq<T> extends AbstractList<T> implements ISeq<T> {
     }
 
     public List<T> toList() {
-        return List.copyOf(this.force());
+        if (cachedList == null) {
+            synchronized (this) {
+                if (cachedList == null) {
+                    cachedList = List.copyOf(this.force());
+                }
+            }
+        }
+        return cachedList;
     }
 
     public Set<T> toSet() {
@@ -497,8 +506,18 @@ public abstract class ASeq<T> extends AbstractList<T> implements ISeq<T> {
     }
 
     @Override
+    public boolean containsAll(Collection<?> c) {
+        return toList().containsAll(c);
+    }
+
+    @Override
     public void clear() {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int indexOf(Object o){
+        return toList().indexOf(o);
     }
 
     @Override
@@ -518,6 +537,11 @@ public abstract class ASeq<T> extends AbstractList<T> implements ISeq<T> {
 
 
     // java.util.Collection
+
+    @Override
+    public boolean contains(Object o){
+        return toList().contains(o);
+    }
 
     @Override
     public Stream<T> stream() {

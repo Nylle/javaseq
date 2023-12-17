@@ -1299,6 +1299,22 @@ class ASeqTest {
         }
 
         @Test
+        void containsAllReturnsTrueIfAllItemsAreContainedInThisSeq() {
+            var sut = TestSeq.from("0", "1", "2", "3");
+
+            assertThat(sut.containsAll(List.of("1", "2"))).isTrue();
+            assertThat(sut.containsAll(List.of("1", "5"))).isFalse();
+        }
+
+        @Test
+        void indexOfReturnsIndexOfSuppliedObjectInThisSeq() {
+            var sut = TestSeq.from("0", "1", "2", "3");
+
+            assertThat(sut.indexOf("1")).isEqualTo(1);
+            assertThat(sut.indexOf("4")).isEqualTo(-1);
+        }
+
+        @Test
         void lastIndexOfReturnsIndexOfLastOccurrenceOfSuppliedObject() {
             var sut = TestSeq.from("a", "b", "c", "a", "d");
 
@@ -1405,6 +1421,14 @@ class ASeqTest {
 
     @Nested
     class CollectionTest {
+
+        @Test
+        void containsReturnsTrueIfSuppliedObjectIsInThisSeq() {
+            var sut = TestSeq.from("0", "1", "2", "3");
+
+            assertThat(sut.contains("1")).isTrue();
+            assertThat(sut.contains("4")).isFalse();
+        }
 
         @Test
         void streamReturnsStream() {
