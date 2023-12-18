@@ -24,9 +24,4 @@ class Cons<T> extends ASeq<T> implements ISeq<T> {
 	public boolean isRealized() {
 		return true;
 	}
-
-	@Override
-	public boolean isEmpty() {
-		return false;
-	}
 }

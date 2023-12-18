@@ -40,11 +40,6 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
     }
 
     @Override
-    public boolean isEmpty() {
-        return false;
-    }
-
-    @Override
     public boolean isRealized() {
         return true;
     }
