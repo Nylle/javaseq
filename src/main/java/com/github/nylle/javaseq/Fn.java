@@ -59,6 +59,11 @@ public class Fn {
         return new LazySeq<>(f);
     }
 
+    @SafeVarargs
+    public static <T> ISeq<T> arraySeq(T... items) {
+        return new ArraySeq<>(items);
+    }
+
     public static <T> ISeq<T> iterate(T x, UnaryOperator<T> f) {
         return lazySeq(() -> cons(x, iterate(f.apply(x), f)));
     }
@@ -100,8 +105,7 @@ public class Fn {
 
     public static <T> ISeq<T> seq(Iterator<T> coll) {
         if (coll != null && coll.hasNext()) {
-//            return chunkIteratorSeq(coll);
-            return lazySeq(() -> cons(coll.next(), seq(coll)));
+            return chunkIteratorSeq(coll);
         }
         return nil();
     }

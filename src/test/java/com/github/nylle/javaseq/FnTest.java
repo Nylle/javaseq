@@ -11,6 +11,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 class FnTest {
 
     @Nested
+    @DisplayName("nil")
+    class NilTest {
+
+        @Test
+        void returnsEmptySeq() {
+            var actual = Fn.nil();
+
+            assertThat(actual)
+                    .isExactlyInstanceOf(Nil.class)
+                    .isEmpty();
+        }
+    }
+
+    @Nested
     @DisplayName("cons")
     class ConsTest {
 
@@ -19,7 +33,7 @@ class FnTest {
             var actual = Fn.cons("a", Fn.cons("b", Fn.cons("c", Nil.empty())));
 
             assertThat(actual)
-                    .isInstanceOf(Cons.class)
+                    .isExactlyInstanceOf(Cons.class)
                     .containsExactly("a", "b", "c");
         }
 
@@ -36,17 +50,6 @@ class FnTest {
     class LazySeqTest {
 
         @Test
-        void returnsSeqWithNulls() {
-            var sut = Fn.lazySeq(() ->
-                    Fn.cons(null, Fn.lazySeq(() ->
-                            Fn.cons(null, Fn.lazySeq(() ->
-                                    Fn.cons(null, Fn.lazySeq(() ->
-                                            Fn.nil())))))));
-
-            assertThat(sut).containsExactly(null, null, null);
-        }
-
-        @Test
         void returnsSeqFromSupplier() {
             var actual = Fn.lazySeq(() ->
                     Fn.cons("a", Fn.lazySeq(() ->
@@ -57,6 +60,42 @@ class FnTest {
             assertThat(actual)
                     .isInstanceOf(LazySeq.class)
                     .containsExactly("a", "b", "c");
+        }
+
+        @Test
+        void returnsSeqWithNulls() {
+            var sut = Fn.lazySeq(() ->
+                    Fn.cons(null, Fn.lazySeq(() ->
+                            Fn.cons(null, Fn.lazySeq(() ->
+                                    Fn.cons(null, Fn.lazySeq(() ->
+                                            Fn.nil())))))));
+
+            assertThat(sut)
+                    .isExactlyInstanceOf(LazySeq.class)
+                    .containsExactly(null, null, null);
+        }
+    }
+
+    @Nested
+    @DisplayName("arraySeq")
+    class ArraySeqTest {
+
+        @Test
+        void returnsSeqWithSuppliedItems() {
+            var sut = Fn.arraySeq(0, 1, 2, 3, 4, 5);
+
+            assertThat(sut)
+                    .isExactlyInstanceOf(ArraySeq.class)
+                    .containsExactly(0, 1, 2, 3, 4, 5);
+        }
+
+        @Test
+        void returnsSeqWithNulls() {
+            var sut = Fn.arraySeq(null, null, null);
+
+            assertThat(sut)
+                    .isExactlyInstanceOf(ArraySeq.class)
+                    .containsExactly(null, null, null);
         }
     }
 
