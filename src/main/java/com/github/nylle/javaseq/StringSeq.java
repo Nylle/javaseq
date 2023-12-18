@@ -3,7 +3,6 @@ package com.github.nylle.javaseq;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
@@ -143,24 +142,6 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
     }
 
     @Override
-    public ISeq<Character> distinct() {
-        var seen = Set.of();
-        var acc = new StringBuilder();
-        for (int i = index; i < length; i++) {
-            var step = str.charAt(i);
-            if (seen.contains(step)) {
-                continue;
-            }
-            acc.append(step);
-            seen = Fn.conj(seen, step);
-        }
-        if (!acc.isEmpty()) {
-            return new StringSeq(acc.toString(), 0);
-        }
-        return Fn.nil();
-    }
-
-    @Override
     public boolean some(Predicate<? super Character> pred) {
         for (int i = index; i < length; i++) {
             if (pred.test(str.charAt(i))) {
@@ -236,19 +217,5 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
     @Override
     public String toString() {
         return toList().toString();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-        StringSeq that = (StringSeq) o;
-        return index == that.index && length == that.length && Objects.equals(str, that.str);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), str, index, length);
     }
 }

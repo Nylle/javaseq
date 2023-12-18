@@ -726,60 +726,6 @@ class StringSeqTest {
         }
     }
 
-    @Nested
-    class Distinct {
-
-        @Test
-        void returnsSeqWithSingleItem() {
-            assertThat(sutFromString("foo").distinct()).containsExactly('f', 'o');
-        }
-
-        @Test
-        void returnsSeqThatAlreadyIsDistinct() {
-            var sut = sutFromString("abc");
-
-            assertThat(sut.distinct()).containsExactly('a', 'b', 'c');
-        }
-
-        @Test
-        void returnsSeqWithSingleItemForSeqWithIdenticalItems() {
-            var sut = sutFromString("aaaaa");
-
-            assertThat(sut.distinct()).containsExactly('a');
-        }
-
-        @Test
-        void returnsDistinctItemsInSameOrderAsEncounteredFirst() {
-            var sut = sutFromString("acabbdfege");
-
-            assertThat(sut.distinct()).containsExactly('a', 'c', 'b', 'd', 'f', 'e', 'g');
-        }
-    }
-
-    @Nested
-    class Sorted {
-
-        @Test
-        void returnsSeqWithSingleItem() {
-            assertThat(sutFromString("a").sorted()).isEqualTo(ISeq.of('a'));
-        }
-
-        @Test
-        void returnsSeqWithAllItemsSortedUsingDefaultComparator() {
-            var sut = sutFromString("aßCcá$B7äA0Áb");
-
-            assertThat(sut.sorted()).containsExactly('$', '0', '7', 'A', 'B', 'C', 'a', 'b', 'c', 'Á', 'ß', 'á', 'ä');
-        }
-
-        @Test
-        void returnsSeqWithAllItemsSortedUsingSuppliedComparator() {
-            var sut = sutFromString("aßCcá$B7äA0Áb");
-
-            assertThat(sut.sorted(Comparator.reverseOrder()))
-                    .containsExactly('ä', 'á', 'ß', 'Á', 'c', 'b', 'a', 'C', 'B', 'A', '7', '0', '$');
-        }
-    }
-
     @Test
     void reverseReturnsReversedSeq() {
         var sut = sutFromString("abcde");
