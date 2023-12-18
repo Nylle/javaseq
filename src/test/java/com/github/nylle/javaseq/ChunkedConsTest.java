@@ -477,6 +477,13 @@ class ChunkedConsTest {
         }
 
         @Test
+        void returnsOptionalOfFirstWhenSeqHasOnlyOneElementAndValIsNotSupplied() {
+            var sut = new ChunkedCons<>(arrayChunk(1), Nil.empty());
+            
+            assertThat(sut.reduce((a, b) -> a + b)).hasValue(1);
+        }
+
+        @Test
         void returnsResultWhenValIsSupplied() {
             var sut = new ChunkedCons<>(arrayChunk(2, 3, 4), ISeq.of(5, 6, 7));
 

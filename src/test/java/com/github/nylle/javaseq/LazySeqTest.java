@@ -1285,11 +1285,10 @@ class LazySeqTest {
     class Reduce {
 
         @Test
-        void returnsEmptyOptionalForLessThanTwoItemsWhenValIsNotSupplied() {
+        void returnsEmptyOptionalForEmptySeqWhenValIsNotSupplied() {
             var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.take(0).reduce((a, b) -> a + b)).isEmpty();
-            assertThat(sut.take(1).reduce((a, b) -> a + b)).isEmpty();
         }
 
         @Test
@@ -1297,7 +1296,7 @@ class LazySeqTest {
             var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.take(0).reduce((a, b) -> a + b)).isEmpty();
-            assertThat(sut.take(1).reduce((a, b) -> a + b)).isEmpty();
+            assertThat(sut.take(1).reduce((a, b) -> a + b)).hasValue(0);
             assertThat(sut.take(2).reduce((a, b) -> a + b)).hasValue(1);
             assertThat(sut.take(4).reduce((a, b) -> a + b)).hasValue(6);
         }

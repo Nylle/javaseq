@@ -210,7 +210,7 @@ public abstract class ASeq<T> extends AList<T> implements ISeq<T> {
     }
 
     public Optional<T> reduce(BinaryOperator<T> f) {
-        if (!isEmpty() && !rest().isEmpty()) {
+        if (!isEmpty()) {
             return Optional.of(rest().reduce(first(), f));
         }
         return Optional.empty();

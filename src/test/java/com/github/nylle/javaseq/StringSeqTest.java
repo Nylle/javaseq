@@ -715,6 +715,7 @@ class StringSeqTest {
             var sut = sutFromString("foo");
 
             assertThat(sut.reduce((a, b) -> b)).hasValue('o');
+            assertThat(sut.drop(2).reduce((a, b) -> b)).hasValue('o');
         }
 
         @Test

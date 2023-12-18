@@ -676,6 +676,13 @@ class ASeqTest {
         }
 
         @Test
+        void returnsOptionalOfFirstWhenSeqHasOnlyOneElementAndValIsNotSupplied() {
+            var sut = TestSeq.from(0);
+
+            assertThat(sut.reduce((a, b) -> a + b)).hasValue(0);
+        }
+
+        @Test
         void returnsResultWhenValIsSupplied() {
             var sut = TestSeq.from(1, 2, 3);
 
