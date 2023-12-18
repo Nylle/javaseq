@@ -22,7 +22,7 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
             throw new IllegalArgumentException("string is null or empty");
         }
         if (index >= str.length()) {
-            throw new IllegalArgumentException("index '" + index + "' is out of range for string '" + str + "'");
+            throw new IllegalArgumentException("index " + index + " is out of range for string " + str);
         }
         this.str = str;
         this.index = index;
@@ -51,7 +51,17 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
 
     @Override
     public ISeq<Character> filter(Predicate<? super Character> pred) {
-        return walk(pred, false);
+        return Fn.lazySeq(() -> {
+            var acc = Fn.<Character>nil();
+            var start = length - 1;
+            for (int i = start; i >= index; i--) {
+                var next = str.charAt(i);
+                if (pred.test(next)) {
+                    acc = Fn.cons(next, acc);
+                }
+            }
+            return acc;
+        });
     }
 
     @Override
@@ -64,11 +74,6 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
             }
             return acc;
         });
-    }
-
-    @Override
-    public ISeq<Character> cons(Character x) {
-        return new StringSeq(x.toString() + str.subSequence(index, length), 0);
     }
 
     @Override
@@ -93,29 +98,6 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
             return Fn.nil();
         }
         return new StringSeq(str, end);
-    }
-
-    @Override
-    public ISeq<Character> takeWhile(Predicate<? super Character> pred) {
-        return walk(pred, true);
-    }
-
-    private ISeq<Character> walk(Predicate<? super Character> pred, boolean stop) {
-        return Fn.lazySeq(() -> {
-            var acc = new StringBuilder();
-            for (int i = index; i < length; i++) {
-                var next = str.charAt(i);
-                if (pred.test(next)) {
-                    acc.append(next);
-                } else if (stop) {
-                    break;
-                }
-            }
-            if (!acc.isEmpty()) {
-                return new StringSeq(acc.toString(), 0);
-            }
-            return Fn.nil();
-        });
     }
 
     @Override

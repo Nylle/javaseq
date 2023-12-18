@@ -34,7 +34,7 @@ class StringSeqTest {
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> new StringSeq("abc", 3))
-                .withMessage("index '3' is out of range for string 'abc'");
+                .withMessage("index 3 is out of range for string abc");
     }
 
     @Test
@@ -85,8 +85,8 @@ class StringSeqTest {
 
         @Test
         void returnsMatchingItems() {
-            assertThat(sutFromString("foobarbaz").filter(x -> x == 'a')).containsExactly('a', 'a');
-            assertThat(sutFromString("xfoobarbaz").rest().filter(x -> x == 'a')).containsExactly('a', 'a');
+            assertThat(sutFromString("foobarbaz").filter(x -> x > 'f')).containsExactly('o', 'o', 'r', 'z');
+            assertThat(sutFromString("xfoobarbaz").rest().filter(x -> x > 'f')).containsExactly('o', 'o', 'r', 'z');
         }
     }
 
