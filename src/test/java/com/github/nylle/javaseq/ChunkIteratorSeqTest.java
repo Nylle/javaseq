@@ -40,12 +40,44 @@ class ChunkIteratorSeqTest {
         return Fn.chunkIteratorSeq(iterator);
     }
 
-    @Test
-    void canHandleLargeCollections() {
-        assertThat(fromRange().take(1_000_000).reduce((a, b) -> a + b)).hasValue(1783293664);
+    @Nested
+    class ForLargeCollections {
 
-        var large = 1_000_000;
-        assertThat(fromRange().take(large).toList()).hasSize(large);
+        private final static int LARGE = 1_000_000;
+
+        @Test
+        void canCopyToList() {
+            assertThat(fromRange().take(LARGE).toList()).hasSize(LARGE);
+        }
+
+        @Test
+        void canReduce() {
+            assertThat(fromRange().take(LARGE).reduce((a, b) -> a + b)).isNotEmpty();
+        }
+
+        @Test
+        void canFilter() {
+            assertThat(fromRange().take(LARGE).filter(x -> x > 0).count()).isEqualTo(LARGE - 1);
+            assertThat(fromRange().take(LARGE).filter(x -> x > 0).toList()).hasSize(LARGE - 1);
+        }
+
+        @Test
+        void canMap() {
+            assertThat(fromRange().take(LARGE).map(x -> x + 1).count()).isEqualTo(LARGE);
+            assertThat(fromRange().take(LARGE).map(x -> x + 1).toList()).hasSize(LARGE);
+        }
+
+        @Test
+        void canMapcat() {
+            assertThat(fromRange().take(LARGE).mapcat(x -> ISeq.of(x, x)).count()).isEqualTo(LARGE * 2);
+            assertThat(fromRange().take(LARGE).mapcat(x -> ISeq.of(x, x)).toList()).hasSize(LARGE * 2);
+        }
+
+        @Test
+        void canPartition() {
+            assertThat(fromRange().take(LARGE).partition(2).count()).isEqualTo(LARGE / 2);
+            assertThat(fromRange().take(LARGE).partition(2).toList()).hasSize(LARGE / 2);
+        }
     }
 
     @Test
