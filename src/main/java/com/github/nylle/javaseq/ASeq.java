@@ -388,7 +388,7 @@ public abstract class ASeq<T> extends AList<T> implements ISeq<T> {
     }
 
     public Set<T> toSet() {
-        return Set.copyOf(reify());
+        return Set.copyOf(this);
     }
 
 

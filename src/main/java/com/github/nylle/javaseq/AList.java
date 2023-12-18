@@ -25,7 +25,7 @@ public abstract class AList<T> implements List<T> {
 
     // java.util.List
 
-    public T set(int index, T element){
+    public T set(int index, T element) {
         throw new UnsupportedOperationException();
     }
 
@@ -49,7 +49,7 @@ public abstract class AList<T> implements List<T> {
         throw new UnsupportedOperationException();
     }
 
-    public T remove(int index){
+    public T remove(int index) {
         throw new UnsupportedOperationException();
     }
 
@@ -73,7 +73,7 @@ public abstract class AList<T> implements List<T> {
         throw new UnsupportedOperationException();
     }
 
-    public List<T> subList(int fromIndex, int toIndex){
+    public List<T> subList(int fromIndex, int toIndex) {
         return reify().subList(fromIndex, toIndex);
     }
 
@@ -81,7 +81,7 @@ public abstract class AList<T> implements List<T> {
         return reify().containsAll(c);
     }
 
-    public int indexOf(Object o){
+    public int indexOf(Object o) {
         return reify().indexOf(o);
     }
 
@@ -101,7 +101,7 @@ public abstract class AList<T> implements List<T> {
         Object[] r = new Object[size()];
         Iterator<T> it = iterator();
         for (int i = 0; i < r.length; i++) {
-            if (! it.hasNext())
+            if (!it.hasNext())
                 return Arrays.copyOf(r, i);
             r[i] = it.next();
         }
@@ -110,11 +110,11 @@ public abstract class AList<T> implements List<T> {
 
     public <U> U[] toArray(U[] a) {
         int size = size();
-        U[] r = a.length >= size ? a : (U[])java.lang.reflect.Array.newInstance(a.getClass().getComponentType(), size);
+        U[] r = a.length >= size ? a : (U[]) java.lang.reflect.Array.newInstance(a.getClass().getComponentType(), size);
         Iterator<T> it = iterator();
 
         for (int i = 0; i < r.length; i++) {
-            if (! it.hasNext()) {
+            if (!it.hasNext()) {
                 if (a == r) {
                     r[i] = null;
                 } else if (a.length < i) {
@@ -127,7 +127,7 @@ public abstract class AList<T> implements List<T> {
                 }
                 return a;
             }
-            r[i] = (U)it.next();
+            r[i] = (U) it.next();
         }
         return it.hasNext() ? finishToArray(r, it) : r;
     }
@@ -143,7 +143,7 @@ public abstract class AList<T> implements List<T> {
                 len = newLength(len, 1, (len >> 1) + 1);
                 r = Arrays.copyOf(r, len);
             }
-            r[i++] = (T)it.next();
+            r[i++] = (T) it.next();
         }
         return (i == len) ? r : Arrays.copyOf(r, i);
     }
@@ -171,7 +171,7 @@ public abstract class AList<T> implements List<T> {
 
     // java.util.Collection
 
-    public boolean contains(Object o){
+    public boolean contains(Object o) {
         return reify().contains(o);
     }
 

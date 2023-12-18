@@ -1858,4 +1858,31 @@ class LazySeqTest {
             assertThat(sut).hasToString("[0, 1, 2, 3]");
         }
     }
+
+    @Test
+    void toArrayDefersToNestedSeq() {
+        var nested = Mockito.<ISeq<Integer>>mock();
+
+        new LazySeq<>(() -> nested).toArray();
+
+        verify(nested).toArray();
+    }
+
+    @Test
+    void indexOfDefersToNestedSeq() {
+        var nested = Mockito.<ISeq<Integer>>mock();
+
+        new LazySeq<>(() -> nested).indexOf(0);
+
+        verify(nested).indexOf(0);
+    }
+
+    @Test
+    void lastIndexOfDefersToNestedSeq() {
+        var nested = Mockito.<ISeq<Integer>>mock();
+
+        new LazySeq<>(() -> nested).lastIndexOf(0);
+
+        verify(nested).lastIndexOf(0);
+    }
 }

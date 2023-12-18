@@ -1,5 +1,7 @@
 package com.github.nylle.javaseq;
 
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 class LazySeq<T> extends ASeq<T> implements ISeq<T> {
@@ -44,13 +46,48 @@ class LazySeq<T> extends ASeq<T> implements ISeq<T> {
     }
 
     @Override
+    public boolean isRealized() {
+        return seq != null;
+    }
+
+    @Override
+    public <U> U reduce(U val, BiFunction<U, ? super T, U> f) {
+        return seq().reduce(val, f);
+    }
+
+    @Override
+    public void run(Consumer<? super T> proc) {
+        seq().run(proc);
+    }
+
+    @Override
+    public T nth(int index) {
+        return seq().nth(index);
+    }
+
+    @Override
+    public T nth(int index, T notFound) {
+        return seq().nth(index, notFound);
+    }
+
+    @Override
     public int count() {
         return seq().count();
     }
 
     @Override
-    public boolean isRealized() {
-        return seq != null;
+    public Object[] toArray() {
+        return seq().toArray();
+    }
+
+    @Override
+    public int indexOf(Object o) {
+        return seq().indexOf(o);
+    }
+
+    @Override
+    public int lastIndexOf(Object o) {
+        return seq().lastIndexOf(o);
     }
 
     @Override
