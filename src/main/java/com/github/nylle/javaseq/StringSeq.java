@@ -7,7 +7,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class StringSeq extends ASeq<Character> implements ISeq<Character> {
@@ -52,31 +51,6 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
     @Override
     public boolean isRealized() {
         return true;
-    }
-
-    @Override
-    public ISeq<Character> filter(Predicate<? super Character> pred) {
-        return Fn.lazySeq(() -> {
-            var acc = Fn.<Character>nil();
-            for (int i = end - 1; i >= index; i--) {
-                var next = str.charAt(i);
-                if (pred.test(next)) {
-                    acc = Fn.cons(next, acc);
-                }
-            }
-            return acc;
-        });
-    }
-
-    @Override
-    public <R> ISeq<R> map(Function<? super Character, ? extends R> f) {
-        return Fn.lazySeq(() -> {
-            var acc = Fn.<R>nil();
-            for (int i = end - 1; i >= index; i--) {
-                acc = Fn.cons(f.apply(str.charAt(i)), acc);
-            }
-            return acc;
-        });
     }
 
     @Override
@@ -132,19 +106,6 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
             return new StringSeq(str, newIndex, end);
         }
         return Fn.nil();
-    }
-
-    @Override
-    public <U> ISeq<U> reductions(U init, BiFunction<U, ? super Character, U> f) {
-        return Fn.lazySeq(() -> {
-            var acc = ISeq.of(init);
-            var result = init;
-            for (int i = index; i < end; i++) {
-                result = f.apply(result, str.charAt(i));
-                acc = Fn.cons(result, acc);
-            }
-            return acc.reverse();
-        });
     }
 
     @Override
