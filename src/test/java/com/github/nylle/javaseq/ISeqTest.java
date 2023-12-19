@@ -119,11 +119,9 @@ class ISeqTest {
 
         @Test
         void returnsSeqOfCharactersInString() {
-            var actual = ISeq.sequence("foo");
-
-            assertThat(actual)
-                    .isInstanceOf(StringSeq.class)
-                    .containsExactly('f', 'o', 'o');
+            assertThat(ISeq.sequence("foo")).isInstanceOf(StringSeq.class).containsExactly('f', 'o', 'o');
+            assertThat(ISeq.sequence("foo".toCharArray())).isExactlyInstanceOf(StringSeq.class).containsExactly('f', 'o', 'o');
+            assertThat(ISeq.sequence(new Character[] {'f', 'o', 'o'})).isExactlyInstanceOf(StringSeq.class).containsExactly('f', 'o', 'o');
         }
 
         @Test

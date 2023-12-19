@@ -1,5 +1,6 @@
 package com.github.nylle.javaseq;
 
+import java.nio.CharBuffer;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -92,6 +93,24 @@ public class Fn {
     public static <K, V> ISeq<Map.Entry<K, V>> seq(Map<K, V> coll) {
         if (coll != null) {
             return seq(coll.entrySet().iterator());
+        }
+        return nil();
+    }
+
+    public static ISeq<Character> seq(char[] coll) {
+        if (coll != null && coll.length > 0) {
+            return new StringSeq(CharBuffer.wrap(coll), 0, coll.length);
+        }
+        return nil();
+    }
+
+    public static ISeq<Character> seq(Character[] coll) {
+        if (coll != null && coll.length > 0) {
+            var s = new StringBuilder(coll.length);
+            for (Character c : coll) {
+                s.append(c.charValue());
+            }
+            return new StringSeq(s.toString(), 0, coll.length);
         }
         return nil();
     }

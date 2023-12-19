@@ -46,6 +46,14 @@ public interface ISeq<T> extends List<T> {
         return Fn.seq(coll);
     }
 
+    static ISeq<Character> sequence(char[] coll) {
+        return Fn.seq(coll);
+    }
+
+    static ISeq<Character> sequence(Character[] coll) {
+        return Fn.seq(coll);
+    }
+
     static ISeq<Character> sequence(CharSequence coll) {
         return Fn.seq(coll);
     }

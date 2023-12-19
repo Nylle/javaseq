@@ -100,6 +100,18 @@ class FnTest {
     }
 
     @Nested
+    @DisplayName("seq")
+    class SeqTest {
+
+        @Test
+        void createsStringSeq() {
+            assertThat(Fn.seq("foo")).isExactlyInstanceOf(StringSeq.class).containsExactly('f', 'o', 'o');
+            assertThat(Fn.seq("foo".toCharArray())).isExactlyInstanceOf(StringSeq.class).containsExactly('f', 'o', 'o');
+            assertThat(Fn.seq(new Character[] {'f', 'o', 'o'})).isExactlyInstanceOf(StringSeq.class).containsExactly('f', 'o', 'o');
+        }
+    }
+
+    @Nested
     @DisplayName("concat")
     class Concat {
 
