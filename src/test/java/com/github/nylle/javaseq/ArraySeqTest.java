@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import java.util.Comparator;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -111,6 +112,18 @@ class ArraySeqTest {
 
     @Nested
     class Filter {
+
+        @Test
+        void returnsNilWhenNoItemsMatch() {
+            assertThat(sutFrom(0, 1, 2, 3, 4, 5).filter(x -> x < 0)).isEmpty();
+            assertThat(sutFrom(0, 1, 2, 3, 4, 5).rest().filter(x -> x < 0)).isEmpty();
+        }
+
+        @Test
+        void returnsMatchingItems() {
+            assertThat(sutFrom(0, 1, 2, 3, 4, 5).filter(x -> x > 2)).containsExactly(3, 4, 5);
+            assertThat(sutFrom(0, 1, 2, 3, 4, 5).rest().filter(x -> x > 2)).containsExactly(3, 4, 5);
+        }
 
         @Test
         void isLazy() {
@@ -285,6 +298,93 @@ class ArraySeqTest {
 
             assertThat(sut.reduce("", (a, b) -> a + b)).isEqualTo("0123");
             assertThat(sut.take(0).reduce("", (a, b) -> a + b)).isEqualTo("");
+        }
+    }
+
+    @Nested
+    class Some {
+
+        @Test
+        void returnsFalseIfNoneOfTheItemsMatchPred() {
+            var sut = sutFrom(0, 1, 2);
+
+            assertThat(sut.some(x -> x > 3)).isFalse();
+        }
+
+        @Test
+        void returnsTrueIfFirstItemMatchesPred() {
+            var sut = sutFrom(0, 1, 2);
+
+            assertThat(sut.some(x -> x == 0)).isTrue();
+        }
+
+        @Test
+        void returnsTrueIfAllItemsMatchPred() {
+            var sut = sutFrom(0, 1, 2);
+
+            assertThat(sut.some(x -> x > -1)).isTrue();
+        }
+
+        @Test
+        void returnsTrueIfSomeItemMatchesPred() {
+            var sut = sutFrom(0, 1, 2);
+
+            assertThat(sut.some(x -> x == 1)).isTrue();
+        }
+
+        @Test
+        void returnsTrueIfLastItemMatchesPred() {
+            var sut = sutFrom(0, 1, 2);
+
+            assertThat(sut.some(x -> x == 2)).isTrue();
+        }
+    }
+
+    @Nested
+    class Every {
+
+        @Test
+        void returnsTrueIfAllItemsInSeqMatchPred() {
+            var sut = sutFrom(0, 1, 2);
+
+            assertThat(sut.every(x -> x > -1)).isTrue();
+        }
+
+        @Test
+        void returnsFalseIfFirstItemDoesNotMatchPred() {
+            var sut = sutFrom(0, 1, 2);
+
+            assertThat(sut.every(x -> x > 0)).isFalse();
+        }
+
+        @Test
+        void returnsFalseIfAnyItemDoesNotMatchPred() {
+            var sut = sutFrom(0, 1, 2);
+
+            assertThat(sut.every(x -> x < 1)).isFalse();
+        }
+
+        @Test
+        void returnsFalseIfLastItemDoesNotMatchPred() {
+            var sut = sutFrom(0, 1, 2);
+
+            assertThat(sut.every(x -> x < 2)).isFalse();
+        }
+    }
+
+    @Nested
+    class Max {
+
+        @Test
+        void returnsSingleItem() {
+            assertThat(sutFrom(0).max(Comparator.naturalOrder())).hasValue(0);
+        }
+
+        @Test
+        void returnsHighestValue() {
+            var sut = sutFrom(0, 1, 2);
+
+            assertThat(sut.max(Comparator.naturalOrder())).hasValue(2);
         }
     }
 

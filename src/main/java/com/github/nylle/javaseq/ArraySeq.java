@@ -1,7 +1,9 @@
 package com.github.nylle.javaseq;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -130,6 +132,36 @@ public class ArraySeq<T> extends ASeq<T> implements ISeq<T> {
         for (int i = index; i < end; i++) {
             proc.accept(array[i]);
         }
+    }
+
+    @Override
+    public boolean some(Predicate<? super T> pred) {
+        for (int i = index; i < end; i++) {
+            if (pred.test(array[i])) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean every(Predicate<? super T> pred) {
+        for (int i = index; i < end; i++) {
+            if (!pred.test(array[i])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public Optional<T> max(Comparator<? super T> comp) {
+        var max = array[index];
+        for (int i = index + 1; i < end; i++) {
+            var next = array[i];
+            max = comp.compare(max, next) > 0 ? max : next;
+        }
+        return Optional.of(max);
     }
 
     @Override
