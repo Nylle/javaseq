@@ -120,7 +120,7 @@ public abstract class ASeq<T> extends AList<T> implements ISeq<T> {
             if (n > 0 && !isEmpty()) {
                 return n == 1
                         ? ISeq.of(first())
-                        : rest().take(n - 1).cons(first());
+                        : Fn.cons(first(), rest().take(n - 1));
             }
             return Fn.nil();
         });
@@ -140,7 +140,7 @@ public abstract class ASeq<T> extends AList<T> implements ISeq<T> {
     public ISeq<T> takeWhile(Predicate<? super T> pred) {
         return Fn.lazySeq(() -> {
             if (!isEmpty() && pred.test(first())) {
-                return rest().takeWhile(pred).cons(first());
+                return Fn.cons(first(), rest().takeWhile(pred));
             }
             return Fn.nil();
         });
@@ -203,7 +203,7 @@ public abstract class ASeq<T> extends AList<T> implements ISeq<T> {
     public <U> ISeq<U> reductions(U init, BiFunction<U, ? super T, U> f) {
         return Fn.lazySeq(() -> {
             if (!isEmpty()) {
-                return rest().reductions(f.apply(init, first()), f).cons(init);
+                return Fn.cons(init, rest().reductions(f.apply(init, first()), f));
             }
             return ISeq.of(init);
         });
@@ -244,7 +244,7 @@ public abstract class ASeq<T> extends AList<T> implements ISeq<T> {
                 return Fn.nil();
             }
             var first = result.first();
-            return step(result.rest(), Fn.conj(seen, first)).cons(first);
+            return Fn.cons(first, step(result.rest(), Fn.conj(seen, first)));
         });
     }
 
