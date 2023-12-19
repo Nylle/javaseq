@@ -379,6 +379,14 @@ public abstract class ASeq<T> extends AList<T> implements ISeq<T> {
         return filter(pred).findFirst();
     }
 
+    public <K, V> Map<K, V> toMap() {
+        if (isEmpty()) return Map.of();
+        if (first() instanceof Map.Entry<?, ?>) {
+            return toMap(k -> ((Map.Entry<K, V>) k).getKey(), v -> ((Map.Entry<K, V>) v).getValue(), (a, b) -> b);
+        }
+        throw new UnsupportedOperationException("ISeq is not of type Map.Entry. Provide key- and value-mappers");
+    }
+
     public <K, V> Map<K, V> toMap(Function<T, K> k, Function<T, V> v) {
         return Map.ofEntries(map(x -> Map.entry(k.apply(x), v.apply(x))).toArray(new Map.Entry[0]));
     }
@@ -393,14 +401,6 @@ public abstract class ASeq<T> extends AList<T> implements ISeq<T> {
                                 .cons(acc.findFirst(y -> y.getKey().equals(x.getKey())).map(y -> Map.entry(x.getKey(), m.apply(y.getValue(), x.getValue()))).orElse(x)));
 
         return Map.ofEntries(entries.toArray(new Map.Entry[0]));
-    }
-
-    public <K, V> Map<K, V> toMap() {
-        if (isEmpty()) return Map.of();
-        if (first() instanceof Map.Entry<?, ?>) {
-            return toMap(k -> ((Map.Entry<K, V>) k).getKey(), v -> ((Map.Entry<K, V>) v).getValue(), (a, b) -> b);
-        }
-        throw new UnsupportedOperationException("ISeq is not of type Map.Entry. Provide key- and value-mappers");
     }
 
     public List<T> toList() {
