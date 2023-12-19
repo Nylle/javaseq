@@ -129,6 +129,14 @@ public class Fn {
         return nil();
     }
 
+    public static <T> ISeq<T> concat(Iterable<T> coll, T x) {
+        return concat(seq(coll), ISeq.of(x));
+    }
+
+    public static ISeq<Character> concat(CharSequence coll, Character x) {
+        return concat(seq(coll), ISeq.of(x));
+    }
+
     @SafeVarargs
     public static <T> ISeq<T> concat(Iterable<T>... colls) {
         return seq(colls).mapcat(x -> x);
@@ -142,6 +150,10 @@ public class Fn {
             return seq;
         });
     }
+//
+//    public static ISeq<Character> concat(CharSequence... colls) {
+//        return seq(colls).mapcat(x -> x);
+//    }
 
     // forwarding functions
 
@@ -183,6 +195,10 @@ public class Fn {
         return seq(coll).second();
     }
 
+
+//    public static <T> Function<Iterable<T>, ISeq<T>> filter(Predicate<? super T> pred) {
+//        return (coll) -> seq(coll).filter(pred);
+//    }
 
     public static <T> ISeq<T> filter(Predicate<? super T> pred, Iterable<T> coll) {
         return seq(coll).filter(pred);

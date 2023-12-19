@@ -1040,6 +1040,55 @@ class ASeqTest {
         }
     }
 
+    @Nested
+    class Concat {
+
+        @Test
+        void appendsItemToTheEndOfTheSeq() {
+            var sut = TestSeq.from(0, 1, 2, 3, 4);
+
+            var actual = sut.concat(999);
+
+            assertThat(actual.nth(0)).isEqualTo(0);
+            assertThat(actual.nth(1)).isEqualTo(1);
+            assertThat(actual.nth(2)).isEqualTo(2);
+            assertThat(actual.nth(3)).isEqualTo(3);
+            assertThat(actual.nth(4)).isEqualTo(4);
+            assertThat(actual.nth(5)).isEqualTo(999);
+        }
+
+        @Test
+        void appendingAnItemIsLazy() {
+            var infiniteSeq = new TestSeq<>(1, Fn.iterate(2, x -> x + 1));
+
+            var actual = infiniteSeq.concat(0);
+
+            assertThat(actual.drop(10).take(1)).containsExactly(11);
+        }
+
+        @Test
+        void appendsCollectionToTheEndOfTheSeq() {
+            var sut = TestSeq.from(0, 1, 2);
+
+            var actual = sut.concat(List.of(33, 44));
+
+            assertThat(actual.nth(0)).isEqualTo(0);
+            assertThat(actual.nth(1)).isEqualTo(1);
+            assertThat(actual.nth(2)).isEqualTo(2);
+            assertThat(actual.nth(3)).isEqualTo(33);
+            assertThat(actual.nth(4)).isEqualTo(44);
+        }
+
+        @Test
+        void appendingACollIsLazy() {
+            var infiniteSeq = new TestSeq<>(1, Fn.iterate(2, x -> x + 1));
+
+            var actual = infiniteSeq.concat(List.of(0, -1));
+
+            assertThat(actual.drop(10).take(1)).containsExactly(11);
+        }
+    }
+
     @Test
     void strReturnsConcatenatedStringRepresentationsOfAllItems() {
         assertThat(TestSeq.from("", "0", "1", "2", "3").str())

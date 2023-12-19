@@ -28,6 +28,26 @@ public abstract class ASeq<T> extends AList<T> implements ISeq<T> {
         return Fn.cons(x, this);
     }
 
+    public ISeq<T> concat(T x) {
+        return Fn.concat(this, Fn.cons(x, Fn.nil()));
+    }
+
+    public ISeq<T> concat(Iterable<T> coll) {
+        return Fn.concat(this, Fn.seq(coll));
+    }
+
+    public ISeq<T> concat(Iterator<T> coll) {
+        return Fn.concat(this, Fn.seq(coll));
+    }
+
+    public ISeq<T> concat(Stream<T> coll) {
+        return Fn.concat(this, Fn.seq(coll));
+    }
+
+    public ISeq<T> concat(T[] coll) {
+        return Fn.concat(this, Fn.seq(coll));
+    }
+
     public ISeq<T> filter(Predicate<? super T> pred) {
         return Fn.lazySeq(() -> {
             if (!isEmpty()) {

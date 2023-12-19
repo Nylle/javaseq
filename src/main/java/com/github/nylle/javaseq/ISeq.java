@@ -144,6 +144,16 @@ public interface ISeq<T> extends List<T> {
 
     ISeq<T> cons(T x);
 
+    ISeq<T> concat(T x);
+
+    ISeq<T> concat(Iterable<T> coll);
+
+    ISeq<T> concat(Iterator<T> coll);
+
+    ISeq<T> concat(Stream<T> coll);
+
+    ISeq<T> concat(T[] coll);
+
     Optional<T> reduce(BinaryOperator<T> f);
 
     <U> U reduce(U val, BiFunction<U, ? super T, U> f);
