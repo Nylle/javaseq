@@ -148,6 +148,16 @@ class ArraySeqTest {
                     .isExactlyInstanceOf(ArraySeq.class)
                     .containsExactly(1, 2, 3);
         }
+
+        @Test
+        void returnsEntireSeqWhenTakingMoreThanPresent() {
+            assertThat(sutFrom(0, 1, 2, 3, 4, 5).take(7))
+                    .isExactlyInstanceOf(ArraySeq.class)
+                    .containsExactly(0, 1, 2, 3, 4, 5);
+            assertThat(sutFrom(0, 1, 2, 3, 4, 5).rest().take(7))
+                    .isExactlyInstanceOf(ArraySeq.class)
+                    .containsExactly(1, 2, 3, 4, 5);
+        }
     }
 
     @Nested

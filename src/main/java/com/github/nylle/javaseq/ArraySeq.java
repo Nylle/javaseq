@@ -63,6 +63,9 @@ public class ArraySeq<T> extends ASeq<T> implements ISeq<T> {
 
     @Override
     public ISeq<T> take(long n) {
+        if(n >= count) {
+            return this;
+        }
         if (n > 0) {
             return new ArraySeq<T>(array, index, (int) n + index);
         }
