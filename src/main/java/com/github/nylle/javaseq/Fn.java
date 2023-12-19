@@ -1,7 +1,7 @@
 package com.github.nylle.javaseq;
 
 import java.nio.CharBuffer;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -25,11 +25,11 @@ public class Fn {
 
     private static final int CHUNK_SIZE = 32;
     static <T> ISeq<T> chunkIteratorSeq(final Iterator<T> iterator) {
-        if(iterator.hasNext()) {
+        if (iterator.hasNext()) {
             return lazySeq(() -> {
                 T[] arr = (T[]) new Object[CHUNK_SIZE];
                 int n = 0;
-                while(iterator.hasNext() && n < CHUNK_SIZE) {
+                while (iterator.hasNext() && n < CHUNK_SIZE) {
                     arr[n++] = iterator.next();
                 }
                 return new ChunkedCons<>(new ArrayChunk<>(arr, 0, n), chunkIteratorSeq(iterator));
@@ -62,7 +62,8 @@ public class Fn {
 
     @SafeVarargs
     public static <T> ISeq<T> arraySeq(T... items) {
-        return new ArraySeq<>(items);
+        if(items.length > 0) return new ArraySeq<>(items);
+        return nil();
     }
 
     public static <T> ISeq<T> iterate(T x, UnaryOperator<T> f) {
@@ -70,17 +71,17 @@ public class Fn {
     }
 
     public static <T> ISeq<T> seq(T[] coll) {
-        if (coll != null) {
-            return seq(Arrays.asList(coll).iterator());
+        if (coll != null && coll.length > 0) {
+            return arraySeq(coll);
         }
         return nil();
     }
 
     public static <T> ISeq<T> seq(Iterable<T> coll) {
-        if (coll != null) {
-            return coll instanceof ISeq<T> seq ? seq : seq(coll.iterator());
-        }
-        return nil();
+        if (coll == null) return nil();
+        if (coll instanceof ISeq<T> seq) return seq;
+        if (coll instanceof ArrayList<T> arrayList) return arraySeq((T[]) arrayList.toArray());
+        return seq(coll.iterator());
     }
 
     public static <T> ISeq<T> seq(Stream<T> coll) {
@@ -721,7 +722,7 @@ public class Fn {
 
 
     public static String str(Object o) {
-        if(o instanceof Iterable coll) {
+        if (o instanceof Iterable coll) {
             return seq(coll).str();
         }
         return o.toString();

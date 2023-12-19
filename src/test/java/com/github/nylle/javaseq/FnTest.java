@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -103,11 +104,43 @@ class FnTest {
     @DisplayName("seq")
     class SeqTest {
 
-        @Test
-        void createsStringSeq() {
-            assertThat(Fn.seq("foo")).isExactlyInstanceOf(StringSeq.class).containsExactly('f', 'o', 'o');
-            assertThat(Fn.seq("foo".toCharArray())).isExactlyInstanceOf(StringSeq.class).containsExactly('f', 'o', 'o');
-            assertThat(Fn.seq(new Character[] {'f', 'o', 'o'})).isExactlyInstanceOf(StringSeq.class).containsExactly('f', 'o', 'o');
+        @Nested
+        @DisplayName("StringSeq")
+        class StringSeqTest {
+
+            @Test
+            void isCreatedFromString() {
+                assertThat(Fn.seq("foo")).isExactlyInstanceOf(StringSeq.class).containsExactly('f', 'o', 'o');
+            }
+
+            @Test
+            void isCreatedFromCharArray() {
+                assertThat(Fn.seq("foo".toCharArray())).isExactlyInstanceOf(StringSeq.class).containsExactly('f', 'o', 'o');
+            }
+
+            @Test
+            void isCreatedFromCharacterArray() {
+                assertThat(Fn.seq(new Character[]{'f', 'o', 'o'})).isExactlyInstanceOf(StringSeq.class).containsExactly('f', 'o', 'o');
+            }
+        }
+
+        @Nested
+        @DisplayName("ArraySeq")
+        class ArraySeqTest {
+
+            @Test
+            void isCreatedFromArray() {
+                var actual = Fn.seq(new Integer[]{0, 1, 2});
+
+                assertThat(actual).isExactlyInstanceOf(ArraySeq.class).containsExactly(0, 1, 2);
+            }
+
+            @Test
+            void isCreatedFromArrayList() {
+                var actual = Fn.seq(new ArrayList<>(List.of("a", "b", "c")));
+
+                assertThat(actual).isExactlyInstanceOf(ArraySeq.class).containsExactly("a", "b", "c");
+            }
         }
     }
 

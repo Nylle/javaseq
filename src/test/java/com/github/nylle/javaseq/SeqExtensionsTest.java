@@ -39,7 +39,7 @@ class SeqExtensionsTest {
         @Test
         void returnsSeqOfItemsInArray() {
             assertThat(SeqExtensions.toSeq("f o o".split(" ")))
-                    .isInstanceOf(LazySeq.class)
+                    .isInstanceOf(ArraySeq.class)
                     .containsExactly("f", "o", "o");
         }
     }
@@ -103,13 +103,15 @@ class SeqExtensionsTest {
         @Test
         void returnsEmptySeqIfIterableIsEmpty() {
             assertThat(SeqExtensions.toSeq("")).isEmpty();
+            assertThat(SeqExtensions.toSeq("".toCharArray())).isEmpty();
+            assertThat(SeqExtensions.toSeq(new Character[0])).isEmpty();
         }
 
         @Test
         void returnsSeqOfItemsInIterable() {
-            assertThat(SeqExtensions.toSeq("foo"))
-                    .isInstanceOf(StringSeq.class)
-                    .containsExactly('f', 'o', 'o');
+            assertThat(SeqExtensions.toSeq("foo")).isInstanceOf(StringSeq.class).containsExactly('f', 'o', 'o');
+            assertThat(SeqExtensions.toSeq("foo".toCharArray())).isInstanceOf(StringSeq.class).containsExactly('f', 'o', 'o');
+            assertThat(SeqExtensions.toSeq(new Character[]{'f', 'o', 'o'})).isInstanceOf(StringSeq.class).containsExactly('f', 'o', 'o');
         }
     }
 }

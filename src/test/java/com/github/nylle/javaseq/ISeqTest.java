@@ -68,7 +68,7 @@ class ISeqTest {
             list.add(null);
 
             assertThat(ISeq.sequence(list))
-                    .isInstanceOf(LazySeq.class)
+                    .isInstanceOf(ArraySeq.class)
                     .containsExactly(null, null, null);
         }
 
@@ -104,7 +104,7 @@ class ISeqTest {
             var array = new Integer[]{1, 2, 3};
 
             assertThat(ISeq.sequence(array))
-                    .isInstanceOf(LazySeq.class)
+                    .isInstanceOf(ArraySeq.class)
                     .containsExactly(1, 2, 3);
         }
 
