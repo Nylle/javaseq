@@ -19,22 +19,30 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 class StringSeqTest {
 
     private static ISeq<Character> sutFromString(String str) {
-        return new StringSeq(str, 0);
+        return new StringSeq(str, 0, str.length());
     }
 
     @Test
     void constructorThrows() {
         assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> new StringSeq(null, 0))
+                .isThrownBy(() -> new StringSeq(null, 0, 1))
                 .withMessage("string is null or empty");
 
         assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> new StringSeq("", 0))
+                .isThrownBy(() -> new StringSeq("", 0, 1))
                 .withMessage("string is null or empty");
 
         assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> new StringSeq("abc", 3))
+                .isThrownBy(() -> new StringSeq("abc", 3, 4))
                 .withMessage("index 3 is out of range for string abc");
+
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> new StringSeq("abc", 2, 4))
+                .withMessage("end 4 is out of range for string abc");
+
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> new StringSeq("abc", 2, 2))
+                .withMessage("end 2 must be greater than index 2");
     }
 
     @Test
@@ -338,6 +346,16 @@ class StringSeqTest {
         void returnsStringSeqWithMoreThanZeroItems() {
             assertThat(sutFromString("foobar").take(3)).containsExactly('f', 'o', 'o');
             assertThat(sutFromString("xfoobar").rest().take(3)).containsExactly('f', 'o', 'o');
+        }
+
+        @Test
+        void returnsEntireSeqWhenTakingMoreThanPresent() {
+            assertThat(sutFromString("foobar").take(7))
+                    .isExactlyInstanceOf(StringSeq.class)
+                    .containsExactly('f', 'o', 'o', 'b', 'a', 'r');
+            assertThat(sutFromString("xfoobar").rest().take(7))
+                    .isExactlyInstanceOf(StringSeq.class)
+                    .containsExactly('f', 'o', 'o', 'b', 'a', 'r');
         }
     }
 

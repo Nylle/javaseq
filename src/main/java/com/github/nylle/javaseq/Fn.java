@@ -98,7 +98,7 @@ public class Fn {
 
     public static ISeq<Character> seq(CharSequence coll) {
         if (coll != null && !coll.isEmpty()) {
-            return new StringSeq(coll, 0);
+            return new StringSeq(coll, 0, coll.length());
         }
         return nil();
     }

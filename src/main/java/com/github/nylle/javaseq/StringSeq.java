@@ -14,18 +14,26 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
 
     private final CharSequence str;
     private final int index;
-    private final int length;
+    private final int end;
+    private final int count;
 
-    StringSeq(CharSequence str, int index) {
+    StringSeq(CharSequence str, int index, int end) {
         if (str == null || str.isEmpty()) {
             throw new IllegalArgumentException("string is null or empty");
         }
         if (index >= str.length()) {
             throw new IllegalArgumentException("index " + index + " is out of range for string " + str);
         }
+        if (end > str.length()) {
+            throw new IllegalArgumentException("end " + end + " is out of range for string " + str);
+        }
+        if (end <= index) {
+            throw new IllegalArgumentException("end " + end + " must be greater than index " + index);
+        }
         this.str = str;
         this.index = index;
-        this.length = str.length();
+        this.end = end;
+        this.count = end - index;
     }
 
     @Override
@@ -35,7 +43,10 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
 
     @Override
     public ISeq<Character> rest() {
-        return index + 1 < length ? new StringSeq(str, index + 1) : Fn.nil();
+        if (count > 1) {
+            return new StringSeq(str, index + 1, end);
+        }
+        return Fn.nil();
     }
 
     @Override
@@ -47,8 +58,7 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
     public ISeq<Character> filter(Predicate<? super Character> pred) {
         return Fn.lazySeq(() -> {
             var acc = Fn.<Character>nil();
-            var start = length - 1;
-            for (int i = start; i >= index; i--) {
+            for (int i = end - 1; i >= index; i--) {
                 var next = str.charAt(i);
                 if (pred.test(next)) {
                     acc = Fn.cons(next, acc);
@@ -62,8 +72,7 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
     public <R> ISeq<R> map(Function<? super Character, ? extends R> f) {
         return Fn.lazySeq(() -> {
             var acc = Fn.<R>nil();
-            var start = length - 1;
-            for (int i = start; i >= index; i--) {
+            for (int i = end - 1; i >= index; i--) {
                 acc = Fn.cons(f.apply(str.charAt(i)), acc);
             }
             return acc;
@@ -72,44 +81,57 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
 
     @Override
     public ISeq<Character> take(long n) {
-        if (n <= 0) {
-            return Fn.nil();
-        }
-        int end = (int) n + index;
-        if (end >= length) {
+        if(n >= count) {
             return this;
         }
-        return new StringSeq(str.subSequence(index, end), 0);
+        if (n > 0) {
+            return new StringSeq(str, index, (int) n + index);
+        }
+        return Fn.nil();
     }
 
     @Override
     public ISeq<Character> drop(long n) {
-        if (n <= 0) {
-            return this;
-        }
-        int end = (int) n + index;
-        if (end >= length) {
+        if (n >= count) {
             return Fn.nil();
         }
-        return new StringSeq(str, end);
+        if (n > 0) {
+            return new StringSeq(str, (int) n + index, end);
+        }
+        return this;
+    }
+
+    @Override
+    public ISeq<Character> takeWhile(Predicate<? super Character> pred) {
+        var newEnd = index;
+        for (int i = index; i < end; i++) {
+            if (!pred.test(str.charAt(i))) {
+                break;
+            }
+            newEnd++;
+        }
+        if (newEnd > index) {
+            return new StringSeq(str, index, newEnd);
+        }
+        return Fn.nil();
     }
 
     @Override
     public ISeq<Character> dropWhile(Predicate<? super Character> pred) {
-        return Fn.lazySeq(() -> {
-            var end = length - 1;
-            for (int i = index; i < length; i++) {
-                if (pred.test(str.charAt(i))) {
-                    continue;
-                }
-                end = i;
+        var newIndex = index;
+        for (int i = index; i < end; i++) {
+            if (!pred.test(str.charAt(i))) {
                 break;
             }
-            if (end < length - 1) {
-                return new StringSeq(str, end);
-            }
-            return Fn.nil();
-        });
+            newIndex++;
+        }
+        if (newIndex == index) {
+            return this;
+        }
+        if (newIndex < end) {
+            return new StringSeq(str, newIndex, end);
+        }
+        return Fn.nil();
     }
 
     @Override
@@ -117,7 +139,7 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
         return Fn.lazySeq(() -> {
             var acc = ISeq.of(init);
             var result = init;
-            for (int i = index; i < length; i++) {
+            for (int i = index; i < end; i++) {
                 result = f.apply(result, str.charAt(i));
                 acc = Fn.cons(result, acc);
             }
@@ -128,7 +150,7 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
     @Override
     public <U> U reduce(U val, BiFunction<U, ? super Character, U> f) {
         var result = val;
-        for (int i = index; i < length; i++) {
+        for (int i = index; i < end; i++) {
             result = f.apply(result, str.charAt(i));
         }
         return result;
@@ -136,14 +158,14 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
 
     @Override
     public void run(Consumer<? super Character> proc) {
-        for (int i = index; i < length; i++) {
+        for (int i = index; i < end; i++) {
             proc.accept(str.charAt(i));
         }
     }
 
     @Override
     public boolean some(Predicate<? super Character> pred) {
-        for (int i = index; i < length; i++) {
+        for (int i = index; i < end; i++) {
             if (pred.test(str.charAt(i))) {
                 return true;
             }
@@ -153,7 +175,7 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
 
     @Override
     public boolean every(Predicate<? super Character> pred) {
-        for (int i = index; i < length; i++) {
+        for (int i = index; i < end; i++) {
             if (!pred.test(str.charAt(i))) {
                 return false;
             }
@@ -164,7 +186,7 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
     @Override
     public Optional<Character> max(Comparator<? super Character> comp) {
         var max = str.charAt(index);
-        for (int i = index + 1; i < length; i++) {
+        for (int i = index + 1; i < end; i++) {
             var next = str.charAt(i);
             max = comp.compare(max, next) > 0 ? max : next;
         }
@@ -172,33 +194,35 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
     }
 
     @Override
-    public Character nth(int index) {
-        var result = nth(index, null);
-        if (result == null) {
-            throw new IndexOutOfBoundsException(index);
+    public Character nth(int i) {
+        if (i < 0 || i >= count) {
+            throw new IndexOutOfBoundsException(i);
         }
-        return result;
+        return str.charAt(i + index);
     }
 
     @Override
-    public Character nth(int index, Character notFound) {
-        var i = this.index + index;
-
-        if (i >= this.index && i < length) {
-            return str.charAt(i);
+    public Character nth(int i, Character notFound) {
+        if (i < 0 || i >= count) {
+            return notFound;
         }
-        return notFound;
+        return str.charAt(i + index);
+    }
+
+    @Override
+    public int count() {
+        return count;
     }
 
     @Override
     public ISeq<Character> reverse() {
-        return new StringSeq(new StringBuilder(str.subSequence(index, length)).reverse().toString(), 0);
+        return new StringSeq(new StringBuilder(str.subSequence(index, end)).reverse().toString(), 0, end);
     }
 
     @Override
     public List<Character> toList() {
         var acc = new ArrayList<Character>();
-        for (int i = index; i < length; i++) {
+        for (int i = index; i < end; i++) {
             acc.add(str.charAt(i));
         }
         return List.copyOf(acc);
@@ -207,11 +231,6 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
     @Override
     public Set<Character> toSet() {
         return Set.copyOf(toList());
-    }
-
-    @Override
-    public int count() {
-        return length - index;
     }
 
     @Override
