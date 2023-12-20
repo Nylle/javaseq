@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -83,16 +84,16 @@ class FnTest {
 
         @Test
         void returnsSeqWithSuppliedItems() {
-            var sut = Fn.arraySeq(0, 1, 2, 3, 4, 5);
+            var sut = Fn.arraySeq(new Integer[] {0, 1, 2, 3});
 
             assertThat(sut)
                     .isExactlyInstanceOf(ArraySeq.class)
-                    .containsExactly(0, 1, 2, 3, 4, 5);
+                    .containsExactly(0, 1, 2, 3);
         }
 
         @Test
         void returnsSeqWithNulls() {
-            var sut = Fn.arraySeq(null, null, null);
+            var sut = Fn.arraySeq(new Integer[] {null, null, null});
 
             assertThat(sut)
                     .isExactlyInstanceOf(ArraySeq.class)
@@ -259,6 +260,15 @@ class FnTest {
         }
 
         @Test
+        void returnsSeqFromConcatenatingMultipleStrings() {
+            var actual = Fn.concat("hello", " ", "world");
+
+            assertThat(actual)
+                    .isInstanceOf(StringSeq.class)
+                    .containsExactly('h', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd');
+        }
+
+        @Test
         void returnsSeqFromConcatenatingMultipleIterables() {
             var actual = Fn.concat(List.of("a", "b"), List.of("c", "d"), List.of("e", "f"));
 
@@ -277,6 +287,26 @@ class FnTest {
 
             assertThat(Fn.concat(ISeq.iterate("a", x -> x + "a"), ISeq.of("c", "d"), ISeq.of("e", "f")).take(7))
                     .containsExactly("a", "aa", "aaa", "aaaa", "aaaaa", "aaaaaa", "aaaaaaa");
+        }
+    }
+
+    @Nested
+    @DisplayName("conj")
+    class ConjTest {
+
+        @Test
+        void returnsNewListWithXAdded() {
+            assertThat(Fn.conj(List.of(1), 2)).isInstanceOf(List.class).containsExactly(1, 2);
+        }
+
+        @Test
+        void returnsNewSetWithXAdded() {
+            assertThat(Fn.conj(Set.of(1), 2)).isInstanceOf(Set.class).containsExactlyInAnyOrder(1, 2);
+        }
+
+        @Test
+        void returnsNewSeqWithXAdded() {
+            assertThat(Fn.conj(ISeq.of(1), 2)).isInstanceOf(ISeq.class).containsExactly(2, 1);
         }
     }
 }
