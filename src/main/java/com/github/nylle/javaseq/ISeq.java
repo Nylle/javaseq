@@ -537,12 +537,12 @@ public interface ISeq<T> extends List<T> {
     ISeq<T> cons(T x);
 
     /**
-     * Returns a new seq with the items of this seq where {@code x} is the last item.
+     * Returns a new seq representing the concatenation of the items in this seq and {@code xs}.
      *
-     * @param x the item to be concatenated to this seq
-     * @return a new seq with the items of this seq where x is the last item
+     * @param xs one or more items to be concatenated to this seq
+     * @return a new seq representing the concatenation of the items in this seq and xs
      */
-    ISeq<T> concat(T x);
+    ISeq<T> concat(T... xs);
 
     /**
      * Returns a new seq representing the concatenation of the items in this seq and {@code coll}.
@@ -567,14 +567,6 @@ public interface ISeq<T> extends List<T> {
      * @return a new seq representing the concatenation of the items in this seq and coll
      */
     ISeq<T> concat(Stream<T> coll);
-
-    /**
-     * Returns a new seq representing the concatenation of the items in this seq and {@code coll}.
-     *
-     * @param coll the collection to be concatenated to this seq
-     * @return a new seq representing the concatenation of the items in this seq and coll
-     */
-    ISeq<T> concat(T[] coll);
 
     /**
      * Returns an {@code Optional} of the result of applying {@code f} to the first 2 items in this seq, then applying

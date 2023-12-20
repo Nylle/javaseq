@@ -144,11 +144,11 @@ _(This is similar to zipping two collections.)_
 #### cons(x)
 - Returns a new seq where x is the first item and this seq is the rest.
 
+#### concat(xs)
+- Returns a seq representing the concatenation of the items in this seq and xs.
+
 #### distinct()
 - Returns a seq of the items of this seq with duplicates removed. **Caution:** The seq will be fully realized. If this seq is infinite, it will run infinitely or until system resources are exhausted.
-
-#### concat(coll)
-- Returns a seq representing the concatenation of the items in this seq and coll.
 
 #### sorted()
 - Returns a seq of the items of this seq sorted by using compare. **Caution:** The seq will be fully realized. If this seq is infinite, it will run infinitely or until system resources are exhausted.
