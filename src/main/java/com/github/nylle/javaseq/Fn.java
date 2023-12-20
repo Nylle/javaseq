@@ -67,64 +67,6 @@ public class Fn {
     }
 
     /**
-     * Returns a lazy seq of {@code x}, {@code f(x)}, {@code f(f(x))} etc. {@code f} must be free of side-effects.
-     *
-     * @param x   initial value
-     * @param f   function to apply to x
-     * @param <T> the type of items in the seq
-     * @return a lazy seq of x, the result of applying f to x, the result of applying f to that, etc.
-     */
-    public static <T> ISeq<T> iterate(T x, UnaryOperator<T> f) {
-        return lazySeq(() -> cons(x, iterate(f.apply(x), f)));
-    }
-
-    /**
-     * Returns a lazy seq of numbers from 0 (inclusive) to infinity, by step 1.
-     *
-     * @return a lazy seq of numbers from 0 (inclusive) to infinity, by step 1
-     */
-    static ISeq<Integer> range() {
-        return Fn.iterate(0, x -> x + 1);
-    }
-
-    /**
-     * Returns a lazy seq of numbers from 0 (inclusive) to {@code end} (exclusive), by step 1.
-     * Returns empty seq when {@code end} is equal to 0.
-     *
-     * @param end exclusive end of the range
-     * @return a lazy seq of numbers from 0 (inclusive) to end (exclusive)
-     */
-    static ISeq<Integer> range(int end) {
-        return Fn.range(0, end);
-    }
-
-    /**
-     * Returns a lazy seq of numbers from {@code start} (inclusive) to {@code end} (exclusive), by step 1.
-     * Returns empty seq when {@code start} is equal to {@code end}.
-     *
-     * @param start inclusive start of the range
-     * @param end   exclusive end of the range
-     * @return a lazy seq of numbers from start (inclusive) to end (exclusive)
-     */
-    static ISeq<Integer> range(int start, int end) {
-        return Fn.range(start, end, 1);
-    }
-
-    /**
-     * Returns a lazy seq of numbers from {@code start} (inclusive) to {@code end} (exclusive), by {@code step}.
-     * Returns infinite seq of {@code start} when {@code step} is equal to 0.
-     * Returns empty seq when {@code start} is equal to {@code end}.
-     *
-     * @param start inclusive start of the range
-     * @param end   exclusive end of the range
-     * @param step  step by which to increase the next number
-     * @return a lazy seq of numbers from start (inclusive) to end (exclusive), by step
-     */
-    static ISeq<Integer> range(int start, int end, int step) {
-        return Fn.iterate(start, x -> x + step).takeWhile(x -> step >= 0 ? (x < end) : (x > end));
-    }
-
-    /**
      * Coerces {@code coll} to a (possibly empty) seq, if it is not already one. Will not force a lazy collection
      * like {@code Stream} or {@code Iterator}. If {@code coll} is a {@code String}, the returned seq will contain items
      * of type {@code Character}. If {@code coll} is a {@code Map} the returned seq will contain items of type
@@ -260,6 +202,87 @@ public class Fn {
             return chunkIteratorSeq(coll);
         }
         return nil();
+    }
+
+    /**
+     * Returns a lazy seq of {@code x}, {@code f(x)}, {@code f(f(x))} etc. {@code f} must be free of side-effects.
+     *
+     * @param x   initial value
+     * @param f   function to apply to x
+     * @param <T> the type of items in the seq
+     * @return a lazy seq of x, the result of applying f to x, the result of applying f to that, etc.
+     */
+    public static <T> ISeq<T> iterate(T x, UnaryOperator<T> f) {
+        return lazySeq(() -> cons(x, iterate(f.apply(x), f)));
+    }
+
+    /**
+     * Returns a lazy (infinite!) seq of {@code x}s.
+     *
+     * @param x the item to repeat
+     * @param <T> the type of x
+     * @return a lazy (infinite!) seq of xs
+     */
+    static <T> ISeq<T> repeat(T x) {
+        return Fn.iterate(x, i -> x);
+    }
+
+    /**
+     * Returns a lazy seq of {@code x}s with length {@code n}.
+     *
+     * @param n the number of times to repeat x
+     * @param x the item to repeat
+     * @param <T> the type of x
+     * @return a lazy seq of xs with length n
+     */
+    static <T> ISeq<T> repeat(int n, T x) {
+        return Fn.iterate(x, i -> x).take(n);
+    }
+
+    /**
+     * Returns a lazy seq of numbers from 0 (inclusive) to infinity, by step 1.
+     *
+     * @return a lazy seq of numbers from 0 (inclusive) to infinity, by step 1
+     */
+    static ISeq<Integer> range() {
+        return Fn.iterate(0, x -> x + 1);
+    }
+
+    /**
+     * Returns a lazy seq of numbers from 0 (inclusive) to {@code end} (exclusive), by step 1.
+     * Returns empty seq when {@code end} is equal to 0.
+     *
+     * @param end exclusive end of the range
+     * @return a lazy seq of numbers from 0 (inclusive) to end (exclusive)
+     */
+    static ISeq<Integer> range(int end) {
+        return Fn.range(0, end);
+    }
+
+    /**
+     * Returns a lazy seq of numbers from {@code start} (inclusive) to {@code end} (exclusive), by step 1.
+     * Returns empty seq when {@code start} is equal to {@code end}.
+     *
+     * @param start inclusive start of the range
+     * @param end   exclusive end of the range
+     * @return a lazy seq of numbers from start (inclusive) to end (exclusive)
+     */
+    static ISeq<Integer> range(int start, int end) {
+        return Fn.range(start, end, 1);
+    }
+
+    /**
+     * Returns a lazy seq of numbers from {@code start} (inclusive) to {@code end} (exclusive), by {@code step}.
+     * Returns infinite seq of {@code start} when {@code step} is equal to 0.
+     * Returns empty seq when {@code start} is equal to {@code end}.
+     *
+     * @param start inclusive start of the range
+     * @param end   exclusive end of the range
+     * @param step  step by which to increase the next number
+     * @return a lazy seq of numbers from start (inclusive) to end (exclusive), by step
+     */
+    static ISeq<Integer> range(int start, int end, int step) {
+        return Fn.iterate(start, x -> x + step).takeWhile(x -> step >= 0 ? (x < end) : (x > end));
     }
 
     public static <T> ISeq<T> concat(Iterable<T> coll, T x) {

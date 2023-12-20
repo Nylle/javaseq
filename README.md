@@ -61,21 +61,27 @@ While Streams help to work with lazy collections by providing the aforementioned
 - Coerces coll to a (possibly empty) seq, if it is not already one. Will not force a lazy Stream or Iterator. If coll is a String, the returned seq will contain items of type Character. If coll is a Map<K, V> the returned seq will contain items of type Map.Entry<K, V> (see [toMap](#tomap)). Yields empty seq if coll is null or empty.
 
 #### ISeq.iterate(x, f)
-- Returns a seq of x, f(x), f(f(x)) etc. f must be free of side-effects.
+- Returns a seq of x, f(x), f(f(x)) etc. f must be free of side effects.
+
+#### ISeq.repeat(x)
+- Returns a lazy (infinite!) seq of xs.
+
+#### ISeq.repeat(n, x)
+- Returns a lazy seq of xs with length n.
 
 #### ISeq.range()
-- Returns a seq of nums from 0 (inclusive) to infinity, by step 1.
+- Returns a seq of numbers from 0 (inclusive) to infinity, by step 1.
 
 #### ISeq.range(end)
-- Returns a seq of nums from 0 (inclusive) to end (exclusive), by step 1.
+- Returns a seq of numbers from 0 (inclusive) to end (exclusive), by step 1.
 - Returns empty seq when end is equal to 0.
 
 #### ISeq.range(start, end)
-- Returns a seq of nums from start (inclusive) to end (exclusive), by step 1. 
+- Returns a seq of numbers from start (inclusive) to end (exclusive), by step 1. 
 - Returns empty seq when start is equal to end.
 
 #### ISeq.range(start, end, step)
-- Returns a seq of nums from start (inclusive) to end (exclusive), by step. 
+- Returns a seq of numbers from start (inclusive) to end (exclusive), by step. 
 - Returns infinite seq of start when step is equal to 0.
 - Returns empty seq when start is equal to end.
 

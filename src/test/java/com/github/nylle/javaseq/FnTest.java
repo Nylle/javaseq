@@ -121,6 +121,33 @@ class FnTest {
     }
 
     @Nested
+    @DisplayName("repeat")
+    class RepeatTest {
+
+        @Test
+        void returnsSeqWithNulls() {
+            var sut = Fn.repeat(null);
+
+            assertThat(sut.take(4)).containsExactly(null, null, null, null);
+        }
+
+        @Test
+        void returnsInfiniteSeqOfXs() {
+            var actual = Fn.repeat(99);
+
+            assertThat(actual.take(4))
+                    .containsExactly(99, 99, 99, 99);
+        }
+
+        @Test
+        void returnsSeqOfXsWithLengthN() {
+            var actual = Fn.repeat(4, "bar");
+
+            assertThat(actual).containsExactly("bar", "bar", "bar", "bar");
+        }
+    }
+
+    @Nested
     @DisplayName("range")
     class RangeTest {
 
