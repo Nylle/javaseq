@@ -101,6 +101,73 @@ class FnTest {
     }
 
     @Nested
+    @DisplayName("iterate")
+    class IterateTest {
+
+        @Test
+        void returnsSeqWithNulls() {
+            var sut = Fn.iterate(null, x -> null);
+
+            assertThat(sut.take(4)).containsExactly(null, null, null, null);
+        }
+
+        @Test
+        void returnsSeqOfInitialValueUsingFunction() {
+            var actual = Fn.iterate(0, x -> x + 1);
+
+            assertThat(actual.take(4))
+                    .containsExactly(0, 1, 2, 3);
+        }
+    }
+
+    @Nested
+    @DisplayName("range")
+    class RangeTest {
+
+        @Test
+        void returnsInfiniteSeqOfIntegersStartingWithZero() {
+            assertThat(Fn.range().take(3))
+                    .isInstanceOf(LazySeq.class)
+                    .containsExactly(0, 1, 2);
+        }
+
+        @Test
+        void returnsSeqOfIntegersStartingWithZeroUntilEnd() {
+            assertThat(Fn.range(3))
+                    .isInstanceOf(LazySeq.class)
+                    .containsExactly(0, 1, 2);
+        }
+
+        @Test
+        void returnsSeqOfIntegersFromStartInclusiveUntilEndExclusive() {
+            assertThat(Fn.range(1, 5)).isInstanceOf(LazySeq.class).containsExactly(1, 2, 3, 4);
+            assertThat(Fn.range(-5, 5)).isInstanceOf(LazySeq.class).containsExactly(-5, -4, -3, -2, -1, 0, 1, 2, 3, 4);
+        }
+
+        @Test
+        void returnsSeqOfIntegersFromStartInclusiveUntilEndExclusiveByStep() {
+            assertThat(Fn.range(10, 25, 5)).isInstanceOf(LazySeq.class).containsExactly(10, 15, 20);
+            assertThat(Fn.range(10, -25, -5)).isInstanceOf(LazySeq.class).containsExactly(10, 5, 0, -5, -10, -15, -20);
+            assertThat(Fn.range(-10, 25, 5)).isInstanceOf(LazySeq.class).containsExactly(-10, -5, 0, 5, 10, 15, 20);
+        }
+
+        @Test
+        void returnsInfiniteSeqOfStartWhenStepIsZero() {
+            assertThat(Fn.range(10, 25, 0).take(10))
+                    .isInstanceOf(LazySeq.class)
+                    .containsExactly(10, 10, 10, 10, 10, 10, 10, 10, 10, 10);
+        }
+
+        @Test
+        void returnsEmptySeqWhenStartIsEqualToEnd() {
+            assertThat(Fn.range(10, 10)).isEqualTo(Nil.empty());
+            assertThat(Fn.range(-10, -10)).isEqualTo(Nil.empty());
+            assertThat(Fn.range(1, 1, 1)).isEqualTo(Nil.empty());
+            assertThat(Fn.range(-1, -1, 1)).isEqualTo(Nil.empty());
+        }
+    }
+
+    @Nested
     @DisplayName("seq")
     class SeqTest {
 

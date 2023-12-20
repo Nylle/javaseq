@@ -1,6 +1,5 @@
 package com.github.nylle.javaseq;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +16,6 @@ import static org.assertj.core.api.Assertions.entry;
 class ISeqTest {
 
     @Nested
-    @DisplayName("of")
     class Of {
 
         @Test
@@ -57,8 +55,7 @@ class ISeqTest {
     }
 
     @Nested
-    @DisplayName("sequence")
-    class Sequence {
+    class From {
 
         @Test
         void returnsSeqWithNulls() {
@@ -67,7 +64,7 @@ class ISeqTest {
             list.add(null);
             list.add(null);
 
-            assertThat(ISeq.sequence(list))
+            assertThat(ISeq.from(list))
                     .isInstanceOf(ArraySeq.class)
                     .containsExactly(null, null, null);
         }
@@ -76,7 +73,7 @@ class ISeqTest {
         void returnsSeqOfItemsInIterable() {
             var list = List.of(1, 2, 3);
 
-            assertThat(ISeq.sequence(list))
+            assertThat(ISeq.from(list))
                     .isInstanceOf(LazySeq.class)
                     .containsExactly(1, 2, 3);
         }
@@ -85,7 +82,7 @@ class ISeqTest {
         void returnsSeqOfItemsOfIterator() {
             var infiniteIterator = Stream.iterate(0, x -> x + 1).iterator();
 
-            assertThat(ISeq.sequence(infiniteIterator).take(4))
+            assertThat(ISeq.from(infiniteIterator).take(4))
                     .isInstanceOf(LazySeq.class)
                     .containsExactly(0, 1, 2, 3);
         }
@@ -94,7 +91,7 @@ class ISeqTest {
         void returnsSeqOfItemsInStream() {
             var infiniteStream = Stream.iterate(0, x -> x + 1);
 
-            assertThat(ISeq.sequence(infiniteStream).take(4))
+            assertThat(ISeq.from(infiniteStream).take(4))
                     .isInstanceOf(LazySeq.class)
                     .containsExactly(0, 1, 2, 3);
         }
@@ -103,7 +100,7 @@ class ISeqTest {
         void returnsSeqOfItemsInArray() {
             var array = new Integer[]{1, 2, 3};
 
-            assertThat(ISeq.sequence(array))
+            assertThat(ISeq.from(array))
                     .isInstanceOf(ArraySeq.class)
                     .containsExactly(1, 2, 3);
         }
@@ -112,117 +109,50 @@ class ISeqTest {
         void returnsSeqOfKeyValuePairsInMap() {
             var map = Map.of("a", 1, "b", 2, "c", 3);
 
-            assertThat(ISeq.sequence(map))
+            assertThat(ISeq.from(map))
                     .isInstanceOf(LazySeq.class)
                     .containsExactlyInAnyOrder(entry("a", 1), entry("b", 2), entry("c", 3));
         }
 
         @Test
         void returnsSeqOfCharactersInString() {
-            assertThat(ISeq.sequence("foo")).isInstanceOf(StringSeq.class).containsExactly('f', 'o', 'o');
-            assertThat(ISeq.sequence("foo".toCharArray())).isExactlyInstanceOf(StringSeq.class).containsExactly('f', 'o', 'o');
-            assertThat(ISeq.sequence(new Character[] {'f', 'o', 'o'})).isExactlyInstanceOf(StringSeq.class).containsExactly('f', 'o', 'o');
+            assertThat(ISeq.from("foo")).isInstanceOf(StringSeq.class).containsExactly('f', 'o', 'o');
+            assertThat(ISeq.from("foo".toCharArray())).isExactlyInstanceOf(StringSeq.class).containsExactly('f', 'o', 'o');
+            assertThat(ISeq.from(new Character[] {'f', 'o', 'o'})).isExactlyInstanceOf(StringSeq.class).containsExactly('f', 'o', 'o');
         }
 
         @Test
         void returnsEmptySeqIfCollIsNull() {
-            assertThat(ISeq.sequence((Iterable<Integer>) null)).isInstanceOf(Nil.class).isEmpty();
-            assertThat(ISeq.sequence((Stream<Integer>) null)).isInstanceOf(Nil.class).isEmpty();
-            assertThat(ISeq.sequence((Iterator<Integer>) null)).isInstanceOf(Nil.class).isEmpty();
-            assertThat(ISeq.sequence((Map<String, Integer>) null)).isInstanceOf(Nil.class).isEmpty();
-            assertThat(ISeq.sequence((String) null)).isInstanceOf(Nil.class).isEmpty();
+            assertThat(ISeq.from((Iterable<Integer>) null)).isInstanceOf(Nil.class).isEmpty();
+            assertThat(ISeq.from((Stream<Integer>) null)).isInstanceOf(Nil.class).isEmpty();
+            assertThat(ISeq.from((Iterator<Integer>) null)).isInstanceOf(Nil.class).isEmpty();
+            assertThat(ISeq.from((Map<String, Integer>) null)).isInstanceOf(Nil.class).isEmpty();
+            assertThat(ISeq.from((String) null)).isInstanceOf(Nil.class).isEmpty();
         }
 
         @Test
         void returnsEmptySeqIfCollIsEmpty() {
-            assertThat(ISeq.sequence(List.<Integer>of())).isInstanceOf(Nil.class).isEmpty();
-            assertThat(ISeq.sequence(Stream.<Integer>of())).isInstanceOf(Nil.class).isEmpty();
-            assertThat(ISeq.sequence(Collections.<Integer>emptyIterator())).isInstanceOf(Nil.class).isEmpty();
-            assertThat(ISeq.sequence(Map.<String, Integer>of())).isInstanceOf(Nil.class).isEmpty();
-            assertThat(ISeq.sequence("")).isInstanceOf(Nil.class).isEmpty();
+            assertThat(ISeq.from(List.<Integer>of())).isInstanceOf(Nil.class).isEmpty();
+            assertThat(ISeq.from(Stream.<Integer>of())).isInstanceOf(Nil.class).isEmpty();
+            assertThat(ISeq.from(Collections.<Integer>emptyIterator())).isInstanceOf(Nil.class).isEmpty();
+            assertThat(ISeq.from(Map.<String, Integer>of())).isInstanceOf(Nil.class).isEmpty();
+            assertThat(ISeq.from("")).isInstanceOf(Nil.class).isEmpty();
         }
 
         @Test
         void returnsCollIfAlreadyASeq() {
             var coll = ISeq.of(1, 2, 3);
-            assertThat(ISeq.sequence(coll)).isSameAs(coll);
+            assertThat(ISeq.from(coll)).isSameAs(coll);
         }
 
         @Test
         void doesNotForceLazyColl() {
-            assertThat(ISeq.sequence(Stream.iterate(0, x -> x + 1)).take(3))
+            assertThat(ISeq.from(Stream.iterate(0, x -> x + 1)).take(3))
                     .isInstanceOf(LazySeq.class)
                     .containsExactly(0, 1, 2);
-            assertThat(ISeq.sequence(Stream.iterate(0, x -> x + 1).iterator()).take(3))
+            assertThat(ISeq.from(Stream.iterate(0, x -> x + 1).iterator()).take(3))
                     .isInstanceOf(LazySeq.class)
                     .containsExactly(0, 1, 2);
-        }
-    }
-
-    @Nested
-    @DisplayName("iterate")
-    class Iterate {
-
-        @Test
-        void returnsSeqWithNulls() {
-            var sut = ISeq.iterate(null, x -> null);
-
-            assertThat(sut.take(4)).containsExactly(null, null, null, null);
-        }
-
-        @Test
-        void returnsSeqOfInitialValueUsingFunction() {
-            var actual = ISeq.iterate(0, x -> x + 1);
-
-            assertThat(actual.take(4))
-                    .containsExactly(0, 1, 2, 3);
-        }
-    }
-
-    @Nested
-    @DisplayName("range")
-    class Range {
-
-        @Test
-        void returnsInfiniteSeqOfIntegersStartingWithZero() {
-            assertThat(ISeq.range().take(3))
-                    .isInstanceOf(LazySeq.class)
-                    .containsExactly(0, 1, 2);
-        }
-
-        @Test
-        void returnsSeqOfIntegersStartingWithZeroUntilEnd() {
-            assertThat(ISeq.range(3))
-                    .isInstanceOf(LazySeq.class)
-                    .containsExactly(0, 1, 2);
-        }
-
-        @Test
-        void returnsSeqOfIntegersFromStartInclusiveUntilEndExclusive() {
-            assertThat(ISeq.range(1, 5)).isInstanceOf(LazySeq.class).containsExactly(1, 2, 3, 4);
-            assertThat(ISeq.range(-5, 5)).isInstanceOf(LazySeq.class).containsExactly(-5, -4, -3, -2, -1, 0, 1, 2, 3, 4);
-        }
-
-        @Test
-        void returnsSeqOfIntegersFromStartInclusiveUntilEndExclusiveByStep() {
-            assertThat(ISeq.range(10, 25, 5)).isInstanceOf(LazySeq.class).containsExactly(10, 15, 20);
-            assertThat(ISeq.range(10, -25, -5)).isInstanceOf(LazySeq.class).containsExactly(10, 5, 0, -5, -10, -15, -20);
-            assertThat(ISeq.range(-10, 25, 5)).isInstanceOf(LazySeq.class).containsExactly(-10, -5, 0, 5, 10, 15, 20);
-        }
-
-        @Test
-        void returnsInfiniteSeqOfStartWhenStepIsZero() {
-            assertThat(ISeq.range(10, 25, 0).take(10))
-                    .isInstanceOf(LazySeq.class)
-                    .containsExactly(10, 10, 10, 10, 10, 10, 10, 10, 10, 10);
-        }
-
-        @Test
-        void returnsEmptySeqWhenStartIsEqualToEnd() {
-            assertThat(ISeq.range(10, 10)).isEqualTo(Nil.empty());
-            assertThat(ISeq.range(-10, -10)).isEqualTo(Nil.empty());
-            assertThat(ISeq.range(1, 1, 1)).isEqualTo(Nil.empty());
-            assertThat(ISeq.range(-1, -1, 1)).isEqualTo(Nil.empty());
         }
     }
 }

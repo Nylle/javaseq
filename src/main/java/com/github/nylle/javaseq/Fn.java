@@ -66,10 +66,74 @@ public class Fn {
         return nil();
     }
 
+    /**
+     * Returns a lazy seq of {@code x}, {@code f(x)}, {@code f(f(x))} etc. {@code f} must be free of side-effects.
+     *
+     * @param x   initial value
+     * @param f   function to apply to x
+     * @param <T> the type of items in the seq
+     * @return a lazy seq of x, the result of applying f to x, the result of applying f to that, etc.
+     */
     public static <T> ISeq<T> iterate(T x, UnaryOperator<T> f) {
         return lazySeq(() -> cons(x, iterate(f.apply(x), f)));
     }
 
+    /**
+     * Returns a lazy seq of numbers from 0 (inclusive) to infinity, by step 1.
+     *
+     * @return a lazy seq of numbers from 0 (inclusive) to infinity, by step 1
+     */
+    static ISeq<Integer> range() {
+        return Fn.iterate(0, x -> x + 1);
+    }
+
+    /**
+     * Returns a lazy seq of numbers from 0 (inclusive) to {@code end} (exclusive), by step 1.
+     * Returns empty seq when {@code end} is equal to 0.
+     *
+     * @param end exclusive end of the range
+     * @return a lazy seq of numbers from 0 (inclusive) to end (exclusive)
+     */
+    static ISeq<Integer> range(int end) {
+        return Fn.range(0, end);
+    }
+
+    /**
+     * Returns a lazy seq of numbers from {@code start} (inclusive) to {@code end} (exclusive), by step 1.
+     * Returns empty seq when {@code start} is equal to {@code end}.
+     *
+     * @param start inclusive start of the range
+     * @param end   exclusive end of the range
+     * @return a lazy seq of numbers from start (inclusive) to end (exclusive)
+     */
+    static ISeq<Integer> range(int start, int end) {
+        return Fn.range(start, end, 1);
+    }
+
+    /**
+     * Returns a lazy seq of numbers from {@code start} (inclusive) to {@code end} (exclusive), by {@code step}.
+     * Returns infinite seq of {@code start} when {@code step} is equal to 0.
+     * Returns empty seq when {@code start} is equal to {@code end}.
+     *
+     * @param start inclusive start of the range
+     * @param end   exclusive end of the range
+     * @param step  step by which to increase the next number
+     * @return a lazy seq of numbers from start (inclusive) to end (exclusive), by step
+     */
+    static ISeq<Integer> range(int start, int end, int step) {
+        return Fn.iterate(start, x -> x + step).takeWhile(x -> step >= 0 ? (x < end) : (x > end));
+    }
+
+    /**
+     * Coerces {@code coll} to a (possibly empty) seq, if it is not already one. Will not force a lazy collection
+     * like {@code Stream} or {@code Iterator}. If {@code coll} is a {@code String}, the returned seq will contain items
+     * of type {@code Character}. If {@code coll} is a {@code Map} the returned seq will contain items of type
+     * {@code Map.Entry} (see {@link ISeq#toMap()}). Yields empty seq if {@code coll} is null or empty.
+     *
+     * @param coll a collection to be coerced to a seq
+     * @param <T>  the type of items in the seq
+     * @return a seq of items in coll
+     */
     public static <T> ISeq<T> seq(T[] coll) {
         if (coll != null && coll.length > 0) {
             return arraySeq(coll);
@@ -77,6 +141,16 @@ public class Fn {
         return nil();
     }
 
+    /**
+     * Coerces {@code coll} to a (possibly empty) seq, if it is not already one. Will not force a lazy collection
+     * like {@code Stream} or {@code Iterator}. If {@code coll} is a {@code String}, the returned seq will contain items
+     * of type {@code Character}. If {@code coll} is a {@code Map} the returned seq will contain items of type
+     * {@code Map.Entry} (see {@link ISeq#toMap()}). Yields empty seq if {@code coll} is null or empty.
+     *
+     * @param coll a collection to be coerced to a seq
+     * @param <T>  the type of items in the seq
+     * @return a seq of items in coll
+     */
     public static <T> ISeq<T> seq(Iterable<T> coll) {
         if (coll == null) return nil();
         if (coll instanceof ISeq<T> seq) return seq;
@@ -84,6 +158,16 @@ public class Fn {
         return seq(coll.iterator());
     }
 
+    /**
+     * Coerces {@code coll} to a (possibly empty) seq, if it is not already one. Will not force a lazy collection
+     * like {@code Stream} or {@code Iterator}. If {@code coll} is a {@code String}, the returned seq will contain items
+     * of type {@code Character}. If {@code coll} is a {@code Map} the returned seq will contain items of type
+     * {@code Map.Entry} (see {@link ISeq#toMap()}). Yields empty seq if {@code coll} is null or empty.
+     *
+     * @param coll a collection to be coerced to a seq
+     * @param <T>  the type of items in the seq
+     * @return a seq of items in coll
+     */
     public static <T> ISeq<T> seq(Stream<T> coll) {
         if (coll != null) {
             return seq(coll.iterator());
@@ -91,6 +175,17 @@ public class Fn {
         return nil();
     }
 
+    /**
+     * Coerces {@code coll} to a (possibly empty) seq, if it is not already one. Will not force a lazy collection
+     * like {@code Stream} or {@code Iterator}. If {@code coll} is a {@code String}, the returned seq will contain items
+     * of type {@code Character}. If {@code coll} is a {@code Map} the returned seq will contain items of type
+     * {@code Map.Entry} (see {@link ISeq#toMap()}). Yields empty seq if {@code coll} is null or empty.
+     *
+     * @param coll a collection to be coerced to a seq
+     * @param <K>  the type of key in entry in the seq
+     * @param <V>  the type of value in entry in the seq
+     * @return a seq of items in coll
+     */
     public static <K, V> ISeq<Map.Entry<K, V>> seq(Map<K, V> coll) {
         if (coll != null) {
             return seq(coll.entrySet().iterator());
@@ -98,6 +193,15 @@ public class Fn {
         return nil();
     }
 
+    /**
+     * Coerces {@code coll} to a (possibly empty) seq, if it is not already one. Will not force a lazy collection
+     * like {@code Stream} or {@code Iterator}. If {@code coll} is a {@code String}, the returned seq will contain items
+     * of type {@code Character}. If {@code coll} is a {@code Map} the returned seq will contain items of type
+     * {@code Map.Entry} (see {@link ISeq#toMap()}). Yields empty seq if {@code coll} is null or empty.
+     *
+     * @param coll a collection to be coerced to a seq
+     * @return a seq of items in coll
+     */
     public static ISeq<Character> seq(char[] coll) {
         if (coll != null && coll.length > 0) {
             return new StringSeq(CharBuffer.wrap(coll), 0, coll.length);
@@ -105,6 +209,15 @@ public class Fn {
         return nil();
     }
 
+    /**
+     * Coerces {@code coll} to a (possibly empty) seq, if it is not already one. Will not force a lazy collection
+     * like {@code Stream} or {@code Iterator}. If {@code coll} is a {@code String}, the returned seq will contain items
+     * of type {@code Character}. If {@code coll} is a {@code Map} the returned seq will contain items of type
+     * {@code Map.Entry} (see {@link ISeq#toMap()}). Yields empty seq if {@code coll} is null or empty.
+     *
+     * @param coll a collection to be coerced to a seq
+     * @return a seq of items in coll
+     */
     public static ISeq<Character> seq(Character[] coll) {
         if (coll != null && coll.length > 0) {
             var s = new StringBuilder(coll.length);
@@ -116,6 +229,15 @@ public class Fn {
         return nil();
     }
 
+    /**
+     * Coerces {@code coll} to a (possibly empty) seq, if it is not already one. Will not force a lazy collection
+     * like {@code Stream} or {@code Iterator}. If {@code coll} is a {@code String}, the returned seq will contain items
+     * of type {@code Character}. If {@code coll} is a {@code Map} the returned seq will contain items of type
+     * {@code Map.Entry} (see {@link ISeq#toMap()}). Yields empty seq if {@code coll} is null or empty.
+     *
+     * @param coll a collection to be coerced to a seq
+     * @return a seq of items in coll
+     */
     public static ISeq<Character> seq(CharSequence coll) {
         if (coll != null && !coll.isEmpty()) {
             return new StringSeq(coll, 0, coll.length());
@@ -123,6 +245,16 @@ public class Fn {
         return nil();
     }
 
+    /**
+     * Coerces {@code coll} to a (possibly empty) seq, if it is not already one. Will not force a lazy collection
+     * like {@code Stream} or {@code Iterator}. If {@code coll} is a {@code String}, the returned seq will contain items
+     * of type {@code Character}. If {@code coll} is a {@code Map} the returned seq will contain items of type
+     * {@code Map.Entry} (see {@link ISeq#toMap()}). Yields empty seq if {@code coll} is null or empty.
+     *
+     * @param coll a collection to be coerced to a seq
+     * @param <T>  the type of items in the seq
+     * @return a seq of items in coll
+     */
     public static <T> ISeq<T> seq(Iterator<T> coll) {
         if (coll != null && coll.hasNext()) {
             return chunkIteratorSeq(coll);

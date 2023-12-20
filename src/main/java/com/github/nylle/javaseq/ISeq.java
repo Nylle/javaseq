@@ -53,7 +53,7 @@ public interface ISeq<T> extends List<T> {
      * @param <T>  the type of items in the seq
      * @return a seq of items in coll
      */
-    static <T> ISeq<T> sequence(T[] coll) {
+    static <T> ISeq<T> from(T[] coll) {
         return Fn.seq(coll);
     }
 
@@ -67,7 +67,7 @@ public interface ISeq<T> extends List<T> {
      * @param <T>  the type of items in the seq
      * @return a seq of items in coll
      */
-    static <T> ISeq<T> sequence(Iterable<T> coll) {
+    static <T> ISeq<T> from(Iterable<T> coll) {
         return Fn.seq(coll);
     }
 
@@ -81,7 +81,7 @@ public interface ISeq<T> extends List<T> {
      * @param <T>  the type of items in the seq
      * @return a seq of items in coll
      */
-    static <T> ISeq<T> sequence(Iterator<T> coll) {
+    static <T> ISeq<T> from(Iterator<T> coll) {
         return Fn.seq(coll);
     }
 
@@ -95,7 +95,7 @@ public interface ISeq<T> extends List<T> {
      * @param <T>  the type of items in the seq
      * @return a seq of items in coll
      */
-    static <T> ISeq<T> sequence(Stream<T> coll) {
+    static <T> ISeq<T> from(Stream<T> coll) {
         return Fn.seq(coll);
     }
 
@@ -108,7 +108,7 @@ public interface ISeq<T> extends List<T> {
      * @param coll a collection to be coerced to a seq
      * @return a seq of items in coll
      */
-    static ISeq<Character> sequence(char[] coll) {
+    static ISeq<Character> from(char[] coll) {
         return Fn.seq(coll);
     }
 
@@ -121,7 +121,7 @@ public interface ISeq<T> extends List<T> {
      * @param coll a collection to be coerced to a seq
      * @return a seq of items in coll
      */
-    static ISeq<Character> sequence(Character[] coll) {
+    static ISeq<Character> from(Character[] coll) {
         return Fn.seq(coll);
     }
 
@@ -134,7 +134,7 @@ public interface ISeq<T> extends List<T> {
      * @param coll a collection to be coerced to a seq
      * @return a seq of items in coll
      */
-    static ISeq<Character> sequence(CharSequence coll) {
+    static ISeq<Character> from(CharSequence coll) {
         return Fn.seq(coll);
     }
 
@@ -149,7 +149,7 @@ public interface ISeq<T> extends List<T> {
      * @param <V>  the type of value in entry in the seq
      * @return a seq of items in coll
      */
-    static <K, V> ISeq<Map.Entry<K, V>> sequence(Map<K, V> coll) {
+    static <K, V> ISeq<Map.Entry<K, V>> from(Map<K, V> coll) {
         return Fn.seq(coll);
     }
 
@@ -171,7 +171,7 @@ public interface ISeq<T> extends List<T> {
      * @return a lazy seq of numbers from 0 (inclusive) to infinity, by step 1
      */
     static ISeq<Integer> range() {
-        return ISeq.iterate(0, x -> x + 1);
+        return Fn.range();
     }
 
     /**
@@ -182,7 +182,7 @@ public interface ISeq<T> extends List<T> {
      * @return a lazy seq of numbers from 0 (inclusive) to end (exclusive)
      */
     static ISeq<Integer> range(int end) {
-        return ISeq.range(0, end);
+        return Fn.range(0, end);
     }
 
     /**
@@ -194,7 +194,7 @@ public interface ISeq<T> extends List<T> {
      * @return a lazy seq of numbers from start (inclusive) to end (exclusive)
      */
     static ISeq<Integer> range(int start, int end) {
-        return ISeq.range(start, end, 1);
+        return Fn.range(start, end, 1);
     }
 
     /**
@@ -208,7 +208,7 @@ public interface ISeq<T> extends List<T> {
      * @return a lazy seq of numbers from start (inclusive) to end (exclusive), by step
      */
     static ISeq<Integer> range(int start, int end, int step) {
-        return ISeq.iterate(start, x -> x + step).takeWhile(x -> step >= 0 ? (x < end) : (x > end));
+        return Fn.iterate(start, x -> x + step).takeWhile(x -> step >= 0 ? (x < end) : (x > end));
     }
 
     /**
@@ -834,7 +834,7 @@ public interface ISeq<T> extends List<T> {
      * <b>Caution:</b> The seq will be fully realized. If this seq is infinite, it will run infinitely or until system
      * resources are exhausted.
      *
-     * @see #sequence(Map)
+     * @see #from(Map)
      * @param <K> the type of the keys
      * @param <V> the type of the values
      * @return

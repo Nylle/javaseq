@@ -57,11 +57,8 @@ While Streams help to work with lazy collections by providing the aforementioned
 #### ISeq.lazySeq(body)
 - Takes a body of expressions (supplier) that returns an ISeq or Nil that will invoke the body only the first time it is accessed, and will cache the result and return it on all subsequent calls (see [isRealized](#isrealized)).
 
-#### ISeq.sequence(coll)
+#### ISeq.from(coll)
 - Coerces coll to a (possibly empty) seq, if it is not already one. Will not force a lazy Stream or Iterator. If coll is a String, the returned seq will contain items of type Character. If coll is a Map<K, V> the returned seq will contain items of type Map.Entry<K, V> (see [toMap](#tomap)). Yields empty seq if coll is null or empty.
-
-#### ISeq.concat(colls...)
-- Returns a seq representing the concatenation of the items in the supplied colls.
 
 #### ISeq.iterate(x, f)
 - Returns a seq of x, f(x), f(f(x)) etc. f must be free of side-effects.
@@ -149,6 +146,9 @@ _(This is similar to zipping two collections.)_
 
 #### distinct()
 - Returns a seq of the items of this seq with duplicates removed. **Caution:** The seq will be fully realized. If this seq is infinite, it will run infinitely or until system resources are exhausted.
+
+#### concat(coll)
+- Returns a seq representing the concatenation of the items in this seq and coll.
 
 #### sorted()
 - Returns a seq of the items of this seq sorted by using compare. **Caution:** The seq will be fully realized. If this seq is infinite, it will run infinitely or until system resources are exhausted.
