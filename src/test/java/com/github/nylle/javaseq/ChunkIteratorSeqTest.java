@@ -1,5 +1,6 @@
 package com.github.nylle.javaseq;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -41,6 +42,7 @@ class ChunkIteratorSeqTest {
     }
 
     @Nested
+    @Disabled("due to high mem consumption better run on-demand only")
     class ForLargeCollections {
 
         private final static int LARGE = 1_000_000;

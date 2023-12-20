@@ -44,13 +44,10 @@ public interface ISeq<T> extends List<T> {
     }
 
     /**
-     * Coerces {@code coll} to a (possibly empty) seq, if it is not already one. Will not force a lazy collection
-     * like {@code Stream} or {@code Iterator}. If {@code coll} is a {@code String}, the returned seq will contain items
-     * of type {@code Character}. If {@code coll} is a {@code Map} the returned seq will contain items of type
-     * {@code Map.Entry} (see {@link #toMap()}). Yields empty seq if {@code coll} is null or empty.
+     * Coerces {@code coll} to a (possibly empty) seq.
      *
-     * @param coll a collection to be coerced to a seq
-     * @param <T>  the type of items in the seq
+     * @param coll an array to be coerced to a seq
+     * @param <T>  the type of items in coll
      * @return a seq of items in coll
      */
     static <T> ISeq<T> from(T[] coll) {
@@ -58,13 +55,10 @@ public interface ISeq<T> extends List<T> {
     }
 
     /**
-     * Coerces {@code coll} to a (possibly empty) seq, if it is not already one. Will not force a lazy collection
-     * like {@code Stream} or {@code Iterator}. If {@code coll} is a {@code String}, the returned seq will contain items
-     * of type {@code Character}. If {@code coll} is a {@code Map} the returned seq will contain items of type
-     * {@code Map.Entry} (see {@link #toMap()}). Yields empty seq if {@code coll} is null or empty.
+     * Coerces {@code coll} to a (possibly empty) lazy seq, if it is not already one. Will not force a lazy collection.
      *
-     * @param coll a collection to be coerced to a seq
-     * @param <T>  the type of items in the seq
+     * @param coll an iterator to be coerced to a seq
+     * @param <T>  the type of items in coll
      * @return a seq of items in coll
      */
     static <T> ISeq<T> from(Iterable<T> coll) {
@@ -72,10 +66,7 @@ public interface ISeq<T> extends List<T> {
     }
 
     /**
-     * Coerces {@code coll} to a (possibly empty) seq, if it is not already one. Will not force a lazy collection
-     * like {@code Stream} or {@code Iterator}. If {@code coll} is a {@code String}, the returned seq will contain items
-     * of type {@code Character}. If {@code coll} is a {@code Map} the returned seq will contain items of type
-     * {@code Map.Entry} (see {@link #toMap()}). Yields empty seq if {@code coll} is null or empty.
+     * Coerces {@code coll} to a (possibly empty) lazy seq. Will not force the {@code Iterator}.
      *
      * @param coll a collection to be coerced to a seq
      * @param <T>  the type of items in the seq
@@ -86,13 +77,10 @@ public interface ISeq<T> extends List<T> {
     }
 
     /**
-     * Coerces {@code coll} to a (possibly empty) seq, if it is not already one. Will not force a lazy collection
-     * like {@code Stream} or {@code Iterator}. If {@code coll} is a {@code String}, the returned seq will contain items
-     * of type {@code Character}. If {@code coll} is a {@code Map} the returned seq will contain items of type
-     * {@code Map.Entry} (see {@link #toMap()}). Yields empty seq if {@code coll} is null or empty.
+     * Coerces {@code coll} to a (possibly empty) seq. Will not force the {@code Stream}.
      *
-     * @param coll a collection to be coerced to a seq
-     * @param <T>  the type of items in the seq
+     * @param coll a stream to be coerced to a seq
+     * @param <T>  the type of items in the stream
      * @return a seq of items in coll
      */
     static <T> ISeq<T> from(Stream<T> coll) {
@@ -100,12 +88,10 @@ public interface ISeq<T> extends List<T> {
     }
 
     /**
-     * Coerces {@code coll} to a (possibly empty) seq, if it is not already one. Will not force a lazy collection
-     * like {@code Stream} or {@code Iterator}. If {@code coll} is a {@code String}, the returned seq will contain items
-     * of type {@code Character}. If {@code coll} is a {@code Map} the returned seq will contain items of type
-     * {@code Map.Entry} (see {@link #toMap()}). Yields empty seq if {@code coll} is null or empty.
+     * Coerces {@code coll} to a (possibly empty) seq. The returned seq will contain items of type {@code Character}.
      *
-     * @param coll a collection to be coerced to a seq
+     * @see #str
+     * @param coll an array to be coerced to a seq
      * @return a seq of items in coll
      */
     static ISeq<Character> from(char[] coll) {
@@ -113,12 +99,10 @@ public interface ISeq<T> extends List<T> {
     }
 
     /**
-     * Coerces {@code coll} to a (possibly empty) seq, if it is not already one. Will not force a lazy collection
-     * like {@code Stream} or {@code Iterator}. If {@code coll} is a {@code String}, the returned seq will contain items
-     * of type {@code Character}. If {@code coll} is a {@code Map} the returned seq will contain items of type
-     * {@code Map.Entry} (see {@link #toMap()}). Yields empty seq if {@code coll} is null or empty.
+     * Coerces {@code coll} to a (possibly empty) seq. The returned seq will contain items of type {@code Character}.
      *
-     * @param coll a collection to be coerced to a seq
+     * @see #str
+     * @param coll an array to be coerced to a seq
      * @return a seq of items in coll
      */
     static ISeq<Character> from(Character[] coll) {
@@ -126,12 +110,10 @@ public interface ISeq<T> extends List<T> {
     }
 
     /**
-     * Coerces {@code coll} to a (possibly empty) seq, if it is not already one. Will not force a lazy collection
-     * like {@code Stream} or {@code Iterator}. If {@code coll} is a {@code String}, the returned seq will contain items
-     * of type {@code Character}. If {@code coll} is a {@code Map} the returned seq will contain items of type
-     * {@code Map.Entry} (see {@link #toMap()}). Yields empty seq if {@code coll} is null or empty.
+     * Coerces {@code coll} to a (possibly empty) seq. The returned seq will contain items of type {@code Character}.
      *
-     * @param coll a collection to be coerced to a seq
+     * @see #str
+     * @param coll a string to be coerced to a seq
      * @return a seq of items in coll
      */
     static ISeq<Character> from(CharSequence coll) {
@@ -139,14 +121,13 @@ public interface ISeq<T> extends List<T> {
     }
 
     /**
-     * Coerces {@code coll} to a (possibly empty) seq, if it is not already one. Will not force a lazy collection
-     * like {@code Stream} or {@code Iterator}. If {@code coll} is a {@code String}, the returned seq will contain items
-     * of type {@code Character}. If {@code coll} is a {@code Map} the returned seq will contain items of type
-     * {@code Map.Entry} (see {@link #toMap()}). Yields empty seq if {@code coll} is null or empty.
+     * Coerces {@code coll} to a (possibly empty) seq. Will not force a lazy collection. The returned seq will contain
+     * items of type {@code Map.Entry}.
      *
-     * @param coll a collection to be coerced to a seq
-     * @param <K>  the type of key in entry in the seq
-     * @param <V>  the type of value in entry in the seq
+     * @see #toMap
+     * @param coll a map to be coerced to a seq
+     * @param <K>  the type of key in the map
+     * @param <V>  the type of value in the map
      * @return a seq of items in coll
      */
     static <K, V> ISeq<Map.Entry<K, V>> from(Map<K, V> coll) {
@@ -280,23 +261,8 @@ public interface ISeq<T> extends List<T> {
      * <p>
      * <i>This is similar to zipping two collections in C# or Kotlin.</i>
      *
-     * @param coll the collection to map this seq to
-     * @param f    a function that accepts two parameters to map the corresponding items in both colls
-     * @param <S>  the type of items in coll
-     * @param <R>  the type of items in this seq
-     * @return a seq of the result of applying f to the set of n items in both this seq and coll
-     */
-    <S, R> ISeq<R> map(ISeq<? extends S> coll, BiFunction<? super T, ? super S, ? extends R> f);
-
-    /**
-     * Returns a lazy seq of the result of applying {@code f} to the set of first items in both this seq and {@code coll},
-     * followed by applying {@code f} to the set of second items in this seq and {@code coll}, until any one of the
-     * collections is exhausted. Any remaining items in either collection are ignored.
-     * <p>
-     * <i>This is similar to zipping two collections in C# or Kotlin.</i>
-     *
-     * @param coll the collection to map this seq to
-     * @param f    a function that accepts two parameters to map the corresponding items in both colls
+     * @param coll the collection to map this seq with
+     * @param f    a function that accepts two parameters to map the corresponding items in both collections
      * @param <S>  the type of items in coll
      * @param <R>  the type of items in this seq
      * @return a seq of the result of applying f to the set of n items in both this seq and coll
@@ -310,8 +276,8 @@ public interface ISeq<T> extends List<T> {
      * <p>
      * <i>This is similar to zipping two collections in C# or Kotlin.</i>
      *
-     * @param coll the collection to map this seq to
-     * @param f    a function that accepts two parameters to map the corresponding items in both colls
+     * @param coll the iterator to map this seq with
+     * @param f    a function that accepts two parameters to map the corresponding items in both collections
      * @param <S>  the type of items in coll
      * @param <R>  the type of items in this seq
      * @return a seq of the result of applying f to the set of n items in both this seq and coll
@@ -325,8 +291,8 @@ public interface ISeq<T> extends List<T> {
      * <p>
      * <i>This is similar to zipping two collections in C# or Kotlin.</i>
      *
-     * @param coll the collection to map this seq to
-     * @param f    a function that accepts two parameters to map the corresponding items in both colls
+     * @param coll the stream to map this seq with
+     * @param f    a function that accepts two parameters to map the corresponding items in both collections
      * @param <S>  the type of items in coll
      * @param <R>  the type of items in this seq
      * @return a seq of the result of applying f to the set of n items in both this seq and coll
@@ -340,8 +306,8 @@ public interface ISeq<T> extends List<T> {
      * <p>
      * <i>This is similar to zipping two collections in C# or Kotlin.</i>
      *
-     * @param coll the collection to map this seq to
-     * @param f    a function that accepts two parameters to map the corresponding items in both colls
+     * @param coll the array to map this seq with
+     * @param f    a function that accepts two parameters to map the corresponding items in both collections
      * @param <S>  the type of items in coll
      * @param <R>  the type of items in this seq
      * @return a seq of the result of applying f to the set of n items in both this seq and coll
@@ -355,8 +321,8 @@ public interface ISeq<T> extends List<T> {
      * <p>
      * <i>This is similar to zipping two collections in C# or Kotlin.</i>
      *
-     * @param coll the collection to map this seq to
-     * @param f    a function that accepts two parameters to map the corresponding items in both colls
+     * @param coll the character sequence to map this seq with
+     * @param f    a function that accepts two parameters to map the corresponding items in both collections
      * @param <R>  the type of items in this seq
      * @return a seq of the result of applying f to the set of n items in both this seq and coll
      */
@@ -378,19 +344,7 @@ public interface ISeq<T> extends List<T> {
      * Returns a lazy seq of the result of applying {@link #concat} to the result of applying {@link #map} to {@code f} and
      * {@code coll} and the items in this seq. Function {@code f} should return a collection.
      *
-     * @param coll the collection to map with this seq
-     * @param f    the mapping function to apply to each pair of items
-     * @param <S>  the type of items in coll
-     * @param <R>  the type of items in the returned seq
-     * @return a seq of the result of applying concat to the result of applying map to f and coll and the items in this seq
-     */
-    <S, R> ISeq<R> mapcat(ISeq<? extends S> coll, BiFunction<? super T, ? super S, Iterable<? extends R>> f);
-
-    /**
-     * Returns a lazy seq of the result of applying {@link #concat} to the result of applying {@link #map} to {@code f} and
-     * {@code coll} and the items in this seq. Function {@code f} should return a collection.
-     *
-     * @param coll the collection to map with this seq
+     * @param coll the collection to mapcat this seq with
      * @param f    the mapping function to apply to each pair of items
      * @param <S>  the type of items in coll
      * @param <R>  the type of items in the returned seq
@@ -402,7 +356,7 @@ public interface ISeq<T> extends List<T> {
      * Returns a lazy seq of the result of applying {@link #concat} to the result of applying {@link #map} to {@code f} and
      * {@code coll} and the items in this seq. Function {@code f} should return a collection.
      *
-     * @param coll the collection to map with this seq
+     * @param coll the iterator to mapcat this seq with
      * @param f    the mapping function to apply to each pair of items
      * @param <S>  the type of items in coll
      * @param <R>  the type of items in the returned seq
@@ -414,7 +368,7 @@ public interface ISeq<T> extends List<T> {
      * Returns a lazy seq of the result of applying {@link #concat} to the result of applying {@link #map} to {@code f} and
      * {@code coll} and the items in this seq. Function {@code f} should return a collection.
      *
-     * @param coll the collection to map with this seq
+     * @param coll the stream to mapcat this seq with
      * @param f    the mapping function to apply to each pair of items
      * @param <S>  the type of items in coll
      * @param <R>  the type of items in the returned seq
@@ -426,7 +380,7 @@ public interface ISeq<T> extends List<T> {
      * Returns a lazy seq of the result of applying {@link #concat} to the result of applying {@link #map} to {@code f} and
      * {@code coll} and the items in this seq. Function {@code f} should return a collection.
      *
-     * @param coll the collection to map with this seq
+     * @param coll the array to mapcat this seq with
      * @param f    the mapping function to apply to each pair of items
      * @param <S>  the type of items in coll
      * @param <R>  the type of items in the returned seq
@@ -438,7 +392,7 @@ public interface ISeq<T> extends List<T> {
      * Returns a lazy seq of the result of applying {@link #concat} to the result of applying {@link #map} to {@code f} and
      * {@code coll} and the items in this seq. Function {@code f} should return a collection.
      *
-     * @param coll the collection to map with this seq
+     * @param coll the character sequence to mapcat this seq with
      * @param f    the mapping function to apply to each pair of items
      * @param <R>  the type of items in the returned seq
      * @return a seq of the result of applying concat to the result of applying map to f and coll and the items in this seq

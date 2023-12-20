@@ -64,17 +64,14 @@ public abstract class ASeq<T> extends AList<T> implements ISeq<T> {
         });
     }
 
-    public <S, R> ISeq<R> map(ISeq<? extends S> coll, BiFunction<? super T, ? super S, ? extends R> f) {
+    public <S, R> ISeq<R> map(Iterable<? extends S> coll, BiFunction<? super T, ? super S, ? extends R> f) {
         return Fn.lazySeq(() -> {
-            if (!isEmpty() && !coll.isEmpty()) {
-                return Fn.cons(f.apply(first(), coll.first()), rest().map(coll.rest(), f));
+            var s = Fn.seq(coll);
+            if (!isEmpty() && !s.isEmpty()) {
+                return Fn.cons(f.apply(first(), s.first()), rest().map(s.rest(), f));
             }
             return Fn.nil();
         });
-    }
-
-    public <S, R> ISeq<R> map(Iterable<? extends S> coll, BiFunction<? super T, ? super S, ? extends R> f) {
-        return map(Fn.seq(coll), f);
     }
 
     public <S, R> ISeq<R> map(Iterator<? extends S> coll, BiFunction<? super T, ? super S, ? extends R> f) {
@@ -102,17 +99,14 @@ public abstract class ASeq<T> extends AList<T> implements ISeq<T> {
         });
     }
 
-    public <S, R> ISeq<R> mapcat(ISeq<? extends S> coll, BiFunction<? super T, ? super S, Iterable<? extends R>> f) {
+    public <S, R> ISeq<R> mapcat(Iterable<? extends S> coll, BiFunction<? super T, ? super S, Iterable<? extends R>> f) {
         return Fn.lazySeq(() -> {
-            if (!isEmpty() && !coll.isEmpty()) {
-                return Fn.concat(f.apply(first(), coll.first()).iterator(), rest().mapcat(coll.rest(), f));
+            var s = Fn.seq(coll);
+            if (!isEmpty() && !s.isEmpty()) {
+                return Fn.concat(f.apply(first(), s.first()).iterator(), rest().mapcat(s.rest(), f));
             }
             return Fn.nil();
         });
-    }
-
-    public <S, R> ISeq<R> mapcat(Iterable<? extends S> coll, BiFunction<? super T, ? super S, Iterable<? extends R>> f) {
-        return mapcat(Fn.seq(coll), f);
     }
 
     public <S, R> ISeq<R> mapcat(Iterator<? extends S> coll, BiFunction<? super T, ? super S, Iterable<? extends R>> f) {

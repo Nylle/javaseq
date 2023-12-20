@@ -44,7 +44,7 @@ class Nil<T> extends ASeq<T> implements ISeq<T> {
 	}
 
 	@Override
-	public <S, R> ISeq<R> map(ISeq<? extends S> coll, BiFunction<? super T, ? super S, ? extends R> f) {
+	public <S, R> ISeq<R> map(Iterable<? extends S> coll, BiFunction<? super T, ? super S, ? extends R> f) {
 		return empty();
 	}
 

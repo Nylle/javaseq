@@ -71,16 +71,17 @@ public class ChunkedCons<T> extends ASeq<T> implements ISeq<T> {
     }
 
     @Override
-    public <S, R> ISeq<R> map(ISeq<? extends S> coll, BiFunction<? super T, ? super S, ? extends R> f) {
+    public <S, R> ISeq<R> map(Iterable<? extends S> coll, BiFunction<? super T, ? super S, ? extends R> f) {
         return Fn.lazySeq(() -> {
-            if (coll.isEmpty()) {
+            var s = Fn.seq(coll);
+            if (s.isEmpty()) {
                 return Fn.nil();
             }
             var acc = new Object[chunkSize];
             for (int i = 0; i < chunkSize; i++) {
-                acc[i] = f.apply(chunk.nth(i), coll.nth(i));
+                acc[i] = f.apply(chunk.nth(i), s.nth(i));
             }
-            return new ChunkedCons<R>(new ArrayChunk(acc), rest.map(coll.drop(chunkSize), f));
+            return new ChunkedCons<R>(new ArrayChunk(acc), rest.map(s.drop(chunkSize), f));
         });
     }
 
