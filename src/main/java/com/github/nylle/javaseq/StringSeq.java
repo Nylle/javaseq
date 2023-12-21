@@ -1,9 +1,7 @@
 package com.github.nylle.javaseq;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -142,16 +140,6 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
             }
         }
         return true;
-    }
-
-    @Override
-    public Optional<Character> max(Comparator<? super Character> comp) {
-        var max = str.charAt(index);
-        for (int i = index + 1; i < end; i++) {
-            var next = str.charAt(i);
-            max = comp.compare(max, next) > 0 ? max : next;
-        }
-        return Optional.of(max);
     }
 
     @Override

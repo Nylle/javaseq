@@ -1,9 +1,7 @@
 package com.github.nylle.javaseq;
 
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -152,16 +150,6 @@ public class ArraySeq<T> extends ASeq<T> implements ISeq<T> {
             }
         }
         return true;
-    }
-
-    @Override
-    public Optional<T> max(Comparator<? super T> comp) {
-        var max = array[index];
-        for (int i = index + 1; i < end; i++) {
-            var next = array[i];
-            max = comp.compare(max, next) > 0 ? max : next;
-        }
-        return Optional.of(max);
     }
 
     @Override

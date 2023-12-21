@@ -1,9 +1,7 @@
 package com.github.nylle.javaseq;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -210,22 +208,6 @@ public class ChunkedCons<T> extends ASeq<T> implements ISeq<T> {
             }
         }
         return rest().every(pred);
-    }
-
-    @Override
-    public Optional<T> max(Comparator<? super T> comp) {
-        var max = chunk.nth(0);
-        for(int i = 1; i < chunkSize; i++) {
-            var next = chunk.nth(i);
-            max = comp.compare(max, next) > 0 ? max : next;
-        }
-
-        var more = rest.max(comp);
-        if(more.isEmpty()) {
-            return Optional.of(max);
-        }
-
-        return comp.compare(max, more.get()) > 0 ? Optional.of(max) : more;
     }
 
     @Override

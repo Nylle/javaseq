@@ -297,14 +297,7 @@ public abstract class ASeq<T> extends AList<T> implements ISeq<T> {
         if (rest().isEmpty()) {
             return Optional.of(first());
         }
-        var result = first();
-        var s = rest();
-        while (!s.isEmpty()) {
-            var next = s.first();
-            result = comp.compare(result, next) > 0 ? result : next;
-            s = s.rest();
-        }
-        return Optional.of(result);
+        return reduce((a, b) -> comp.compare(a, b) > 0 ? a : b);
     }
 
     public Optional<T> min(Comparator<? super T> comp) {
