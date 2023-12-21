@@ -55,7 +55,7 @@ public class ArraySeq<T> extends ASeq<T> implements ISeq<T> {
         if (count > 1) {
             return new ArraySeq<>(array, index + 1, end);
         }
-        return Fn.nil();
+        return Util.nil();
     }
 
     @Override
@@ -71,13 +71,13 @@ public class ArraySeq<T> extends ASeq<T> implements ISeq<T> {
         if (n > 0) {
             return new ArraySeq<T>(array, index, (int) n + index);
         }
-        return Fn.nil();
+        return Util.nil();
     }
 
     @Override
     public ISeq<T> drop(long n) {
         if (n >= count) {
-            return Fn.nil();
+            return Util.nil();
         }
         if (n > 0) {
             return new ArraySeq<T>(array, (int) n + index, end);
@@ -97,7 +97,7 @@ public class ArraySeq<T> extends ASeq<T> implements ISeq<T> {
         if (newEnd > index) {
             return new ArraySeq<>(array, index, newEnd);
         }
-        return Fn.nil();
+        return Util.nil();
     }
 
     @Override
@@ -115,7 +115,7 @@ public class ArraySeq<T> extends ASeq<T> implements ISeq<T> {
         if (newIndex < end) {
             return new ArraySeq<>(array, newIndex, end);
         }
-        return Fn.nil();
+        return Util.nil();
     }
 
     @Override

@@ -34,11 +34,11 @@ class ChunkIteratorSeqTest {
     }
 
     private static <T> ISeq<T> recursive(T x, UnaryOperator<T> f) {
-        return fromIterator(Fn.iterate(x, f).iterator());
+        return fromIterator(ISeq.iterate(x, f).iterator());
     }
 
     private static <T> ISeq<T> fromIterator(Iterator<T> iterator) {
-        return Fn.chunkIteratorSeq(iterator);
+        return Util.chunkIteratorSeq(iterator);
     }
 
     @Nested

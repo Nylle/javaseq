@@ -1059,7 +1059,7 @@ class ASeqTest {
 
         @Test
         void appendingAnItemIsLazy() {
-            var infiniteSeq = new TestSeq<>(1, Fn.iterate(2, x -> x + 1));
+            var infiniteSeq = new TestSeq<>(1, ISeq.iterate(2, x -> x + 1));
 
             var actual = infiniteSeq.concat(0);
 
@@ -1081,7 +1081,7 @@ class ASeqTest {
 
         @Test
         void appendingACollIsLazy() {
-            var infiniteSeq = new TestSeq<>(1, Fn.iterate(2, x -> x + 1));
+            var infiniteSeq = new TestSeq<>(1, ISeq.iterate(2, x -> x + 1));
 
             var actual = infiniteSeq.concat(List.of(0, -1));
 

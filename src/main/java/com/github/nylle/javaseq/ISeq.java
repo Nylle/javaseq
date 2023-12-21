@@ -1,5 +1,7 @@
 package com.github.nylle.javaseq;
 
+import java.nio.CharBuffer;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
@@ -24,7 +26,7 @@ public interface ISeq<T> extends List<T> {
      */
     @SuppressWarnings("unchecked")
     static <T> ISeq<T> of() {
-        return Fn.nil();
+        return Util.nil();
     }
 
     /**
@@ -36,11 +38,7 @@ public interface ISeq<T> extends List<T> {
      */
     @SafeVarargs
     static <T> ISeq<T> of(T... xs) {
-        var result = ISeq.<T>of();
-        for (var i = xs.length - 1; i >= 0; i--) {
-            result = Fn.cons(xs[i], result);
-        }
-        return result;
+        return Util.arraySeq(xs);
     }
 
     /**
@@ -50,8 +48,8 @@ public interface ISeq<T> extends List<T> {
      * @param <T>  the type of items in coll
      * @return a seq of items in coll
      */
-    static <T> ISeq<T> from(T[] coll) {
-        return Fn.seq(coll);
+    static <T> ISeq<T> seq(T[] coll) {
+        return Util.arraySeq(coll);
     }
 
     /**
@@ -61,8 +59,11 @@ public interface ISeq<T> extends List<T> {
      * @param <T>  the type of items in coll
      * @return a seq of items in coll
      */
-    static <T> ISeq<T> from(Iterable<T> coll) {
-        return Fn.seq(coll);
+    static <T> ISeq<T> seq(Iterable<T> coll) {
+        if (coll == null) return Util.nil();
+        if (coll instanceof ISeq<T> seq) return seq;
+        if (coll instanceof ArrayList<T> arrayList) return Util.arraySeq((T[]) arrayList.toArray());
+        return seq(coll.iterator());
     }
 
     /**
@@ -72,8 +73,11 @@ public interface ISeq<T> extends List<T> {
      * @param <T>  the type of items in the seq
      * @return a seq of items in coll
      */
-    static <T> ISeq<T> from(Iterator<T> coll) {
-        return Fn.seq(coll);
+    static <T> ISeq<T> seq(Iterator<T> coll) {
+        if (coll != null && coll.hasNext()) {
+            return Util.chunkIteratorSeq(coll);
+        }
+        return Util.nil();
     }
 
     /**
@@ -83,8 +87,11 @@ public interface ISeq<T> extends List<T> {
      * @param <T>  the type of items in the stream
      * @return a seq of items in coll
      */
-    static <T> ISeq<T> from(Stream<T> coll) {
-        return Fn.seq(coll);
+    static <T> ISeq<T> seq(Stream<T> coll) {
+        if (coll != null) {
+            return seq(coll.iterator());
+        }
+        return Util.nil();
     }
 
     /**
@@ -94,8 +101,11 @@ public interface ISeq<T> extends List<T> {
      * @param coll an array to be coerced to a seq
      * @return a seq of items in coll
      */
-    static ISeq<Character> from(char[] coll) {
-        return Fn.seq(coll);
+    static ISeq<Character> seq(char[] coll) {
+        if (coll != null && coll.length > 0) {
+            return Util.stringSeq(CharBuffer.wrap(coll));
+        }
+        return Util.nil();
     }
 
     /**
@@ -105,8 +115,15 @@ public interface ISeq<T> extends List<T> {
      * @param coll an array to be coerced to a seq
      * @return a seq of items in coll
      */
-    static ISeq<Character> from(Character[] coll) {
-        return Fn.seq(coll);
+    static ISeq<Character> seq(Character[] coll) {
+        if (coll != null && coll.length > 0) {
+            var s = new StringBuilder(coll.length);
+            for (Character c : coll) {
+                s.append(c.charValue());
+            }
+            return Util.stringSeq(s.toString());
+        }
+        return Util.nil();
     }
 
     /**
@@ -116,8 +133,11 @@ public interface ISeq<T> extends List<T> {
      * @param coll a string to be coerced to a seq
      * @return a seq of items in coll
      */
-    static ISeq<Character> from(CharSequence coll) {
-        return Fn.seq(coll);
+    static ISeq<Character> seq(CharSequence coll) {
+        if (coll != null && !coll.isEmpty()) {
+            return Util.stringSeq(coll);
+        }
+        return Util.nil();
     }
 
     /**
@@ -130,8 +150,11 @@ public interface ISeq<T> extends List<T> {
      * @param <V>  the type of value in the map
      * @return a seq of items in coll
      */
-    static <K, V> ISeq<Map.Entry<K, V>> from(Map<K, V> coll) {
-        return Fn.seq(coll);
+    static <K, V> ISeq<Map.Entry<K, V>> seq(Map<K, V> coll) {
+        if (coll != null) {
+            return seq(coll.entrySet().iterator());
+        }
+        return Util.nil();
     }
 
     /**
@@ -143,7 +166,7 @@ public interface ISeq<T> extends List<T> {
      * @return a lazy seq of x, the result of applying f to x, the result of applying f to that, etc.
      */
     static <T> ISeq<T> iterate(T x, UnaryOperator<T> f) {
-        return Fn.iterate(x, f);
+        return Util.lazySeq(() -> Util.cons(x, iterate(f.apply(x), f)));
     }
 
     /**
@@ -152,7 +175,7 @@ public interface ISeq<T> extends List<T> {
      * @return a lazy seq of numbers from 0 (inclusive) to infinity, by step 1
      */
     static ISeq<Integer> range() {
-        return Fn.range();
+        return ISeq.iterate(0, x -> x + 1);
     }
 
     /**
@@ -163,7 +186,7 @@ public interface ISeq<T> extends List<T> {
      * @return a lazy seq of numbers from 0 (inclusive) to end (exclusive)
      */
     static ISeq<Integer> range(int end) {
-        return Fn.range(0, end);
+        return ISeq.range(0, end);
     }
 
     /**
@@ -175,7 +198,7 @@ public interface ISeq<T> extends List<T> {
      * @return a lazy seq of numbers from start (inclusive) to end (exclusive)
      */
     static ISeq<Integer> range(int start, int end) {
-        return Fn.range(start, end, 1);
+        return ISeq.range(start, end, 1);
     }
 
     /**
@@ -189,8 +212,82 @@ public interface ISeq<T> extends List<T> {
      * @return a lazy seq of numbers from start (inclusive) to end (exclusive), by step
      */
     static ISeq<Integer> range(int start, int end, int step) {
-        return Fn.iterate(start, x -> x + step).takeWhile(x -> step >= 0 ? (x < end) : (x > end));
+        return ISeq.iterate(start, x -> x + step).takeWhile(x -> step >= 0 ? (x < end) : (x > end));
     }
+
+    /**
+     * Returns a lazy (infinite!) seq of {@code x}s.
+     *
+     * @param x   the item to repeat
+     * @param <T> the type of x
+     * @return a lazy (infinite!) seq of xs
+     */
+    static <T> ISeq<T> repeat(T x) {
+        return ISeq.iterate(x, i -> x);
+    }
+
+    /**
+     * Returns a lazy seq of {@code x}s with length {@code n}.
+     *
+     * @param n   the number of times to repeat x
+     * @param x   the item to repeat
+     * @param <T> the type of x
+     * @return a lazy seq of xs with length n
+     */
+    static <T> ISeq<T> repeat(int n, T x) {
+        return ISeq.iterate(x, i -> x).take(n);
+    }
+
+    /**
+     * Returns a lazy seq representing the concatenation of the items in {@code coll} and {@code x}.
+     *
+     * @param coll a collection to concat to
+     * @param x    the item to append
+     * @param <T>  the type of the items in the returned seq
+     * @return a lazy seq representing the concatenation of the items in coll and x
+     */
+    static <T> ISeq<T> concat(Iterable<T> coll, T x) {
+        return concat(seq(coll), ISeq.of(x));
+    }
+
+    /**
+     * Returns a lazy seq representing the concatenation of the items in {@code coll} and {@code x}.
+     *
+     * @param coll the CharSequence to concat to
+     * @param x    the character to append
+     * @return a lazy seq representing the concatenation of the items in coll and x
+     */
+    static ISeq<Character> concat(CharSequence coll, Character x) {
+        return concat(seq(coll), ISeq.of(x));
+    }
+
+    /**
+     * Returns a lazy seq representing the concatenation of the items in the supplied {@code colls}.
+     *
+     * @param colls the collections to concatenate into a seq
+     * @param <T>   the type of the items in the returned seq
+     * @return a lazy seq representing the concatenation of the items in the supplied colls
+     */
+    @SafeVarargs
+    static <T> ISeq<T> concat(Iterable<T>... colls) {
+        return seq(colls).mapcat(x -> x);
+    }
+
+    /**
+     * Returns a lazy seq representing the concatenation of the items in the supplied {@code colls}.
+     *
+     * @param colls the strings to concatenate into a seq
+     * @return a lazy seq representing the concatenation of the items in the supplied colls
+     */
+    static ISeq<Character> concat(CharSequence... colls) {
+        var sb = new StringBuilder();
+        for (var coll : colls) {
+            sb.append(coll);
+        }
+        return seq(sb.toString());
+    }
+
+    // Members
 
     /**
      * Returns the first item in this seq or null if it is empty.
@@ -780,10 +877,10 @@ public interface ISeq<T> extends List<T> {
      * <b>Caution:</b> The seq will be fully realized. If this seq is infinite, it will run infinitely or until system
      * resources are exhausted.
      *
-     * @see #from(Map)
+     * @see #seq(Map)
      * @param <K> the type of the keys
      * @param <V> the type of the values
-     * @return
+     * @return a new map with the keys and values of the items in this seq
      * @throws UnsupportedOperationException if the seq is not of type {@code java.util.Map.Entry}
      */
     <K, V> Map<K, V> toMap();
