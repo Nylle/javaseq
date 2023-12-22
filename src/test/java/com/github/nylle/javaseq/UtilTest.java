@@ -17,7 +17,7 @@ class UtilTest {
 
         @Test
         void returnsEmptySeq() {
-            var actual = Util.nil();
+            var actual = ISeq.of();
 
             assertThat(actual)
                     .isExactlyInstanceOf(Nil.class)
@@ -31,7 +31,7 @@ class UtilTest {
 
         @Test
         void returnsSeqFromFirstElementAndSeq() {
-            var actual = Util.cons("a", Util.cons("b", Util.cons("c", Nil.empty())));
+            var actual = ISeq.cons("a", ISeq.cons("b", ISeq.cons("c", Nil.empty())));
 
             assertThat(actual)
                     .isExactlyInstanceOf(Cons.class)
@@ -40,7 +40,7 @@ class UtilTest {
 
         @Test
         void returnsSeqWithNulls() {
-            var sut = Util.cons(null, Util.cons(null, Util.cons(null, Nil.empty())));
+            var sut = ISeq.cons(null, ISeq.cons(null, ISeq.cons(null, Nil.empty())));
 
             assertThat(sut).containsExactly(null, null, null);
         }
@@ -52,11 +52,11 @@ class UtilTest {
 
         @Test
         void returnsSeqFromSupplier() {
-            var actual = Util.lazySeq(() ->
-                    Util.cons("a", Util.lazySeq(() ->
-                            Util.cons("b", Util.lazySeq(() ->
-                                    Util.cons("c", Util.lazySeq(() ->
-                                            Util.nil())))))));
+            var actual = ISeq.lazySeq(() ->
+                    ISeq.cons("a", ISeq.lazySeq(() ->
+                            ISeq.cons("b", ISeq.lazySeq(() ->
+                                    ISeq.cons("c", ISeq.lazySeq(() ->
+                                            ISeq.of())))))));
 
             assertThat(actual)
                     .isInstanceOf(LazySeq.class)
@@ -65,11 +65,11 @@ class UtilTest {
 
         @Test
         void returnsSeqWithNulls() {
-            var sut = Util.lazySeq(() ->
-                    Util.cons(null, Util.lazySeq(() ->
-                            Util.cons(null, Util.lazySeq(() ->
-                                    Util.cons(null, Util.lazySeq(() ->
-                                            Util.nil())))))));
+            var sut = ISeq.lazySeq(() ->
+                    ISeq.cons(null, ISeq.lazySeq(() ->
+                            ISeq.cons(null, ISeq.lazySeq(() ->
+                                    ISeq.cons(null, ISeq.lazySeq(() ->
+                                            ISeq.of())))))));
 
             assertThat(sut)
                     .isExactlyInstanceOf(LazySeq.class)

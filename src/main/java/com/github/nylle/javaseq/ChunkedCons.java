@@ -42,7 +42,7 @@ public class ChunkedCons<T> extends ASeq<T> implements ISeq<T> {
 
     @Override
     public ISeq<T> filter(Predicate<? super T> pred) {
-        return Util.lazySeq(() -> {
+        return ISeq.lazySeq(() -> {
             var acc = new ArrayList<T>();
             for (int i = 0; i < chunkSize; i++) {
                 if (pred.test(chunk.nth(i))) {
@@ -58,7 +58,7 @@ public class ChunkedCons<T> extends ASeq<T> implements ISeq<T> {
 
     @Override
     public <R> ISeq<R> map(Function<? super T, ? extends R> f) {
-        return Util.lazySeq(() -> {
+        return ISeq.lazySeq(() -> {
             var acc = new ArrayList<R>();
             for (int i = 0; i < chunkSize; i++) {
                 acc.add(f.apply(chunk.nth(i)));
@@ -69,10 +69,10 @@ public class ChunkedCons<T> extends ASeq<T> implements ISeq<T> {
 
     @Override
     public <S, R> ISeq<R> map(Iterable<? extends S> coll, BiFunction<? super T, ? super S, ? extends R> f) {
-        return Util.lazySeq(() -> {
+        return ISeq.lazySeq(() -> {
             var s = ISeq.seq(coll);
             if (s.isEmpty()) {
-                return Util.nil();
+                return ISeq.of();
             }
             var acc = new Object[chunkSize];
             for (int i = 0; i < chunkSize; i++) {
@@ -84,17 +84,17 @@ public class ChunkedCons<T> extends ASeq<T> implements ISeq<T> {
 
     @Override
     public ISeq<T> take(long n) {
-        return Util.lazySeq(() -> {
+        return ISeq.lazySeq(() -> {
             if (n < 1) {
-                return Util.nil();
+                return ISeq.of();
             }
             if (n >= chunkSize) {
                 return new ChunkedCons<>(chunk, rest.take(n - chunkSize));
             }
 
-            var acc = Util.<T>nil();
+            var acc = ISeq.<T>of();
             for (int i = (int) n - 1; i >= 0; i--) {
-                acc = Util.cons(nth(i), acc);
+                acc = ISeq.cons(nth(i), acc);
             }
             return acc;
         });
@@ -102,7 +102,7 @@ public class ChunkedCons<T> extends ASeq<T> implements ISeq<T> {
 
     @Override
     public ISeq<T> drop(long n) {
-        return Util.lazySeq(() -> {
+        return ISeq.lazySeq(() -> {
             if (n < 1) {
                 return this;
             }
@@ -122,7 +122,7 @@ public class ChunkedCons<T> extends ASeq<T> implements ISeq<T> {
 
     @Override
     public ISeq<T> takeWhile(Predicate<? super T> pred) {
-        return Util.lazySeq(() -> {
+        return ISeq.lazySeq(() -> {
             var end = 0;
             for (int i = 0; i < chunkSize; i++) {
                 if (!pred.test(chunk.nth(i))) {
@@ -131,18 +131,18 @@ public class ChunkedCons<T> extends ASeq<T> implements ISeq<T> {
                 end++;
             }
             if (end == 0) { // no match
-                return Util.nil();
+                return ISeq.of();
             }
             if (end == chunkSize) { // all match
                 return new ChunkedCons<>(chunk, rest.takeWhile(pred));
             }
-            return new ChunkedCons<>(chunk.dropLast(chunkSize - end), Util.nil());
+            return new ChunkedCons<>(chunk.dropLast(chunkSize - end), ISeq.of());
         });
     }
 
     @Override
     public ISeq<T> dropWhile(Predicate<? super T> pred) {
-        return Util.lazySeq(() -> {
+        return ISeq.lazySeq(() -> {
             IChunk<T> acc = chunk;
             for (int i = 0; i < chunkSize; i++) {
                 if (pred.test(chunk.nth(i))) {
@@ -160,7 +160,7 @@ public class ChunkedCons<T> extends ASeq<T> implements ISeq<T> {
 
     @Override
     public <U> ISeq<U> reductions(U init, BiFunction<U, ? super T, U> f) {
-        return Util.lazySeq(() -> {
+        return ISeq.lazySeq(() -> {
             var acc = new ArrayList<U>();
             acc.add(init);
             var inter = init;

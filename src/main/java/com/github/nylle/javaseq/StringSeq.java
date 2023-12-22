@@ -42,7 +42,7 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
         if (count > 1) {
             return new StringSeq(str, index + 1, end);
         }
-        return Util.nil();
+        return ISeq.of();
     }
 
     @Override
@@ -58,13 +58,13 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
         if (n > 0) {
             return new StringSeq(str, index, (int) n + index);
         }
-        return Util.nil();
+        return ISeq.of();
     }
 
     @Override
     public ISeq<Character> drop(long n) {
         if (n >= count) {
-            return Util.nil();
+            return ISeq.of();
         }
         if (n > 0) {
             return new StringSeq(str, (int) n + index, end);
@@ -84,7 +84,7 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
         if (newEnd > index) {
             return new StringSeq(str, index, newEnd);
         }
-        return Util.nil();
+        return ISeq.of();
     }
 
     @Override
@@ -102,7 +102,7 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
         if (newIndex < end) {
             return new StringSeq(str, newIndex, end);
         }
-        return Util.nil();
+        return ISeq.of();
     }
 
     @Override

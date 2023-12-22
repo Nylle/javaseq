@@ -1,6 +1,8 @@
 package com.github.nylle.javaseq;
 
+import java.util.Optional;
 import java.util.function.BiFunction;
+import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -19,6 +21,11 @@ class Nil<T> extends ASeq<T> implements ISeq<T> {
 	}
 
 	@Override
+	public T second() {
+		return null;
+	}
+
+	@Override
 	public ISeq<T> rest() {
 		return empty();
 	}
@@ -29,8 +36,13 @@ class Nil<T> extends ASeq<T> implements ISeq<T> {
 	}
 
 	@Override
-	public T get(int index) {
+	public T nth(int index) {
 		throw new IndexOutOfBoundsException(index);
+	}
+
+	@Override
+	public T nth(int index, T notFound) {
+		return notFound;
 	}
 
 	@Override
@@ -46,6 +58,36 @@ class Nil<T> extends ASeq<T> implements ISeq<T> {
 	@Override
 	public <S, R> ISeq<R> map(Iterable<? extends S> coll, BiFunction<? super T, ? super S, ? extends R> f) {
 		return empty();
+	}
+
+	@Override
+	public <R> ISeq<R> mapcat(Function<? super T, ? extends Iterable<? extends R>> f) {
+		return empty();
+	}
+
+	@Override
+	public <S, R> ISeq<R> mapcat(Iterable<? extends S> coll, BiFunction<? super T, ? super S, Iterable<? extends R>> f) {
+		return empty();
+	}
+
+	@Override
+	public ISeq<T> reductions(BinaryOperator<T> f) {
+		return empty();
+	}
+
+	@Override
+	public <U> ISeq<U> reductions(U init, BiFunction<U, ? super T, U> f) {
+		return ISeq.of(init);
+	}
+
+	@Override
+	public Optional<T> reduce(BinaryOperator<T> f) {
+		return Optional.empty();
+	}
+
+	@Override
+	public <U> U reduce(U val, BiFunction<U, ? super T, U> f) {
+		return val;
 	}
 
 	@Override

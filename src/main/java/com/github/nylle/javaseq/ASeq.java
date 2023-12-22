@@ -25,7 +25,7 @@ public abstract class ASeq<T> extends AList<T> implements ISeq<T> {
     }
 
     public ISeq<T> cons(T x) {
-        return Util.cons(x, this);
+        return ISeq.cons(x, this);
     }
 
     public ISeq<T> concat(T... xs) {
@@ -45,32 +45,32 @@ public abstract class ASeq<T> extends AList<T> implements ISeq<T> {
     }
 
     public ISeq<T> filter(Predicate<? super T> pred) {
-        return Util.lazySeq(() -> {
+        return ISeq.lazySeq(() -> {
             if (!isEmpty()) {
                 return pred.test(first())
-                        ? Util.cons(first(), rest().filter(pred))
+                        ? ISeq.cons(first(), rest().filter(pred))
                         : rest().filter(pred);
             }
-            return Util.nil();
+            return ISeq.of();
         });
     }
 
     public <R> ISeq<R> map(Function<? super T, ? extends R> f) {
-        return Util.lazySeq(() -> {
+        return ISeq.lazySeq(() -> {
             if (!isEmpty()) {
-                return Util.cons(f.apply(first()), rest().map(f));
+                return ISeq.cons(f.apply(first()), rest().map(f));
             }
-            return Util.nil();
+            return ISeq.of();
         });
     }
 
     public <S, R> ISeq<R> map(Iterable<? extends S> coll, BiFunction<? super T, ? super S, ? extends R> f) {
-        return Util.lazySeq(() -> {
+        return ISeq.lazySeq(() -> {
             var s = ISeq.seq(coll);
             if (!isEmpty() && !s.isEmpty()) {
-                return Util.cons(f.apply(first(), s.first()), rest().map(s.rest(), f));
+                return ISeq.cons(f.apply(first(), s.first()), rest().map(s.rest(), f));
             }
-            return Util.nil();
+            return ISeq.of();
         });
     }
 
@@ -91,21 +91,21 @@ public abstract class ASeq<T> extends AList<T> implements ISeq<T> {
     }
 
     public <R> ISeq<R> mapcat(Function<? super T, ? extends Iterable<? extends R>> f) {
-        return Util.lazySeq(() -> {
+        return ISeq.lazySeq(() -> {
             if (!isEmpty()) {
                 return Util.concat(f.apply(first()).iterator(), rest().mapcat(f));
             }
-            return Util.nil();
+            return ISeq.of();
         });
     }
 
     public <S, R> ISeq<R> mapcat(Iterable<? extends S> coll, BiFunction<? super T, ? super S, Iterable<? extends R>> f) {
-        return Util.lazySeq(() -> {
+        return ISeq.lazySeq(() -> {
             var s = ISeq.seq(coll);
             if (!isEmpty() && !s.isEmpty()) {
                 return Util.concat(f.apply(first(), s.first()).iterator(), rest().mapcat(s.rest(), f));
             }
-            return Util.nil();
+            return ISeq.of();
         });
     }
 
@@ -126,44 +126,44 @@ public abstract class ASeq<T> extends AList<T> implements ISeq<T> {
     }
 
     public ISeq<T> take(long n) {
-        return Util.lazySeq(() -> {
+        return ISeq.lazySeq(() -> {
             if (n > 0 && !isEmpty()) {
                 return n == 1
                         ? ISeq.of(first())
-                        : Util.cons(first(), rest().take(n - 1));
+                        : ISeq.cons(first(), rest().take(n - 1));
             }
-            return Util.nil();
+            return ISeq.of();
         });
     }
 
     public ISeq<T> drop(long n) {
-        return Util.lazySeq(() -> {
+        return ISeq.lazySeq(() -> {
             if (!isEmpty()) {
                 return n > 0
                         ? rest().drop(n - 1)
                         : this;
             }
-            return Util.nil();
+            return ISeq.of();
         });
     }
 
     public ISeq<T> takeWhile(Predicate<? super T> pred) {
-        return Util.lazySeq(() -> {
+        return ISeq.lazySeq(() -> {
             if (!isEmpty() && pred.test(first())) {
-                return Util.cons(first(), rest().takeWhile(pred));
+                return ISeq.cons(first(), rest().takeWhile(pred));
             }
-            return Util.nil();
+            return ISeq.of();
         });
     }
 
     public ISeq<T> dropWhile(Predicate<? super T> pred) {
-        return Util.lazySeq(() -> {
+        return ISeq.lazySeq(() -> {
             if (!isEmpty()) {
                 return pred.test(first())
                         ? rest().dropWhile(pred)
                         : this;
             }
-            return Util.nil();
+            return ISeq.of();
         });
     }
 
@@ -176,20 +176,20 @@ public abstract class ASeq<T> extends AList<T> implements ISeq<T> {
     }
 
     public ISeq<List<T>> partition(int n, int step, Iterable<T> pad) {
-        return Util.lazySeq(() -> {
+        return ISeq.lazySeq(() -> {
             if (n < 0 || isEmpty()) {
-                return Util.nil();
+                return ISeq.of();
             }
             var part = take(n).toList();
             if (part.size() < n) {
                 if (pad == null) {
-                    return Util.nil();
+                    return ISeq.of();
                 }
-                return Util.cons(
+                return ISeq.cons(
                         ISeq.concat(part, ISeq.seq(pad).take(n - (long) part.size())).toList(),
                         drop(step).partition(n, step, pad));
             }
-            return Util.cons(part, drop(step).partition(n, step, pad));
+            return ISeq.cons(part, drop(step).partition(n, step, pad));
         });
     }
 
@@ -202,18 +202,18 @@ public abstract class ASeq<T> extends AList<T> implements ISeq<T> {
     }
 
     public ISeq<T> reductions(BinaryOperator<T> f) {
-        return Util.lazySeq(() -> {
+        return ISeq.lazySeq(() -> {
             if (!isEmpty()) {
                 return rest().reductions(first(), f);
             }
-            return Util.nil();
+            return ISeq.of();
         });
     }
 
     public <U> ISeq<U> reductions(U init, BiFunction<U, ? super T, U> f) {
-        return Util.lazySeq(() -> {
+        return ISeq.lazySeq(() -> {
             if (!isEmpty()) {
-                return Util.cons(init, rest().reductions(f.apply(init, first()), f));
+                return ISeq.cons(init, rest().reductions(f.apply(init, first()), f));
             }
             return ISeq.of(init);
         });
@@ -248,13 +248,13 @@ public abstract class ASeq<T> extends AList<T> implements ISeq<T> {
     }
 
     private static <T> ISeq<T> step(final ISeq<T> seq, final Set<T> seen) {
-        return Util.lazySeq(() -> {
+        return ISeq.lazySeq(() -> {
             var result = seq.filter(x -> !seen.contains(x));
             if (result.isEmpty()) {
-                return Util.nil();
+                return ISeq.of();
             }
             var first = result.first();
-            return Util.cons(first, step(result.rest(), Util.conj(seen, first)));
+            return ISeq.cons(first, step(result.rest(), Util.conj(seen, first)));
         });
     }
 
@@ -271,9 +271,9 @@ public abstract class ASeq<T> extends AList<T> implements ISeq<T> {
 
     public ISeq<T> reverse() {
         var iter = iterator();
-        var acc = Util.<T>nil();
+        var acc = ISeq.<T>of();
         while(iter.hasNext()) {
-            acc = Util.cons(iter.next(), acc);
+            acc = ISeq.cons(iter.next(), acc);
         }
         return acc;
     }
@@ -378,7 +378,7 @@ public abstract class ASeq<T> extends AList<T> implements ISeq<T> {
         var entries = this
                 .map(x -> Map.entry(k.apply(x), v.apply(x)))
                 .reduce(
-                        Util.<Map.Entry<K, V>>nil(),
+                        ISeq.<Map.Entry<K, V>>of(),
                         (acc, x) -> acc
                                 .filter(y -> !x.getKey().equals(y.getKey()))
                                 .cons(acc.findFirst(y -> y.getKey().equals(x.getKey())).map(y -> Map.entry(x.getKey(), m.apply(y.getValue(), x.getValue()))).orElse(x)));
