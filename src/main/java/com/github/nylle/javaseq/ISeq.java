@@ -55,16 +55,16 @@ public interface ISeq<T> extends List<T> {
     }
 
     /**
-     * Takes a body of expressions (supplier) that returns an ISeq or Nil that will invoke the body only the first time
-     * it is accessed, and will cache the result and return it on all subsequent calls.
+     * Takes a {@code body} of expressions (supplier) that returns an ISeq or Nil that will invoke the body only the
+     * first time it is accessed, and will cache the result and return it on all subsequent calls.
      *
-     * @param f   the supplier
-     * @param <T> the type of the items in the seq
-     * @return a new lazy seq
+     * @param body the supplier
+     * @param <T>  the type of the items in the seq
+     * @return a lazy seq
      * @see ISeq#isRealized
      */
-    static <T> ISeq<T> lazySeq(Supplier<ISeq<T>> f) {
-        return Util.lazySeq(f);
+    static <T> ISeq<T> lazySeq(Supplier<ISeq<T>> body) {
+        return Util.lazySeq(body);
     }
 
     /**
@@ -123,9 +123,9 @@ public interface ISeq<T> extends List<T> {
     /**
      * Coerces {@code coll} to a (possibly empty) seq. The returned seq will contain items of type {@code Character}.
      *
-     * @see #str
      * @param coll an array to be coerced to a seq
      * @return a seq of items in coll
+     * @see #str
      */
     static ISeq<Character> seq(char[] coll) {
         if (coll != null && coll.length > 0) {
@@ -137,9 +137,9 @@ public interface ISeq<T> extends List<T> {
     /**
      * Coerces {@code coll} to a (possibly empty) seq. The returned seq will contain items of type {@code Character}.
      *
-     * @see #str
      * @param coll an array to be coerced to a seq
      * @return a seq of items in coll
+     * @see #str
      */
     static ISeq<Character> seq(Character[] coll) {
         if (coll != null && coll.length > 0) {
@@ -155,9 +155,9 @@ public interface ISeq<T> extends List<T> {
     /**
      * Coerces {@code coll} to a (possibly empty) seq. The returned seq will contain items of type {@code Character}.
      *
-     * @see #str
      * @param coll a string to be coerced to a seq
      * @return a seq of items in coll
+     * @see #str
      */
     static ISeq<Character> seq(CharSequence coll) {
         if (coll != null && !coll.isEmpty()) {
@@ -170,11 +170,11 @@ public interface ISeq<T> extends List<T> {
      * Coerces {@code coll} to a (possibly empty) seq. Will not force a lazy collection. The returned seq will contain
      * items of type {@code Map.Entry}.
      *
-     * @see #toMap
      * @param coll a map to be coerced to a seq
      * @param <K>  the type of key in the map
      * @param <V>  the type of value in the map
      * @return a seq of items in coll
+     * @see #toMap
      */
     static <K, V> ISeq<Map.Entry<K, V>> seq(Map<K, V> coll) {
         if (coll != null) {
@@ -318,8 +318,8 @@ public interface ISeq<T> extends List<T> {
     /**
      * Returns the first item in this seq or null if it is empty.
      *
-     * @see #findFirst
      * @return the first item in this seq
+     * @see #findFirst
      */
     T first();
 
@@ -668,7 +668,7 @@ public interface ISeq<T> extends List<T> {
      * resources are exhausted.
      *
      * @param val the initial value for the reduction
-     * @param f a function taking two arguments to reduce the seq
+     * @param f   a function taking two arguments to reduce the seq
      * @param <U> the type of the result
      * @return the result of the reduction or val
      */
@@ -799,7 +799,7 @@ public interface ISeq<T> extends List<T> {
      * <b>Caution:</b> The seq will be fully realized. If this seq is infinite, it will run infinitely or until system
      * resources are exhausted.
      *
-     * @param f a function returning a number for comparison
+     * @param f   a function returning a number for comparison
      * @param <C> the type of the values to be compared
      * @return the item in this seq for which f, a number, is greatest
      */
@@ -812,7 +812,7 @@ public interface ISeq<T> extends List<T> {
      * <b>Caution:</b> The seq will be fully realized. If this seq is infinite, it will run infinitely or until system
      * resources are exhausted.
      *
-     * @param f a function returning a number for comparison
+     * @param f   a function returning a number for comparison
      * @param <C> the type of the values to be compared
      * @return the item in this seq for which f, a number, is least
      */
@@ -823,10 +823,10 @@ public interface ISeq<T> extends List<T> {
      * <p>
      * <b>Caution:</b> All items up to that index will be realized.
      *
-     * @see #find
      * @param index the index of the item to be returned
      * @return the item at index in this seq
      * @throws IndexOutOfBoundsException if index is out of bounds
+     * @see #find
      */
     T nth(int index);
 
@@ -835,10 +835,10 @@ public interface ISeq<T> extends List<T> {
      * <p>
      * <b>Caution:</b> All items up to {@code index} will be realized.
      *
-     * @see #find
-     * @param index the index of the item to be returned
+     * @param index    the index of the item to be returned
      * @param notFound the default value to be returned if index is out of bounds
      * @return the item at index in this seq, or notFount
+     * @see #find
      */
     T nth(int index, T notFound);
 
@@ -869,9 +869,9 @@ public interface ISeq<T> extends List<T> {
      * <p>
      * <b>Caution:</b> All items up to {@code index} will be realized.
      *
-     * @see #nth
      * @param index the index of the item to be returned
      * @return the item at index in this seq, or an empty Optional
+     * @see #nth
      */
     Optional<T> find(int index);
 
@@ -879,8 +879,8 @@ public interface ISeq<T> extends List<T> {
      * Returns an {@code Optional} of the first item in this seq, or an empty {@code Optional} if this seq contains
      * no items.
      *
-     * @see #first
      * @return the first item, or an empty Optional
+     * @see #first
      */
     Optional<T> findFirst();
 
@@ -903,11 +903,11 @@ public interface ISeq<T> extends List<T> {
      * <b>Caution:</b> The seq will be fully realized. If this seq is infinite, it will run infinitely or until system
      * resources are exhausted.
      *
-     * @see #seq(Map)
      * @param <K> the type of the keys
      * @param <V> the type of the values
      * @return a new map with the keys and values of the items in this seq
      * @throws UnsupportedOperationException if the seq is not of type {@code java.util.Map.Entry}
+     * @see #seq(Map)
      */
     <K, V> Map<K, V> toMap();
 
@@ -918,13 +918,13 @@ public interface ISeq<T> extends List<T> {
      * <b>Caution:</b> The seq will be fully realized. If this seq is infinite, it will run infinitely or until system
      * resources are exhausted.
      *
-     * @param k the function to generate they key
-     * @param v the function to generate the value
+     * @param k   the function to generate they key
+     * @param v   the function to generate the value
      * @param <K> the type of they keys
      * @param <V> the type of the values
      * @return a new Map with entries generated by supplied functions k and v
      * @throws IllegalArgumentException if there are any duplicate keys
-     * @throws NullPointerException if any key or value is {@code null}
+     * @throws NullPointerException     if any key or value is {@code null}
      */
     <K, V> Map<K, V> toMap(Function<T, K> k, Function<T, V> v);
 
@@ -935,9 +935,9 @@ public interface ISeq<T> extends List<T> {
      * <b>Caution:</b> The seq will be fully realized. If this seq is infinite, it will run infinitely or until system
      * resources are exhausted.
      *
-     * @param k the function to generate they key
-     * @param v the function to generate the value
-     * @param m the function to merge values for duplicate keys
+     * @param k   the function to generate they key
+     * @param v   the function to generate the value
+     * @param m   the function to merge values for duplicate keys
      * @param <K> the type of they keys
      * @param <V> the type of the values
      * @return a new Map with entries generated by supplied functions k and v
