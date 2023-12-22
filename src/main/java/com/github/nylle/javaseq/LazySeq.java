@@ -1,7 +1,6 @@
 package com.github.nylle.javaseq;
 
 import java.util.function.BiFunction;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 class LazySeq<T> extends ASeq<T> implements ISeq<T> {
@@ -53,11 +52,6 @@ class LazySeq<T> extends ASeq<T> implements ISeq<T> {
     @Override
     public <U> U reduce(U val, BiFunction<U, ? super T, U> f) {
         return seq().reduce(val, f);
-    }
-
-    @Override
-    public void run(Consumer<? super T> proc) {
-        seq().run(proc);
     }
 
     @Override

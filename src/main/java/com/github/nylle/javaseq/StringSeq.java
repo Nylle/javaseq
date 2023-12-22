@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.function.BiFunction;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class StringSeq extends ASeq<Character> implements ISeq<Character> {
@@ -113,13 +112,6 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
             result = f.apply(result, str.charAt(i));
         }
         return result;
-    }
-
-    @Override
-    public void run(Consumer<? super Character> proc) {
-        for (int i = index; i < end; i++) {
-            proc.accept(str.charAt(i));
-        }
     }
 
     @Override

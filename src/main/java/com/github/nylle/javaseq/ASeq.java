@@ -237,10 +237,10 @@ public abstract class ASeq<T> extends AList<T> implements ISeq<T> {
     }
 
     public void run(Consumer<? super T> proc) {
-        if (!isEmpty()) {
-            proc.accept(first());
-            rest().run(proc);
-        }
+        reduce(ISeq.of(), (a, b) -> {
+            proc.accept(b);
+            return ISeq.of();
+        });
     }
 
     public ISeq<T> distinct() {

@@ -3,7 +3,6 @@ package com.github.nylle.javaseq;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.function.BiFunction;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class ArraySeq<T> extends ASeq<T> implements ISeq<T> {
@@ -123,13 +122,6 @@ public class ArraySeq<T> extends ASeq<T> implements ISeq<T> {
             result = f.apply(result, array[i]);
         }
         return result;
-    }
-
-    @Override
-    public void run(Consumer<? super T> proc) {
-        for (int i = index; i < end; i++) {
-            proc.accept(array[i]);
-        }
     }
 
     @Override

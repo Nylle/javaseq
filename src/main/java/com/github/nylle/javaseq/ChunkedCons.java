@@ -3,7 +3,6 @@ package com.github.nylle.javaseq;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -180,14 +179,6 @@ public class ChunkedCons<T> extends ASeq<T> implements ISeq<T> {
             result = f.apply(result, chunk.nth(i));
         }
         return rest.reduce(result, f);
-    }
-
-    @Override
-    public void run(Consumer<? super T> proc) {
-        for (int i = 0; i < chunkSize; i++) {
-            proc.accept(chunk.nth(i));
-        }
-        rest.run(proc);
     }
 
     @Override
