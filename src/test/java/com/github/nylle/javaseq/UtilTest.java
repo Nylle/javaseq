@@ -6,9 +6,11 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Set;
 
@@ -137,5 +139,21 @@ class UtilTest {
             assertThat(sut.drop(13).take(3)).containsExactly('f', 'o', 'o');
             assertThat(sut.str()).isEqualTo("Hello world!\nfoo\nbar");
         }
+    }
+
+    @Test
+    void toOutputStream() throws IOException {
+        var tmpFile = File.createTempFile("test", ".tmp");
+        try (var outputStream = new FileOutputStream(tmpFile)) {
+
+            var sut = ISeq.seq("Hello world!\nfoo\nbar");
+
+            var charactersWritten = sut.reduce(0, Util.toOutputStream(outputStream, StandardCharsets.UTF_8));
+
+            assertThat(charactersWritten).isEqualTo(sut.count());
+        }
+
+        var actual = Files.readAllLines(tmpFile.toPath(), StandardCharsets.UTF_8);
+        assertThat(actual).containsExactly("Hello world!", "foo", "bar");
     }
 }

@@ -1,6 +1,7 @@
 package com.github.nylle.javaseq;
 
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 public class Util {
@@ -93,5 +95,16 @@ public class Util {
         var result = new ArrayList<>(coll);
         result.addAll(Arrays.asList(xs));
         return List.copyOf(result);
+    }
+
+    public static BiFunction<Integer, Character, Integer> toOutputStream(FileOutputStream outputStream, Charset charset) {
+        return (a, b) -> {
+            try {
+                outputStream.write(charset.encode(b.toString()).array());
+                return a + 1;
+            } catch (IOException ex) {
+                throw new IllegalStateException("unexpected IO error", ex);
+            }
+        };
     }
 }
