@@ -13,6 +13,7 @@ import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
@@ -39,6 +40,31 @@ public interface ISeq<T> extends List<T> {
     @SafeVarargs
     static <T> ISeq<T> of(T... xs) {
         return Util.arraySeq(xs);
+    }
+
+    /**
+     * Returns a seq where {@code x} is the first item and {@code coll} is the rest.
+     *
+     * @param x    the first item
+     * @param coll the remaining items
+     * @param <T>  the type of the items
+     * @return a seq where x is the first item and coll is the rest
+     */
+    static <T> ISeq<T> cons(T x, Iterable<T> coll) {
+        return Util.cons(x, ISeq.seq(coll));
+    }
+
+    /**
+     * Takes a body of expressions (supplier) that returns an ISeq or Nil that will invoke the body only the first time
+     * it is accessed, and will cache the result and return it on all subsequent calls.
+     *
+     * @param f   the supplier
+     * @param <T> the type of the items in the seq
+     * @return a new lazy seq
+     * @see ISeq#isRealized
+     */
+    static <T> ISeq<T> lazySeq(Supplier<ISeq<T>> f) {
+        return Util.lazySeq(f);
     }
 
     /**
