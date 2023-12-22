@@ -2,9 +2,11 @@
 
 ## This Is An Exercise
 
-The goal was to build an alternative to Java's Stream API and provide missing features. The API and usage are heavily influenced by Clojure. I've made no measurements in regard to its performance.
+The goal was to build an alternative to Java's Stream API and provide missing features. However, it turned out to be a truly persistent, immutable data-structure with all its advantages and disadvantages. API, usage, and implementation are heavily influenced by Clojure. 
 
-Feel free to copy any of this code. If you find yourself using this in your Java project a lot, chances are you're using the wrong programming-language. Take a look at [C#](https://en.wikipedia.org/wiki/C_Sharp_(programming_language)), [Kotlin](https://kotlinlang.org/) or [Clojure](https://clojure.org/).
+The performance is not comparable to Streams, but depending on the usage (source, size, manipulations), it performs between ArrayList and LinkedList, especially larger collections (> 1000 items) perform surprisingly better than LinkedList.
+
+Feel free to copy any of this code. If you find yourself using this in your Java-project a lot, chances are you're using the wrong programming-language. Take a look at [Clojure](https://clojure.org/) if you want fast, immutable, persistent data structures.
 
 <details>
 <summary>Getting started</summary>
@@ -42,8 +44,10 @@ I've always had a difficult relationship with Java's Streams. After a decade wor
 
 ### Streams Are Not Re-usable
 
-- Stream is not a data structure. The Stream-API is just a thin wrapper around `Iterator`, which provides out-of-the-box laziness.
-- This means that once a Stream is "realized" (fully consumed) it cannot be consumed again, because the underlying iterator cannot be consumed again.
+- Stream is **not** a data structure. The Stream-API is just a thin wrapper around `Iterator`, which provides out-of-the-box laziness.
+- This means that once a Stream is consumed/reduced it cannot be read again, because the underlying iterator cannot be rewound.
+- Instead, a full copy of the original data is created while both, the source and the result are mutable. 
+- Anyone holding a reference to either can never rely on what they get.
 
 ### Features Are Missing
 
@@ -51,10 +55,11 @@ While Streams help to work with lazy collections by providing the aforementioned
 - **zip** -- Map two potentially infinite collections by applying a bi-function f to the set of first items of each collection, followed by applying f to the set of second items in each collection and so forth, until any one of the collections is exhausted (see Clojure's [map](https://clojuredocs.org/clojure.core/map)-function).
 - **partition** -- Split a potentially infinite collection into a collection of collections of fixed size. This allows for batching or creating a sliding window.
 - **head/tail** -- Access the first and/or remaining items of a potentially infinite collection.
+- caching in general
 
 ## Usage
 
-**ISeq** is immutable and always being evaluated lazily. Its content is being cached, hence it can be re-used and operated on as often as needed. Consuming an infinite Seq entirely will run infinitely or until system resources are exhausted.
+**ISeq** is immutable, which means anyone holding a reference to it, will always get the same result. It is also persistent, which means dropping or adding an item will not return a full copy of the collection; instead, the previous, immutable state will be re-used in combination with the added item. Seqs are always being evaluated lazily, which allows for infinite sequences and handling very large amounts of data. Their content is being cached, for it to be re-used and operated on as often as needed. Consuming an infinite Seq entirely, of course will run infinitely or until system resources are exhausted.
 
 ### Creation
 
@@ -140,10 +145,10 @@ _(This is similar to zipping two collections.)_
 - Returns a seq of the result of applying concat to the result of applying map to f and coll and the items in this seq. Function f should return a collection. 
 
 #### takeWhile(pred)
-- Returns a seq of successive items from this seq while pred(item) returns true.
+- Returns a seq of successive items from this seq while pred of item returns true.
 
 #### dropWhile(pred)
-- Returns a seq of the items in this seq starting from the first item for which pred(item) returns false.
+- Returns a seq of the items in this seq starting from the first item for which pred of item returns false.
 
 #### partition(n)
 - Returns a seq of lists of n items each.
@@ -293,19 +298,19 @@ _(This is similar to zipping two collections.)_
 If you're using [Lombok](https://projectlombok.org/) you can add `@ExtensionMethods({SeqExtensions.class})` to your class in order to access the extension methods below.
 
 #### Iterable::toSeq()
-- Returns a seq of the items in extended Iterable.
+- Returns a seq of the items in Iterable.
 
 #### Iterator::toSeq()
-- Returns a seq of the items in extended Iterator.
+- Returns a seq of the items in Iterator.
 
 #### Object[]::toSeq()
-- Returns a seq of the items in extended array.
+- Returns a seq of the items in array.
 
 #### Stream::toSeq()
-- Returns a seq of the items in extended Stream.
+- Returns a seq of the items in Stream.
 
 #### Map::toSeq()
-- Returns a seq of the key-value-pairs in extended Map.
+- Returns a seq of the key-value-pairs in Map.
 
 #### String::toSeq()
-- Returns a seq of the characters in extended String.
+- Returns a seq of the characters in String.
