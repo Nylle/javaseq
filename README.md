@@ -4,7 +4,20 @@
 
 The goal was to build an alternative to Java's Stream API and provide missing features. The API and usage are heavily influenced by Clojure. I've made no measurements in regard to its performance.
 
-Feel free to copy any of this code. If you find yourself using this class in your Java-code a lot, chances are you're using the wrong programming-language. Take a look at [C#](https://en.wikipedia.org/wiki/C_Sharp_(programming_language)), [Kotlin](https://kotlinlang.org/) or [Clojure](https://clojure.org/).
+Feel free to copy any of this code. If you find yourself using this in your Java project a lot, chances are you're using the wrong programming-language. Take a look at [C#](https://en.wikipedia.org/wiki/C_Sharp_(programming_language)), [Kotlin](https://kotlinlang.org/) or [Clojure](https://clojure.org/).
+
+<details>
+<summary>Getting started</summary>
+
+```xml
+<dependency>
+    <groupId>com.github.nylle</groupId>
+    <artifactId>javaseq</artifactId>
+    <version>0.0.1</version>
+</dependency>
+```
+
+</details>
 
 <details>
 <summary>Usage</summary>
