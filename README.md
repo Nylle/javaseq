@@ -1,8 +1,10 @@
-[![Tests](https://github.com/nylle/javaseq/workflows/test/badge.svg?branch=master)](https://github.com/nylle/javaseq/actions?query=workflow%3Atest)
+[![Tests](https://github.com/Nylle/javaseq/workflows/test/badge.svg)](https://github.com/Nylle/JavaFixture/actions?query=workflow%3ATest)
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.nylle/javaseq.svg?label=maven-central)](https://maven-badges.herokuapp.com/maven-central/com.github.nylle/javaseq)
 [![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](http://opensource.org/licenses/MIT)
 
-# Seq
+# JavaSeq
+
+A lazy, immutable, persistent sequence for Java
 
 ## This Is An Exercise
 
