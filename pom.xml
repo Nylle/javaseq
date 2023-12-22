@@ -11,7 +11,7 @@
 
     <name>java-seq</name>
     <url>https://github.com/Nylle/javaseq</url>
-    <description/>
+    <description>A lazy, immutable, persistent sequence for Java</description>
 
     <properties>
         <java.version>17</java.version>
