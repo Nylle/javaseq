@@ -4,6 +4,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Set;
 
@@ -112,6 +117,25 @@ class UtilTest {
         @Test
         void returnsNewSetWithXAdded() {
             assertThat(Util.conj(Set.of(1), 2)).isInstanceOf(Set.class).containsExactlyInAnyOrder(1, 2);
+        }
+    }
+
+    @Test
+    void chunkInputStreamSeq() throws IOException {
+        var tmpFile = File.createTempFile("test", ".tmp");
+        var writer = new FileWriter(tmpFile);
+        writer.write("Hello world!\nfoo\nbar");
+        writer.close();
+
+        try(var inputStream = new FileInputStream(tmpFile)) {
+
+            var sut = Util.chunkInputStreamSeq(inputStream, StandardCharsets.UTF_8);
+
+            assertThat(sut.first()).isEqualTo('H');
+            assertThat(sut.nth(11)).isEqualTo('!');
+            assertThat(sut.drop(12).first()).isEqualTo('\n');
+            assertThat(sut.drop(13).take(3)).containsExactly('f', 'o', 'o');
+            assertThat(sut.str()).isEqualTo("Hello world!\nfoo\nbar");
         }
     }
 }

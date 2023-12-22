@@ -1,5 +1,8 @@
 package com.github.nylle.javaseq;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -12,8 +15,6 @@ public class Util {
 
     private Util() {
     }
-
-    private static final int CHUNK_SIZE = 32;
 
     public static <T> ISeq<T> nil() {
         return Nil.empty();
@@ -36,6 +37,7 @@ public class Util {
         return new StringSeq(coll, 0, coll.length());
     }
 
+    private static final int CHUNK_SIZE = 32;
     public static <T> ISeq<T> chunkIteratorSeq(final Iterator<T> iterator) {
         if (iterator.hasNext()) {
             return lazySeq(() -> {
@@ -46,6 +48,26 @@ public class Util {
                 }
                 return new ChunkedCons<>(new ArrayChunk<>(arr, 0, n), chunkIteratorSeq(iterator));
             });
+        }
+        return nil();
+    }
+
+    private static final int BUFFER_SIZE = 8192;
+    public static ISeq<Character> chunkInputStreamSeq(FileInputStream in, Charset charset) {
+        try {
+            if (in.available() > 0) {
+                return lazySeq(() -> {
+                    try {
+                        byte[] bytes = new byte[BUFFER_SIZE];
+                        int end = in.read(bytes);
+                        return new ChunkedCons<>(new StringChunk(new String(bytes, charset), 0, end), chunkInputStreamSeq(in, charset));
+                    } catch (IOException ex) {
+                        throw new IllegalStateException("unexpected IO error", ex);
+                    }
+                });
+            }
+        } catch (IOException ex) {
+            throw new IllegalStateException("unexpected IO error", ex);
         }
         return nil();
     }
