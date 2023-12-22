@@ -89,6 +89,8 @@ public interface ISeq<T> extends List<T> {
         if (coll == null) return Util.nil();
         if (coll instanceof ISeq<T> seq) return seq;
         if (coll instanceof ArrayList<T> arrayList) return Util.arraySeq((T[]) arrayList.toArray());
+        if (coll.getClass().getName().equals("java.util.ImmutableCollections$ListN")) return Util.arraySeq((T[]) ((List<T>)(coll)).toArray());
+        if (coll.getClass().getName().equals("java.util.ImmutableCollections$List12")) return Util.arraySeq((T[]) ((List<T>)(coll)).toArray());
         return seq(coll.iterator());
     }
 

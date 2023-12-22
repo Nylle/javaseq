@@ -57,7 +57,7 @@ class SeqExtensionsTest {
             var list = List.of(1, 2, 3);
 
             assertThat(SeqExtensions.toSeq(list))
-                    .isInstanceOf(LazySeq.class)
+                    .isInstanceOf(ArraySeq.class)
                     .containsExactly(1, 2, 3);
         }
     }

@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -72,7 +73,7 @@ class ISeqTest {
 
         @Test
         void returnsSeqOfItemsInIterable() {
-            var list = List.of(1, 2, 3);
+            var list = new LinkedList<>(List.of(1, 2, 3));
 
             assertThat(ISeq.seq(list))
                     .isInstanceOf(LazySeq.class)
@@ -82,6 +83,24 @@ class ISeqTest {
         @Test
         void returnsSeqOfItemsInArrayList() {
             var arrayList = new ArrayList<>(List.of("a", "b", "c"));
+
+            assertThat(ISeq.seq(arrayList))
+                    .isExactlyInstanceOf(ArraySeq.class)
+                    .containsExactly("a", "b", "c");
+        }
+
+        @Test
+        void returnsSeqOfItemsInList12() {
+            var arrayList = List.of("a");
+
+            assertThat(ISeq.seq(arrayList))
+                    .isExactlyInstanceOf(ArraySeq.class)
+                    .containsExactly("a");
+        }
+
+        @Test
+        void returnsSeqOfItemsInListN() {
+            var arrayList = List.of("a", "b", "c");
 
             assertThat(ISeq.seq(arrayList))
                     .isExactlyInstanceOf(ArraySeq.class)
@@ -307,5 +326,4 @@ class ISeqTest {
                     .containsExactly("a", "aa", "aaa", "aaaa", "aaaaa", "aaaaaa", "aaaaaaa");
         }
     }
-
 }
