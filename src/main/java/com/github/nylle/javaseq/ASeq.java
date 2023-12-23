@@ -322,7 +322,7 @@ public abstract class ASeq<T> extends AList<T> implements ISeq<T> {
         return nth(index, () -> notFound);
     }
 
-    private T nth(int index, Supplier<T> notFound) {
+    protected T nth(int index, Supplier<T> notFound) {
         if (index < 0 || isEmpty()) {
             return notFound.get();
         }
@@ -460,10 +460,15 @@ public abstract class ASeq<T> extends AList<T> implements ISeq<T> {
         ISeq<T> seq = this;
         while (!seq.isEmpty()) {
             result.append(seq.first());
-            if (!seq.rest().isEmpty()) {
-                result.append(", ");
+            if (seq.rest().isRealized()) {
+                if (!seq.rest().isEmpty()) {
+                    result.append(", ");
+                }
+                seq = seq.rest();
+            } else {
+                result.append(", ").append("?");
+                break;
             }
-            seq = seq.rest();
         }
         return result.append("]").toString();
     }

@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 public class ArraySeq<T> extends ASeq<T> implements ISeq<T> {
 
@@ -145,19 +146,11 @@ public class ArraySeq<T> extends ASeq<T> implements ISeq<T> {
     }
 
     @Override
-    public T nth(int i) {
-        if (i < 0 || i >= count) {
-            throw new IndexOutOfBoundsException(i);
+    protected T nth(int index, Supplier<T> notFound) {
+        if (index < 0 || index >= count) {
+            return notFound.get();
         }
-        return array[i + index];
-    }
-
-    @Override
-    public T nth(int i, T notFound) {
-        if (i < 0 || i >= count) {
-            return notFound;
-        }
-        return array[i + index];
+        return array[index + this.index];
     }
 
     @Override

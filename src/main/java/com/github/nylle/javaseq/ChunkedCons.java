@@ -10,12 +10,10 @@ public class ChunkedCons<T> extends ASeq<T> implements ISeq<T> {
 
     private final IChunk<T> chunk;
     private final ISeq<T> rest;
-    private final int chunkSize;
 
     ChunkedCons(IChunk<T> chunk, ISeq<T> rest) {
         this.chunk = chunk;
         this.rest = rest;
-        this.chunkSize = chunk.count();
     }
 
     private static <T> ChunkedCons<T> chunkedCons(ArrayList<T> xs, ISeq<T> rest) {
@@ -29,7 +27,7 @@ public class ChunkedCons<T> extends ASeq<T> implements ISeq<T> {
 
     @Override
     public ISeq<T> rest() {
-        if (chunkSize > 1) {
+        if (chunk.count() > 1) {
             return new ChunkedCons<>(chunk.dropFirst(), rest);
         }
         return rest;
@@ -44,7 +42,7 @@ public class ChunkedCons<T> extends ASeq<T> implements ISeq<T> {
     public ISeq<T> filter(Predicate<? super T> pred) {
         return ISeq.lazySeq(() -> {
             var acc = new ArrayList<T>();
-            for (int i = 0; i < chunkSize; i++) {
+            for (int i = 0; i < chunk.count(); i++) {
                 if (pred.test(chunk.nth(i))) {
                     acc.add(chunk.nth(i));
                 }
@@ -60,7 +58,7 @@ public class ChunkedCons<T> extends ASeq<T> implements ISeq<T> {
     public <R> ISeq<R> map(Function<? super T, ? extends R> f) {
         return ISeq.lazySeq(() -> {
             var acc = new ArrayList<R>();
-            for (int i = 0; i < chunkSize; i++) {
+            for (int i = 0; i < chunk.count(); i++) {
                 acc.add(f.apply(chunk.nth(i)));
             }
             return chunkedCons(acc, rest.map(f));
@@ -74,11 +72,11 @@ public class ChunkedCons<T> extends ASeq<T> implements ISeq<T> {
             if (s.isEmpty()) {
                 return ISeq.of();
             }
-            var acc = new Object[chunkSize];
-            for (int i = 0; i < chunkSize; i++) {
+            var acc = new Object[chunk.count()];
+            for (int i = 0; i < chunk.count(); i++) {
                 acc[i] = f.apply(chunk.nth(i), s.nth(i));
             }
-            return new ChunkedCons<R>(new ArrayChunk(acc), rest.map(s.drop(chunkSize), f));
+            return new ChunkedCons<R>(new ArrayChunk(acc), rest.map(s.drop(chunk.count()), f));
         });
     }
 
@@ -88,8 +86,8 @@ public class ChunkedCons<T> extends ASeq<T> implements ISeq<T> {
             if (n < 1) {
                 return ISeq.of();
             }
-            if (n >= chunkSize) {
-                return new ChunkedCons<>(chunk, rest.take(n - chunkSize));
+            if (n >= chunk.count()) {
+                return new ChunkedCons<>(chunk, rest.take(n - chunk.count()));
             }
 
             var acc = ISeq.<T>of();
@@ -107,8 +105,8 @@ public class ChunkedCons<T> extends ASeq<T> implements ISeq<T> {
                 return this;
             }
 
-            if (n >= chunkSize) {
-                return rest.drop(n - chunkSize);
+            if (n >= chunk.count()) {
+                return rest.drop(n - chunk.count());
             }
 
             IChunk<T> acc = chunk;
@@ -124,7 +122,7 @@ public class ChunkedCons<T> extends ASeq<T> implements ISeq<T> {
     public ISeq<T> takeWhile(Predicate<? super T> pred) {
         return ISeq.lazySeq(() -> {
             var end = 0;
-            for (int i = 0; i < chunkSize; i++) {
+            for (int i = 0; i < chunk.count(); i++) {
                 if (!pred.test(chunk.nth(i))) {
                     break;
                 }
@@ -133,10 +131,10 @@ public class ChunkedCons<T> extends ASeq<T> implements ISeq<T> {
             if (end == 0) { // no match
                 return ISeq.of();
             }
-            if (end == chunkSize) { // all match
+            if (end == chunk.count()) { // all match
                 return new ChunkedCons<>(chunk, rest.takeWhile(pred));
             }
-            return new ChunkedCons<>(chunk.dropLast(chunkSize - end), ISeq.of());
+            return new ChunkedCons<>(chunk.dropLast(chunk.count() - end), ISeq.of());
         });
     }
 
@@ -144,7 +142,7 @@ public class ChunkedCons<T> extends ASeq<T> implements ISeq<T> {
     public ISeq<T> dropWhile(Predicate<? super T> pred) {
         return ISeq.lazySeq(() -> {
             IChunk<T> acc = chunk;
-            for (int i = 0; i < chunkSize; i++) {
+            for (int i = 0; i < chunk.count(); i++) {
                 if (pred.test(chunk.nth(i))) {
                     acc = acc.dropFirst();
                 } else {
@@ -164,18 +162,18 @@ public class ChunkedCons<T> extends ASeq<T> implements ISeq<T> {
             var acc = new ArrayList<U>();
             acc.add(init);
             var inter = init;
-            for (int i = 0; i < chunkSize - 1; i++) {
+            for (int i = 0; i < chunk.count() - 1; i++) {
                 inter = f.apply(inter, chunk.nth(i));
                 acc.add(inter);
             }
-            return chunkedCons(acc, rest.reductions(f.apply(inter, chunk.nth(chunkSize-1)), f));
+            return chunkedCons(acc, rest.reductions(f.apply(inter, chunk.nth(chunk.count() -1)), f));
         });
     }
 
     @Override
     public <U> U reduce(U val, BiFunction<U, ? super T, U> f) {
         var result = val;
-        for (int i = 0; i < chunkSize; i++) {
+        for (int i = 0; i < chunk.count(); i++) {
             result = f.apply(result, chunk.nth(i));
         }
         return rest.reduce(result, f);
@@ -183,7 +181,7 @@ public class ChunkedCons<T> extends ASeq<T> implements ISeq<T> {
 
     @Override
     public boolean some(Predicate<? super T> pred) {
-        for(int i = 0; i < chunkSize; i++) {
+        for(int i = 0; i < chunk.count(); i++) {
             if(pred.test(chunk.nth(i))) {
                 return true;
             }
@@ -193,7 +191,7 @@ public class ChunkedCons<T> extends ASeq<T> implements ISeq<T> {
 
     @Override
     public boolean every(Predicate<? super T> pred) {
-        for(int i = 0; i < chunkSize; i++) {
+        for(int i = 0; i < chunk.count(); i++) {
             if(!pred.test(chunk.nth(i))) {
                 return false;
             }
@@ -204,11 +202,11 @@ public class ChunkedCons<T> extends ASeq<T> implements ISeq<T> {
     @Override
     public T nth(int index) {
         if(index < 0) throw new IndexOutOfBoundsException(index);
-        if(index < chunkSize) {
+        if(index < chunk.count()) {
             return chunk.nth(index);
         }
         try {
-            return rest.nth(index - chunkSize);
+            return rest.nth(index - chunk.count());
         } catch(IndexOutOfBoundsException ex) {
             throw new IndexOutOfBoundsException(index);
         }
@@ -217,21 +215,21 @@ public class ChunkedCons<T> extends ASeq<T> implements ISeq<T> {
     @Override
     public T nth(int index, T notFound) {
         if(index < 0) return notFound;
-        if(index < chunkSize) {
+        if(index < chunk.count()) {
             return chunk.nth(index);
         }
-        return rest.nth(index - chunkSize, notFound);
+        return rest.nth(index - chunk.count(), notFound);
     }
 
     @Override
     public int count() {
-        return chunkSize + rest.count();
+        return chunk.count() + rest.count();
     }
 
     @Override
     public List<T> toList() {
         var acc = new ArrayList<T>();
-        for (int i = 0; i < chunkSize; i++) {
+        for (int i = 0; i < chunk.count(); i++) {
             acc.add(chunk.nth(i));
         }
         acc.addAll(rest.toList());

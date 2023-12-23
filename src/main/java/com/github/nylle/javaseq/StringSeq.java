@@ -2,9 +2,9 @@ package com.github.nylle.javaseq;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 public class StringSeq extends ASeq<Character> implements ISeq<Character> {
 
@@ -135,17 +135,9 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
     }
 
     @Override
-    public Character nth(int i) {
+    protected Character nth(int i, Supplier<Character> notFound) {
         if (i < 0 || i >= count) {
-            throw new IndexOutOfBoundsException(i);
-        }
-        return str.charAt(i + index);
-    }
-
-    @Override
-    public Character nth(int i, Character notFound) {
-        if (i < 0 || i >= count) {
-            return notFound;
+            return notFound.get();
         }
         return str.charAt(i + index);
     }
@@ -167,15 +159,5 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
             acc.add(str.charAt(i));
         }
         return List.copyOf(acc);
-    }
-
-    @Override
-    public Set<Character> toSet() {
-        return Set.copyOf(toList());
-    }
-
-    @Override
-    public String toString() {
-        return toList().toString();
     }
 }

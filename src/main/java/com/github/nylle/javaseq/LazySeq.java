@@ -83,23 +83,4 @@ class LazySeq<T> extends ASeq<T> implements ISeq<T> {
     public int lastIndexOf(Object o) {
         return seq().lastIndexOf(o);
     }
-
-    @Override
-    public String toString() {
-        var result = new StringBuilder("[");
-        ISeq<T> seq = this;
-        while (!seq.isEmpty()) {
-            result.append(seq.first());
-            if (seq.rest().isRealized()) {
-                if (!seq.rest().isEmpty()) {
-                    result.append(", ");
-                }
-                seq = seq.rest();
-            } else {
-                result.append(", ").append("?");
-                break;
-            }
-        }
-        return result.append("]").toString();
-    }
 }
