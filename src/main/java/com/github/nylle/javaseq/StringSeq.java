@@ -153,7 +153,7 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
     }
 
     @Override
-    public List<Character> toList() {
+    public List<Character> reify() {
         var acc = new ArrayList<Character>();
         for (int i = index; i < end; i++) {
             acc.add(str.charAt(i));

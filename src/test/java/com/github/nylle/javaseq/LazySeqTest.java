@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
@@ -377,16 +376,9 @@ class LazySeqTest {
         }
 
         @Test
-        void toListReturnsEmptyList() {
-            assertThat(fromEmpty().toList())
+        void reifyReturnsEmptyList() {
+            assertThat(fromEmpty().reify())
                     .isInstanceOf(List.class)
-                    .isEmpty();
-        }
-
-        @Test
-        void toSetReturnsEmptySet() {
-            assertThat(fromEmpty().toSet())
-                    .isInstanceOf(Set.class)
                     .isEmpty();
         }
 
@@ -974,20 +966,20 @@ class LazySeqTest {
             var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.partition(0).take(2)).containsExactly(
-                    List.of(),
-                    List.of());
+                    ISeq.of(),
+                    ISeq.of());
 
             assertThat(sut.partition(0, 1).take(2)).containsExactly(
-                    List.of(),
-                    List.of());
+                    ISeq.of(),
+                    ISeq.of());
 
             assertThat(sut.partition(0, 0).take(2)).containsExactly(
-                    List.of(),
-                    List.of());
+                    ISeq.of(),
+                    ISeq.of());
 
             assertThat(sut.partition(0, -1).take(2)).containsExactly(
-                    List.of(),
-                    List.of());
+                    ISeq.of(),
+                    ISeq.of());
         }
 
         @Test
@@ -995,19 +987,19 @@ class LazySeqTest {
             var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.partition(1).take(3)).containsExactly(
-                    List.of(0),
-                    List.of(1),
-                    List.of(2));
+                    ISeq.of(0),
+                    ISeq.of(1),
+                    ISeq.of(2));
 
             assertThat(sut.partition(1, 1).take(3)).containsExactly(
-                    List.of(0),
-                    List.of(1),
-                    List.of(2));
+                    ISeq.of(0),
+                    ISeq.of(1),
+                    ISeq.of(2));
 
             assertThat(sut.partition(1, 2).take(3)).containsExactly(
-                    List.of(0),
-                    List.of(2),
-                    List.of(4));
+                    ISeq.of(0),
+                    ISeq.of(2),
+                    ISeq.of(4));
         }
 
         @Test
@@ -1015,19 +1007,19 @@ class LazySeqTest {
             var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.partition(3).take(3)).containsExactly(
-                    List.of(0, 1, 2),
-                    List.of(3, 4, 5),
-                    List.of(6, 7, 8));
+                    ISeq.of(0, 1, 2),
+                    ISeq.of(3, 4, 5),
+                    ISeq.of(6, 7, 8));
 
             assertThat(sut.partition(3, 3).take(3)).containsExactly(
-                    List.of(0, 1, 2),
-                    List.of(3, 4, 5),
-                    List.of(6, 7, 8));
+                    ISeq.of(0, 1, 2),
+                    ISeq.of(3, 4, 5),
+                    ISeq.of(6, 7, 8));
 
             assertThat(sut.partition(4, 6).take(3)).containsExactly(
-                    List.of(0, 1, 2, 3),
-                    List.of(6, 7, 8, 9),
-                    List.of(12, 13, 14, 15));
+                    ISeq.of(0, 1, 2, 3),
+                    ISeq.of(6, 7, 8, 9),
+                    ISeq.of(12, 13, 14, 15));
         }
 
         @Test
@@ -1035,27 +1027,27 @@ class LazySeqTest {
             var sut = recursive(0, x -> x + 1).take(14);
 
             assertThat(sut.partition(4)).containsExactly(
-                    List.of(0, 1, 2, 3),
-                    List.of(4, 5, 6, 7),
-                    List.of(8, 9, 10, 11));
+                    ISeq.of(0, 1, 2, 3),
+                    ISeq.of(4, 5, 6, 7),
+                    ISeq.of(8, 9, 10, 11));
 
             assertThat(sut.partition(4, 4)).containsExactly(
-                    List.of(0, 1, 2, 3),
-                    List.of(4, 5, 6, 7),
-                    List.of(8, 9, 10, 11));
+                    ISeq.of(0, 1, 2, 3),
+                    ISeq.of(4, 5, 6, 7),
+                    ISeq.of(8, 9, 10, 11));
 
             assertThat(sut.partition(3, 4)).containsExactly(
-                    List.of(0, 1, 2),
-                    List.of(4, 5, 6),
-                    List.of(8, 9, 10));
+                    ISeq.of(0, 1, 2),
+                    ISeq.of(4, 5, 6),
+                    ISeq.of(8, 9, 10));
         }
 
         @Test
         void returnsSeqOfOneEmptyListForStepGreaterThanOrEqualToSizeN() {
             var sut = fromRange(1, 4);
 
-            assertThat(sut.partition(0, 3)).containsExactly(List.of());
-            assertThat(sut.partition(0, 4)).containsExactly(List.of());
+            assertThat(sut.partition(0, 3)).containsExactly(ISeq.of());
+            assertThat(sut.partition(0, 4)).containsExactly(ISeq.of());
         }
 
         @Test
@@ -1063,9 +1055,9 @@ class LazySeqTest {
             var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.partition(3, 2).take(3)).containsExactly(
-                    List.of(0, 1, 2),
-                    List.of(2, 3, 4),
-                    List.of(4, 5, 6));
+                    ISeq.of(0, 1, 2),
+                    ISeq.of(2, 3, 4),
+                    ISeq.of(4, 5, 6));
         }
 
         @Nested
@@ -1076,16 +1068,16 @@ class LazySeqTest {
                 var sut = recursive(0, x -> x + 1).take(14);
 
                 assertThat(sut.partition(4, 4, List.of(-1, -2, -3, -4))).containsExactly(
-                        List.of(0, 1, 2, 3),
-                        List.of(4, 5, 6, 7),
-                        List.of(8, 9, 10, 11),
-                        List.of(12, 13, -1, -2));
+                        ISeq.of(0, 1, 2, 3),
+                        ISeq.of(4, 5, 6, 7),
+                        ISeq.of(8, 9, 10, 11),
+                        ISeq.of(12, 13, -1, -2));
 
                 assertThat(sut.partition(3, 4, List.of(-1, -2, -3, -4))).containsExactly(
-                        List.of(0, 1, 2),
-                        List.of(4, 5, 6),
-                        List.of(8, 9, 10),
-                        List.of(12, 13, -1));
+                        ISeq.of(0, 1, 2),
+                        ISeq.of(4, 5, 6),
+                        ISeq.of(8, 9, 10),
+                        ISeq.of(12, 13, -1));
             }
 
             @Test
@@ -1093,16 +1085,16 @@ class LazySeqTest {
                 var sut = recursive(0, x -> x + 1).take(14);
 
                 assertThat(sut.partition(4, 4, List.of())).containsExactly(
-                        List.of(0, 1, 2, 3),
-                        List.of(4, 5, 6, 7),
-                        List.of(8, 9, 10, 11),
-                        List.of(12, 13));
+                        ISeq.of(0, 1, 2, 3),
+                        ISeq.of(4, 5, 6, 7),
+                        ISeq.of(8, 9, 10, 11),
+                        ISeq.of(12, 13));
 
                 assertThat(sut.partition(3, 4, List.of())).containsExactly(
-                        List.of(0, 1, 2),
-                        List.of(4, 5, 6),
-                        List.of(8, 9, 10),
-                        List.of(12, 13));
+                        ISeq.of(0, 1, 2),
+                        ISeq.of(4, 5, 6),
+                        ISeq.of(8, 9, 10),
+                        ISeq.of(12, 13));
             }
         }
     }
@@ -1134,20 +1126,20 @@ class LazySeqTest {
             var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.partitionAll(0).take(2)).containsExactly(
-                    List.of(),
-                    List.of());
+                    ISeq.of(),
+                    ISeq.of());
 
             assertThat(sut.partitionAll(0, 1).take(2)).containsExactly(
-                    List.of(),
-                    List.of());
+                    ISeq.of(),
+                    ISeq.of());
 
             assertThat(sut.partitionAll(0, 0).take(2)).containsExactly(
-                    List.of(),
-                    List.of());
+                    ISeq.of(),
+                    ISeq.of());
 
             assertThat(sut.partitionAll(0, -1).take(2)).containsExactly(
-                    List.of(),
-                    List.of());
+                    ISeq.of(),
+                    ISeq.of());
         }
 
         @Test
@@ -1155,19 +1147,19 @@ class LazySeqTest {
             var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.partitionAll(1).take(3)).containsExactly(
-                    List.of(0),
-                    List.of(1),
-                    List.of(2));
+                    ISeq.of(0),
+                    ISeq.of(1),
+                    ISeq.of(2));
 
             assertThat(sut.partitionAll(1, 1).take(3)).containsExactly(
-                    List.of(0),
-                    List.of(1),
-                    List.of(2));
+                    ISeq.of(0),
+                    ISeq.of(1),
+                    ISeq.of(2));
 
             assertThat(sut.partitionAll(1, 2).take(3)).containsExactly(
-                    List.of(0),
-                    List.of(2),
-                    List.of(4));
+                    ISeq.of(0),
+                    ISeq.of(2),
+                    ISeq.of(4));
         }
 
         @Test
@@ -1175,27 +1167,27 @@ class LazySeqTest {
             var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.partitionAll(3).take(3)).containsExactly(
-                    List.of(0, 1, 2),
-                    List.of(3, 4, 5),
-                    List.of(6, 7, 8));
+                    ISeq.of(0, 1, 2),
+                    ISeq.of(3, 4, 5),
+                    ISeq.of(6, 7, 8));
 
             assertThat(sut.partitionAll(3, 3).take(3)).containsExactly(
-                    List.of(0, 1, 2),
-                    List.of(3, 4, 5),
-                    List.of(6, 7, 8));
+                    ISeq.of(0, 1, 2),
+                    ISeq.of(3, 4, 5),
+                    ISeq.of(6, 7, 8));
 
             assertThat(sut.partitionAll(4, 6).take(3)).containsExactly(
-                    List.of(0, 1, 2, 3),
-                    List.of(6, 7, 8, 9),
-                    List.of(12, 13, 14, 15));
+                    ISeq.of(0, 1, 2, 3),
+                    ISeq.of(6, 7, 8, 9),
+                    ISeq.of(12, 13, 14, 15));
         }
 
         @Test
         void returnsSeqOfOneEmptyListForStepGreaterThanOrEqualToSizeN() {
             var sut = fromRange(1, 4);
 
-            assertThat(sut.partitionAll(0, 3)).containsExactly(List.of());
-            assertThat(sut.partitionAll(0, 4)).containsExactly(List.of());
+            assertThat(sut.partitionAll(0, 3)).containsExactly(ISeq.of());
+            assertThat(sut.partitionAll(0, 4)).containsExactly(ISeq.of());
         }
 
         @Test
@@ -1203,9 +1195,9 @@ class LazySeqTest {
             var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.partitionAll(3, 2).take(3)).containsExactly(
-                    List.of(0, 1, 2),
-                    List.of(2, 3, 4),
-                    List.of(4, 5, 6));
+                    ISeq.of(0, 1, 2),
+                    ISeq.of(2, 3, 4),
+                    ISeq.of(4, 5, 6));
         }
 
         @Test
@@ -1213,16 +1205,16 @@ class LazySeqTest {
             var sut = recursive(0, x -> x + 1).take(14);
 
             assertThat(sut.partitionAll(4, 4)).containsExactly(
-                    List.of(0, 1, 2, 3),
-                    List.of(4, 5, 6, 7),
-                    List.of(8, 9, 10, 11),
-                    List.of(12, 13));
+                    ISeq.of(0, 1, 2, 3),
+                    ISeq.of(4, 5, 6, 7),
+                    ISeq.of(8, 9, 10, 11),
+                    ISeq.of(12, 13));
 
             assertThat(sut.partitionAll(3, 4)).containsExactly(
-                    List.of(0, 1, 2),
-                    List.of(4, 5, 6),
-                    List.of(8, 9, 10),
-                    List.of(12, 13));
+                    ISeq.of(0, 1, 2),
+                    ISeq.of(4, 5, 6),
+                    ISeq.of(8, 9, 10),
+                    ISeq.of(12, 13));
         }
     }
 
@@ -1355,7 +1347,7 @@ class LazySeqTest {
         void returnsDistinctItemsInSameOrderAsEncounteredFirst() {
             var sut = fromIterator(List.of("a", "c", "a", "b", "b", "d", "f", "e", "g", "e").iterator());
 
-            assertThat(sut.distinct().toList()).containsExactly("a", "c", "b", "d", "f", "e", "g");
+            assertThat(sut.distinct()).containsExactly("a", "c", "b", "d", "f", "e", "g");
         }
     }
 
@@ -1670,14 +1662,14 @@ class LazySeqTest {
     }
 
     @Nested
-    class ToList {
+    class Reify {
 
         @Test
         void returnsFullyRealizedList() {
             var sut = recursive(0, x -> x + 1);
 
             assertThat(sut.isRealized()).isFalse();
-            assertThat(sut.take(4).toList())
+            assertThat(sut.take(4).reify())
                     .isInstanceOf(List.class)
                     .containsExactly(0, 1, 2, 3);
             assertThat(sut.isRealized()).isTrue();

@@ -7,7 +7,6 @@ import org.mockito.Mockito;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -457,20 +456,20 @@ class StringSeqTest {
             var sut = sutFromString("foo");
 
             assertThat(sut.partition(0).take(2)).containsExactly(
-                    List.of(),
-                    List.of());
+                    ISeq.of(),
+                    ISeq.of());
 
             assertThat(sut.partition(0, 1).take(2)).containsExactly(
-                    List.of(),
-                    List.of());
+                    ISeq.of(),
+                    ISeq.of());
 
             assertThat(sut.partition(0, 0).take(2)).containsExactly(
-                    List.of(),
-                    List.of());
+                    ISeq.of(),
+                    ISeq.of());
 
             assertThat(sut.partition(0, -1).take(2)).containsExactly(
-                    List.of(),
-                    List.of());
+                    ISeq.of(),
+                    ISeq.of());
         }
 
         @Test
@@ -478,19 +477,19 @@ class StringSeqTest {
             var sut = sutFromString("01234");
 
             assertThat(sut.partition(1).take(3)).containsExactly(
-                    List.of('0'),
-                    List.of('1'),
-                    List.of('2'));
+                    ISeq.of('0'),
+                    ISeq.of('1'),
+                    ISeq.of('2'));
 
             assertThat(sut.partition(1, 1).take(3)).containsExactly(
-                    List.of('0'),
-                    List.of('1'),
-                    List.of('2'));
+                    ISeq.of('0'),
+                    ISeq.of('1'),
+                    ISeq.of('2'));
 
             assertThat(sut.partition(1, 2).take(3)).containsExactly(
-                    List.of('0'),
-                    List.of('2'),
-                    List.of('4'));
+                    ISeq.of('0'),
+                    ISeq.of('2'),
+                    ISeq.of('4'));
         }
 
         @Test
@@ -498,19 +497,19 @@ class StringSeqTest {
             var sut = sutFromString("abcdefghijklmnop");
 
             assertThat(sut.partition(3).take(3)).containsExactly(
-                    List.of('a', 'b', 'c'),
-                    List.of('d', 'e', 'f'),
-                    List.of('g', 'h', 'i'));
+                    ISeq.of('a', 'b', 'c'),
+                    ISeq.of('d', 'e', 'f'),
+                    ISeq.of('g', 'h', 'i'));
 
             assertThat(sut.partition(3, 3).take(3)).containsExactly(
-                    List.of('a', 'b', 'c'),
-                    List.of('d', 'e', 'f'),
-                    List.of('g', 'h', 'i'));
+                    ISeq.of('a', 'b', 'c'),
+                    ISeq.of('d', 'e', 'f'),
+                    ISeq.of('g', 'h', 'i'));
 
             assertThat(sut.partition(4, 6)).containsExactly(
-                    List.of('a', 'b', 'c', 'd'),
-                    List.of('g', 'h', 'i', 'j'),
-                    List.of('m', 'n', 'o', 'p'));
+                    ISeq.of('a', 'b', 'c', 'd'),
+                    ISeq.of('g', 'h', 'i', 'j'),
+                    ISeq.of('m', 'n', 'o', 'p'));
         }
 
         @Test
@@ -518,19 +517,19 @@ class StringSeqTest {
             var sut = sutFromString("abcdefghijklmn");
 
             assertThat(sut.partition(4)).containsExactly(
-                    List.of('a', 'b', 'c', 'd'),
-                    List.of('e', 'f', 'g', 'h'),
-                    List.of('i', 'j', 'k', 'l'));
+                    ISeq.of('a', 'b', 'c', 'd'),
+                    ISeq.of('e', 'f', 'g', 'h'),
+                    ISeq.of('i', 'j', 'k', 'l'));
 
             assertThat(sut.partition(4, 4)).containsExactly(
-                    List.of('a', 'b', 'c', 'd'),
-                    List.of('e', 'f', 'g', 'h'),
-                    List.of('i', 'j', 'k', 'l'));
+                    ISeq.of('a', 'b', 'c', 'd'),
+                    ISeq.of('e', 'f', 'g', 'h'),
+                    ISeq.of('i', 'j', 'k', 'l'));
 
             assertThat(sut.partition(3, 4)).containsExactly(
-                    List.of('a', 'b', 'c'),
-                    List.of('e', 'f', 'g'),
-                    List.of('i', 'j', 'k'));
+                    ISeq.of('a', 'b', 'c'),
+                    ISeq.of('e', 'f', 'g'),
+                    ISeq.of('i', 'j', 'k'));
         }
 
         @Test
@@ -538,10 +537,10 @@ class StringSeqTest {
             var sut = sutFromString("foo");
 
             assertThat(sut.partition(0, 3)).containsExactly(
-                    List.of());
+                    ISeq.of());
 
             assertThat(sut.partition(0, 4)).containsExactly(
-                    List.of());
+                    ISeq.of());
         }
 
         @Test
@@ -549,9 +548,9 @@ class StringSeqTest {
             var sut = sutFromString("abcde");
 
             assertThat(sut.partition(3, 1)).containsExactly(
-                    List.of('a', 'b', 'c'),
-                    List.of('b', 'c', 'd'),
-                    List.of('c', 'd', 'e'));
+                    ISeq.of('a', 'b', 'c'),
+                    ISeq.of('b', 'c', 'd'),
+                    ISeq.of('c', 'd', 'e'));
         }
 
         @Nested
@@ -562,16 +561,16 @@ class StringSeqTest {
                 var sut = sutFromString("abcdefghijklmn");
 
                 assertThat(sut.partition(4, 4, List.of('0', '1', '2', '3'))).containsExactly(
-                        List.of('a', 'b', 'c', 'd'),
-                        List.of('e', 'f', 'g', 'h'),
-                        List.of('i', 'j', 'k', 'l'),
-                        List.of('m', 'n', '0', '1'));
+                        ISeq.of('a', 'b', 'c', 'd'),
+                        ISeq.of('e', 'f', 'g', 'h'),
+                        ISeq.of('i', 'j', 'k', 'l'),
+                        ISeq.of('m', 'n', '0', '1'));
 
                 assertThat(sut.partition(3, 4, List.of('0', '1', '2', '3'))).containsExactly(
-                        List.of('a', 'b', 'c'),
-                        List.of('e', 'f', 'g'),
-                        List.of('i', 'j', 'k'),
-                        List.of('m', 'n', '0'));
+                        ISeq.of('a', 'b', 'c'),
+                        ISeq.of('e', 'f', 'g'),
+                        ISeq.of('i', 'j', 'k'),
+                        ISeq.of('m', 'n', '0'));
             }
 
             @Test
@@ -579,16 +578,16 @@ class StringSeqTest {
                 var sut = sutFromString("abcdefghijklmn");
 
                 assertThat(sut.partition(4, 4, List.of())).containsExactly(
-                        List.of('a', 'b', 'c', 'd'),
-                        List.of('e', 'f', 'g', 'h'),
-                        List.of('i', 'j', 'k', 'l'),
-                        List.of('m', 'n'));
+                        ISeq.of('a', 'b', 'c', 'd'),
+                        ISeq.of('e', 'f', 'g', 'h'),
+                        ISeq.of('i', 'j', 'k', 'l'),
+                        ISeq.of('m', 'n'));
 
                 assertThat(sut.partition(3, 4, List.of())).containsExactly(
-                        List.of('a', 'b', 'c'),
-                        List.of('e', 'f', 'g'),
-                        List.of('i', 'j', 'k'),
-                        List.of('m', 'n'));
+                        ISeq.of('a', 'b', 'c'),
+                        ISeq.of('e', 'f', 'g'),
+                        ISeq.of('i', 'j', 'k'),
+                        ISeq.of('m', 'n'));
             }
         }
     }
@@ -613,20 +612,20 @@ class StringSeqTest {
             var sut = sutFromString("foo");
 
             assertThat(sut.partitionAll(0).take(2)).containsExactly(
-                    List.of(),
-                    List.of());
+                    ISeq.of(),
+                    ISeq.of());
 
             assertThat(sut.partitionAll(0, 1).take(2)).containsExactly(
-                    List.of(),
-                    List.of());
+                    ISeq.of(),
+                    ISeq.of());
 
             assertThat(sut.partitionAll(0, 0).take(2)).containsExactly(
-                    List.of(),
-                    List.of());
+                    ISeq.of(),
+                    ISeq.of());
 
             assertThat(sut.partitionAll(0, -1).take(2)).containsExactly(
-                    List.of(),
-                    List.of());
+                    ISeq.of(),
+                    ISeq.of());
         }
 
         @Test
@@ -634,19 +633,19 @@ class StringSeqTest {
             var sut = sutFromString("01234");
 
             assertThat(sut.partitionAll(1).take(3)).containsExactly(
-                    List.of('0'),
-                    List.of('1'),
-                    List.of('2'));
+                    ISeq.of('0'),
+                    ISeq.of('1'),
+                    ISeq.of('2'));
 
             assertThat(sut.partitionAll(1, 1).take(3)).containsExactly(
-                    List.of('0'),
-                    List.of('1'),
-                    List.of('2'));
+                    ISeq.of('0'),
+                    ISeq.of('1'),
+                    ISeq.of('2'));
 
             assertThat(sut.partitionAll(1, 2).take(3)).containsExactly(
-                    List.of('0'),
-                    List.of('2'),
-                    List.of('4'));
+                    ISeq.of('0'),
+                    ISeq.of('2'),
+                    ISeq.of('4'));
         }
 
         @Test
@@ -654,27 +653,27 @@ class StringSeqTest {
             var sut = sutFromString("abcdefghijklmnop");
 
             assertThat(sut.partitionAll(3).take(3)).containsExactly(
-                    List.of('a', 'b', 'c'),
-                    List.of('d', 'e', 'f'),
-                    List.of('g', 'h', 'i'));
+                    ISeq.of('a', 'b', 'c'),
+                    ISeq.of('d', 'e', 'f'),
+                    ISeq.of('g', 'h', 'i'));
 
             assertThat(sut.partitionAll(3, 3).take(3)).containsExactly(
-                    List.of('a', 'b', 'c'),
-                    List.of('d', 'e', 'f'),
-                    List.of('g', 'h', 'i'));
+                    ISeq.of('a', 'b', 'c'),
+                    ISeq.of('d', 'e', 'f'),
+                    ISeq.of('g', 'h', 'i'));
 
             assertThat(sut.partitionAll(4, 6)).containsExactly(
-                    List.of('a', 'b', 'c', 'd'),
-                    List.of('g', 'h', 'i', 'j'),
-                    List.of('m', 'n', 'o', 'p'));
+                    ISeq.of('a', 'b', 'c', 'd'),
+                    ISeq.of('g', 'h', 'i', 'j'),
+                    ISeq.of('m', 'n', 'o', 'p'));
         }
 
         @Test
         void returnsSeqOfOneEmptyListForStepGreaterThanOrEqualToSizeN() {
             var sut = sutFromString("foo");
 
-            assertThat(sut.partitionAll(0, 3)).containsExactly(List.of());
-            assertThat(sut.partitionAll(0, 4)).containsExactly(List.of());
+            assertThat(sut.partitionAll(0, 3)).containsExactly(ISeq.of());
+            assertThat(sut.partitionAll(0, 4)).containsExactly(ISeq.of());
         }
 
         @Test
@@ -682,11 +681,11 @@ class StringSeqTest {
             var sut = sutFromString("abcde");
 
             assertThat(sut.partitionAll(3, 1)).containsExactly(
-                    List.of('a', 'b', 'c'),
-                    List.of('b', 'c', 'd'),
-                    List.of('c', 'd', 'e'),
-                    List.of('d', 'e'),
-                    List.of('e'));
+                    ISeq.of('a', 'b', 'c'),
+                    ISeq.of('b', 'c', 'd'),
+                    ISeq.of('c', 'd', 'e'),
+                    ISeq.of('d', 'e'),
+                    ISeq.of('e'));
         }
 
         @Test
@@ -694,16 +693,16 @@ class StringSeqTest {
             var sut = sutFromString("abcdefghijklmn");
 
             assertThat(sut.partitionAll(4, 4)).containsExactly(
-                    List.of('a', 'b', 'c', 'd'),
-                    List.of('e', 'f', 'g', 'h'),
-                    List.of('i', 'j', 'k', 'l'),
-                    List.of('m', 'n'));
+                    ISeq.of('a', 'b', 'c', 'd'),
+                    ISeq.of('e', 'f', 'g', 'h'),
+                    ISeq.of('i', 'j', 'k', 'l'),
+                    ISeq.of('m', 'n'));
 
             assertThat(sut.partitionAll(3, 4)).containsExactly(
-                    List.of('a', 'b', 'c'),
-                    List.of('e', 'f', 'g'),
-                    List.of('i', 'j', 'k'),
-                    List.of('m', 'n'));
+                    ISeq.of('a', 'b', 'c'),
+                    ISeq.of('e', 'f', 'g'),
+                    ISeq.of('i', 'j', 'k'),
+                    ISeq.of('m', 'n'));
         }
     }
 
@@ -714,7 +713,7 @@ class StringSeqTest {
         void returnsASeqWithTheIntermediateValuesOfTheReduction() {
             var sut = sutFromString("foo");
 
-            assertThat(sut.reductions((a, b) -> b).toList()).containsExactly('f', 'o', 'o');
+            assertThat(sut.reductions((a, b) -> b)).containsExactly('f', 'o', 'o');
         }
 
         @Test
@@ -1025,43 +1024,12 @@ class StringSeqTest {
     }
 
     @Test
-    void toListReturnsList() {
+    void reifyReturnsList() {
         var sut = sutFromString("bar");
 
-        assertThat(sut.toList())
+        assertThat(sut.reify())
                 .isInstanceOf(List.class)
                 .containsExactly('b', 'a', 'r');
-    }
-
-    @Nested
-    class ToSet {
-
-        @Test
-        void returnsSet() {
-            var sut = sutFromString("bar");
-
-            assertThat(sut.toSet())
-                    .isInstanceOf(Set.class)
-                    .containsExactlyInAnyOrder('b', 'a', 'r');
-        }
-
-        @Test
-        void returnsSetOfRest() {
-            var sut = sutFromString("xbar").rest();
-
-            assertThat(sut.toSet())
-                    .isInstanceOf(Set.class)
-                    .containsExactlyInAnyOrder('b', 'a', 'r');
-        }
-
-        @Test
-        void returnsSetWithUniqueItems() {
-            var sut = sutFromString("foo");
-
-            assertThat(sut.toSet())
-                    .isInstanceOf(Set.class)
-                    .containsExactlyInAnyOrder('f', 'o');
-        }
     }
 
     @Test

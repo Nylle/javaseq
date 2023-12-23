@@ -180,13 +180,13 @@ public abstract class ASeq<T> extends AList<T> implements ISeq<T> {
             if (n < 0 || isEmpty()) {
                 return ISeq.of();
             }
-            var part = take(n).toList();
-            if (part.size() < n) {
+            var part = take(n);
+            if (part.count() < n) {
                 if (pad == null) {
                     return ISeq.of();
                 }
                 return ISeq.cons(
-                        ISeq.concat(part, ISeq.seq(pad).take(n - (long) part.size())).toList(),
+                        ISeq.concat(part, ISeq.seq(pad).take(n - (long) part.count())),
                         drop(step).partition(n, step, pad));
             }
             return ISeq.cons(part, drop(step).partition(n, step, pad));
@@ -386,19 +386,7 @@ public abstract class ASeq<T> extends AList<T> implements ISeq<T> {
         return Map.ofEntries(entries.toArray(new Map.Entry[0]));
     }
 
-    public List<T> toList() {
-        return reify();
-    }
-
-    public Set<T> toSet() {
-        return Set.copyOf(this);
-    }
-
-
-    // AList
-
-    @Override
-    List<T> reify() {
+    public List<T> reify() {
         return List.copyOf(this);
     }
 

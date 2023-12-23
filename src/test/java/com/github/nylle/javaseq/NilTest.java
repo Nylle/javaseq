@@ -6,7 +6,6 @@ import org.mockito.Mockito;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -356,16 +355,9 @@ public class NilTest {
     }
 
     @Test
-    void toListReturnsEmptyList() {
-        assertThat(Nil.empty().toList())
+    void reifyReturnsEmptyList() {
+        assertThat(Nil.empty().reify())
                 .isInstanceOf(List.class)
-                .isEmpty();
-    }
-
-    @Test
-    void toSetReturnsEmptySet() {
-        assertThat(Nil.empty().toSet())
-                .isInstanceOf(Set.class)
                 .isEmpty();
     }
 

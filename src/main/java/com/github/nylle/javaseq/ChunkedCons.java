@@ -227,12 +227,12 @@ public class ChunkedCons<T> extends ASeq<T> implements ISeq<T> {
     }
 
     @Override
-    public List<T> toList() {
+    public List<T> reify() {
         var acc = new ArrayList<T>();
         for (int i = 0; i < chunk.count(); i++) {
             acc.add(chunk.nth(i));
         }
-        acc.addAll(rest.toList());
+        acc.addAll(rest);
         return List.copyOf(acc);
     }
 }

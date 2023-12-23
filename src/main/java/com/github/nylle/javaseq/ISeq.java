@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
@@ -948,22 +947,13 @@ public interface ISeq<T> extends List<T> {
     <K, V> Map<K, V> toMap(Function<T, K> k, Function<T, V> v, BinaryOperator<V> m);
 
     /**
-     * Returns a {@code List} with all items in this seq.
+     * Returns an immutable {@code java.util.List} with all items in this seq. Throws a {@code java.lang.NullPointerException}
+     * if any nulls are in this seq.
      * <p>
      * <b>Caution:</b> The seq will be fully realized. If this seq is infinite, it will run infinitely or until system
      * resources are exhausted.
      *
      * @return a List with all items in this seq
      */
-    List<T> toList();
-
-    /**
-     * Returns a {@code Set} with all unique items in this seq.
-     * <p>
-     * <b>Caution:</b> The seq will be fully realized. If this seq is infinite, it will run infinitely or until system
-     * resources are exhausted.
-     *
-     * @return a Set with all unique items in this seq
-     */
-    Set<T> toSet();
+    List<T> reify();
 }

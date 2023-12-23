@@ -6,7 +6,6 @@ import org.mockito.Mockito;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -332,7 +331,7 @@ class ChunkedConsTest {
         void returnsSeqDroppingSameItemsAsChunk() {
             var sut = new ChunkedCons<>(arrayChunk(1, 2, 3), ISeq.of(4, 5, 6));
 
-            assertThat(sut.drop(3).toList()).containsExactly(4, 5, 6);
+            assertThat(sut.drop(3)).containsExactly(4, 5, 6);
         }
 
         @Test
@@ -727,38 +726,29 @@ class ChunkedConsTest {
     }
 
     @Nested
-    class ToList {
+    class Reify {
 
         @Test
         void throwsWhenChunkContainsNull() {
             var sut = new ChunkedCons<>(arrayChunk(1, 2, 3, null), ISeq.of(4, 5, 6));
 
-            assertThatExceptionOfType(NullPointerException.class).isThrownBy(() -> sut.toList());
+            assertThatExceptionOfType(NullPointerException.class).isThrownBy(() -> sut.reify());
         }
 
         @Test
         void throwsWhenRestContainsNull() {
             var sut = new ChunkedCons<>(arrayChunk(1, 2, 3), ISeq.of(4, 5, 6, null));
 
-            assertThatExceptionOfType(NullPointerException.class).isThrownBy(() -> sut.toList());
+            assertThatExceptionOfType(NullPointerException.class).isThrownBy(() -> sut.reify());
         }
 
         @Test
         void returnsAllItems() {
             var sut = new ChunkedCons<>(arrayChunk(1, 2, 3), ISeq.of(4, 5, 6));
 
-            assertThat(sut.toList())
+            assertThat(sut.reify())
                     .isInstanceOf(List.class)
                     .containsExactly(1, 2, 3, 4, 5, 6);
         }
-    }
-
-    @Test
-    void toSetReturnsUniqueItems() {
-        var sut = new ChunkedCons<>(arrayChunk(1, 2, 2), ISeq.of(6, 3, 6));
-
-        assertThat(sut.toSet())
-                .isInstanceOf(Set.class)
-                .containsExactlyInAnyOrder(1, 2, 3, 6);
     }
 }
