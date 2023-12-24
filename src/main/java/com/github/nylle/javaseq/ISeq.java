@@ -540,52 +540,52 @@ public interface ISeq<T> extends List<T> {
     ISeq<T> dropWhile(Predicate<? super T> pred);
 
     /**
-     * Returns a lazy seq of lists of {@code n} items each.
+     * Returns a lazy seq of seqs of {@code n} items each.
      *
-     * @param n the number of items per list
-     * @return a seq of lists of n items each
+     * @param n the number of items per partition
+     * @return a seq of seqs of n items each
      */
-    ISeq<List<T>> partition(int n);
+    ISeq<ISeq<T>> partition(int n);
 
     /**
-     * Returns a lazy seq of lists of {@code n} items each, at offsets {@code step} apart.
+     * Returns a lazy seq of seqs of {@code n} items each, at offsets {@code step} apart.
      *
-     * @param n    the number of items per list
+     * @param n    the number of items per partition
      * @param step the offset of each partition
-     * @return a seq of lists of n items each, at offsets step apart
+     * @return a seq of seqs of n items each, at offsets step apart
      */
-    ISeq<List<T>> partition(int n, int step);
+    ISeq<ISeq<T>> partition(int n, int step);
 
     /**
-     * Returns a lazy seq of lists of {@code n} items each, at offsets {@code step} apart. The items in {@code pad} are
+     * Returns a lazy seq of seqs of {@code n} items each, at offsets {@code step} apart. The items in {@code pad} are
      * used as necessary to complete the last partition up to {@code n} items. In case there are not enough padding
      * items, returns a partition with less than {@code n} items.
      *
-     * @param n    the number of items per list
+     * @param n    the number of items per partition
      * @param step the offset of each partition
      * @param pad  a list of items to pad a potentially incomplete last partition
-     * @return a seq of lists of n items each, at offsets step apart and the last partition padded with pad
+     * @return a seq of seqs of n items each, at offsets step apart and the last partition padded with pad
      */
-    ISeq<List<T>> partition(int n, int step, Iterable<T> pad);
+    ISeq<ISeq<T>> partition(int n, int step, Iterable<T> pad);
 
     /**
-     * Returns a lazy seq of lists of {@code n} items each, like {@link #partition}, but may include partitions with
+     * Returns a lazy seq of seqs of {@code n} items each, like {@link #partition}, but may include partitions with
      * fewer than {@code n} items at the end.
      *
-     * @param n the number of items per list
-     * @return a seq of lists of n items each
+     * @param n the number of items per partition
+     * @return a seq of seqs of n items each
      */
-    ISeq<List<T>> partitionAll(int n);
+    ISeq<ISeq<T>> partitionAll(int n);
 
     /**
-     * Returns a lazy seq of lists of {@code n} items each, at offsets {@code step} apart, like {@link #partition}, but
+     * Returns a lazy seq of seqs of {@code n} items each, at offsets {@code step} apart, like {@link #partition}, but
      * may include partitions with fewer than {@code n} items at the end.
      *
-     * @param n    the number of items per list
+     * @param n    the number of items per partition
      * @param step the offset of each partition
-     * @return a seq of lists of n items each, at offsets step apart
+     * @return a seq of seqs of n items each, at offsets step apart
      */
-    ISeq<List<T>> partitionAll(int n, int step);
+    ISeq<ISeq<T>> partitionAll(int n, int step);
 
     /**
      * Returns a lazy seq of the intermediate values of the reduction (as per {@link #reduce}) of this seq by {@code f}.

@@ -157,19 +157,19 @@ _(This is similar to zipping two collections.)_
 - Returns a seq of the items in this seq starting from the first item for which pred of item returns false.
 
 #### partition(n)
-- Returns a seq of lists of n items each.
+- Returns a seq of seqs of n items each.
 
 #### partition(n, step)
-- Returns a seq of lists of n items each, at offsets step apart.
+- Returns a seq of seqs of n items each, at offsets step apart.
 
 #### partition(n, step, pad)
-- Returns a seq of lists of n items each, at offsets step apart. The items in pad are used as necessary to complete the last partition up to n items. In case there are not enough padding items, returns a partition with less than n items.
+- Returns a seq of seqs of n items each, at offsets step apart. The items in pad are used as necessary to complete the last partition up to n items. In case there are not enough padding items, returns a partition with less than n items.
 
 #### partitionAll(n)
-- Returns a seq of lists of n items each, like [partition](#partitionn), but may include partitions with fewer than n items at the end.
+- Returns a seq of seqs of n items each, like [partition](#partitionn), but may include partitions with fewer than n items at the end.
 
 #### partitionAll(n, step)
-- Returns a seq of lists of n items each, at offsets step apart, like [partition](#partitionn-step), but may include partitions with fewer than n items at the end.
+- Returns a seq of seqs of n items each, at offsets step apart, like [partition](#partitionn-step), but may include partitions with fewer than n items at the end.
 
 #### reductions(f)
 - Returns a seq of the intermediate values of the reduction (as per [reduce](#reducef)) of this seq by f.
@@ -262,7 +262,7 @@ _(This is similar to zipping two collections.)_
 #### toMap(k, v, m)
 - Returns a new Map with keys as a result of k(x) and values as a result of v(x) of all xs in this seq, using m(v(x1), v(x2)) to resolve key-collision. **Caution:** The seq will be fully realized. If this seq is infinite, it will run infinitely or until system resources are exhausted.
 
-#### toList()
+#### reify()
 - Returns a List with all items in this seq. **Caution:** The seq will be fully realized. If this seq is infinite, it will run infinitely or until system resources are exhausted.
 
 #### str()

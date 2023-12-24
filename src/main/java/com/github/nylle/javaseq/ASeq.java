@@ -167,15 +167,15 @@ public abstract class ASeq<T> extends AList<T> implements ISeq<T> {
         });
     }
 
-    public ISeq<List<T>> partition(int n) {
+    public ISeq<ISeq<T>> partition(int n) {
         return partition(n, n);
     }
 
-    public ISeq<List<T>> partition(int n, int step) {
+    public ISeq<ISeq<T>> partition(int n, int step) {
         return partition(n, step, null);
     }
 
-    public ISeq<List<T>> partition(int n, int step, Iterable<T> pad) {
+    public ISeq<ISeq<T>> partition(int n, int step, Iterable<T> pad) {
         return ISeq.lazySeq(() -> {
             if (n < 0 || isEmpty()) {
                 return ISeq.of();
@@ -193,11 +193,11 @@ public abstract class ASeq<T> extends AList<T> implements ISeq<T> {
         });
     }
 
-    public ISeq<List<T>> partitionAll(int n) {
+    public ISeq<ISeq<T>> partitionAll(int n) {
         return partition(n, n, List.of());
     }
 
-    public ISeq<List<T>> partitionAll(int n, int step) {
+    public ISeq<ISeq<T>> partitionAll(int n, int step) {
         return partition(n, step, List.of());
     }
 
