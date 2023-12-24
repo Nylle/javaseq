@@ -7,7 +7,7 @@
     <groupId>com.github.nylle</groupId>
     <artifactId>javaseq</artifactId>
     <packaging>jar</packaging>
-    <version>0.0.1</version>
+    <version>0.0.2</version>
 
     <name>java-seq</name>
     <url>https://github.com/Nylle/javaseq</url>
