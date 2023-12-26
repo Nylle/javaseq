@@ -41,7 +41,7 @@ class LazySeq<T> extends ASeq<T> implements ISeq<T> {
 
     @Override
     public boolean isEmpty() {
-        return seq() instanceof Nil;
+        return seq().isEmpty();
     }
 
     @Override
