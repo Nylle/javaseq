@@ -149,7 +149,7 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
 
     @Override
     public ISeq<Character> reverse() {
-        return new StringSeq(new StringBuilder(str.subSequence(index, end)).reverse().toString(), 0, end);
+        return new StringSeq(new StringBuilder(str.subSequence(index, end)).reverse().toString(), 0, end-index);
     }
 
     @Override

@@ -743,11 +743,22 @@ class StringSeqTest {
         }
     }
 
-    @Test
-    void reverseReturnsReversedSeq() {
-        var sut = sutFromString("abcde");
+    @Nested
+    class Reverse {
 
-        assertThat(sut.reverse()).containsExactly('e', 'd', 'c', 'b', 'a');
+        @Test
+        void returnsReversedSeq() {
+            var sut = sutFromString("abcde");
+
+            assertThat(sut.reverse()).containsExactly('e', 'd', 'c', 'b', 'a');
+        }
+
+        @Test
+        void returnsReversedSubSeq() {
+            var sut = sutFromString("abcde").drop(1).take(3);
+
+            assertThat(sut.reverse()).containsExactly('d', 'c', 'b');
+        }
     }
 
     @Nested
