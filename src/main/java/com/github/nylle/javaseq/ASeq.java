@@ -2,6 +2,7 @@ package com.github.nylle.javaseq;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -390,6 +391,11 @@ public abstract class ASeq<T> extends AList<T> implements ISeq<T> {
         return List.copyOf(this);
     }
 
+    public Map<T, Integer> frequencies() {
+        var acc = new HashMap<T, Integer>();
+        this.run(x -> acc.compute(x, (k, v) -> (v == null) ? 1 : v + 1));
+        return Map.copyOf(acc);
+    }
 
     // java.lang.Iterable
 

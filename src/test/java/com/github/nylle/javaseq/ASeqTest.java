@@ -8,6 +8,7 @@ import org.mockito.Mockito;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -140,7 +141,7 @@ class ASeqTest {
     }
 
     @Nested
-    class Map {
+    class MapTest {
 
         @Test
         void returnsSingleMapResult() {
@@ -1231,6 +1232,15 @@ class ASeqTest {
                     .containsEntry(1, "b")
                     .containsEntry(2, "bb");
         }
+    }
+
+    @Test
+    void frequenciesReturnsAMapFromDistinctItemsToTheNumberOfTimesTheyAppear() {
+        var sut = ISeq.seq("abaxyxaba");
+
+        var actual = sut.partition(3, 3).frequencies();
+
+        assertThat(actual).containsExactlyInAnyOrderEntriesOf(Map.of(ISeq.seq("xyx"), 1, ISeq.seq("aba"), 2));
     }
 
     @Test

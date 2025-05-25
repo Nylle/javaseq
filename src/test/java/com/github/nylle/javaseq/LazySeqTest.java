@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
@@ -1751,6 +1752,15 @@ class LazySeqTest {
         var sut = recursive(0, x -> x + 1);
 
         assertThat(sut.parallelStream().limit(3)).containsExactly(0, 1, 2);
+    }
+
+    @Test
+    void frequenciesReturnsAMapFromDistinctItemsToTheNumberOfTimesTheyAppear() {
+        var sut = recursive(-2, x -> x + 1).map(x -> Math.abs(x));
+
+        var actual = sut.drop(1).take(4).frequencies();
+
+        assertThat(actual).containsExactlyInAnyOrderEntriesOf(Map.of(1, 2, 0, 1, 2, 1));
     }
 
     @Nested

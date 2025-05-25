@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.Comparator;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -467,6 +468,15 @@ class ArraySeqTest {
         assertThat(sutFrom(0, 1, 2, 3, 4, 5).count()).isEqualTo(6);
         assertThat(sutFrom(0, 1, 2, 3, 4, 5).rest().count()).isEqualTo(5);
         assertThat(sutFrom(0, 1, 2, 3, 4, 5).take(3).count()).isEqualTo(3);
+    }
+
+    @Test
+    void frequenciesReturnsAMapFromDistinctItemsToTheNumberOfTimesTheyAppear() {
+        var sut = sutFrom(0, 1, 2, 2, 3, 3, 3, 4);
+
+        var actual = sut.drop(1).take(6).frequencies();
+
+        assertThat(actual).containsExactlyInAnyOrderEntriesOf(Map.of(1, 1, 2, 2, 3, 3));
     }
 
     @Test

@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.entry;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
@@ -1133,6 +1134,15 @@ class StringSeqTest {
                     .containsEntry("f", List.of('f'))
                     .containsEntry("o", List.of('o', 'o'));
         }
+    }
+
+    @Test
+    void frequenciesReturnsAMapFromDistinctItemsToTheNumberOfTimesTheyAppear() {
+        var sut = sutFromString("x0121013").rest().take(6);
+
+        var actual = sut.frequencies();
+
+        assertThat(actual).hasSize(3).contains(entry('0', 2), entry('1', 3), entry('2', 1));
     }
 
     @Test
