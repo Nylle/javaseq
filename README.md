@@ -253,6 +253,9 @@ _(This is similar to zipping two collections.)_
 - Returns an Optional of the first item in this seq for which pred(item) returns true.
 - Returns an empty Optional if pred(item) returns false for all items in this seq. **Caution:** The seq will be fully realized. If this seq is infinite, it will run infinitely or until system resources are exhausted.
 
+#### frequencies())
+- Returns an immutable map from distinct items in this seq to the number of times they appear. **Caution:** The seq will be fully realized. If this seq is infinite, it will run infinitely or until system resources are exhausted.
+
 #### toMap()
 - Returns a new Map with the keys and values of the items in this seq<Map.Entry>. Keeps last value on key-collision. If the seq is of any other type, an exception is thrown. **Caution:** The seq will be fully realized. If this seq is infinite, it will run infinitely or until system resources are exhausted.
 
