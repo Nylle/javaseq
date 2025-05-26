@@ -391,10 +391,10 @@ public abstract class ASeq<T> extends AList<T> implements ISeq<T> {
         return List.copyOf(this);
     }
 
-    public Map<T, Integer> frequencies() {
+    public ISeq<Map.Entry<T, Integer>> frequencies() {
         var acc = new HashMap<T, Integer>();
         this.run(x -> acc.compute(x, (k, v) -> (v == null) ? 1 : v + 1));
-        return Map.copyOf(acc);
+        return ISeq.seq(acc);
     }
 
     // java.lang.Iterable

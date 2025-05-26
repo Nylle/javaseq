@@ -1760,7 +1760,7 @@ class LazySeqTest {
 
         var actual = sut.drop(1).take(4).frequencies();
 
-        assertThat(actual).containsExactlyInAnyOrderEntriesOf(Map.of(1, 2, 0, 1, 2, 1));
+        assertThat(actual.toMap()).containsExactlyInAnyOrderEntriesOf(Map.of(1, 2, 0, 1, 2, 1));
     }
 
     @Nested

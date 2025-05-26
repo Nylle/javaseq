@@ -958,12 +958,12 @@ public interface ISeq<T> extends List<T> {
     List<T> reify();
 
     /**
-     * Returns an immutable {@code java.util.Map} from distinct items in this seq to the number of times they appear.
+     * Returns a seq of {@code java.util.Map.Entry} from distinct items in this seq to the number of times they appear.
      * <p>
      * <b>Caution:</b> The seq will be fully realized. If this seq is infinite, it will run infinitely or until system
      * resources are exhausted.
      *
-     * @return a Map from distinct items in this seq to the number of times they appear
+     * @return a seq of {@code java.util.Map.Entry} from distinct items in this seq to the number of times they appear
      */
-    Map<T, Integer> frequencies();
+    ISeq<Map.Entry<T, Integer>> frequencies();
 }

@@ -1240,7 +1240,7 @@ class ASeqTest {
 
         var actual = sut.partition(3, 3).frequencies();
 
-        assertThat(actual).containsExactlyInAnyOrderEntriesOf(Map.of(ISeq.seq("xyx"), 1, ISeq.seq("aba"), 2));
+        assertThat(actual.toMap()).containsExactlyInAnyOrderEntriesOf(Map.of(ISeq.seq("xyx"), 1, ISeq.seq("aba"), 2));
     }
 
     @Test

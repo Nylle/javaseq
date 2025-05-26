@@ -476,7 +476,7 @@ class ArraySeqTest {
 
         var actual = sut.drop(1).take(6).frequencies();
 
-        assertThat(actual).containsExactlyInAnyOrderEntriesOf(Map.of(1, 1, 2, 2, 3, 3));
+        assertThat(actual.toMap()).containsExactlyInAnyOrderEntriesOf(Map.of(1, 1, 2, 2, 3, 3));
     }
 
     @Test
