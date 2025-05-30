@@ -649,9 +649,9 @@ class ASeqTest {
 
         @Test
         void splitsStrings() {
-            var sut = ISeq.seq("hello,world,foo,bar");
+            var sut = ISeq.seq("hello,world,,foo,bar");
 
-            var actual = sut.partitionBy(x -> x.equals(',')).filter(x -> !x.equals(ISeq.of(','))).map(x -> x.str());
+            var actual = sut.partitionBy(x -> x.equals(',')).filter(x -> !x.first().equals(',')).map(x -> x.str());
 
             assertThat(actual).containsExactly("hello", "world", "foo", "bar");
         }
