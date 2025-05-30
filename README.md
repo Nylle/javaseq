@@ -171,6 +171,9 @@ _(This is similar to zipping two collections.)_
 #### partitionAll(n, step)
 - Returns a seq of seqs of n items each, at offsets step apart, like [partition](#partitionn-step), but may include partitions with fewer than n items at the end.
 
+### partitionBy(f)
+- Applies f to each value in coll, splitting it each time f returns a new value. Returns a lazy seq of partitions.
+
 #### reductions(f)
 - Returns a seq of the intermediate values of the reduction (as per [reduce](#reducef)) of this seq by f.
 
@@ -253,7 +256,7 @@ _(This is similar to zipping two collections.)_
 - Returns an Optional of the first item in this seq for which pred(item) returns true.
 - Returns an empty Optional if pred(item) returns false for all items in this seq. **Caution:** The seq will be fully realized. If this seq is infinite, it will run infinitely or until system resources are exhausted.
 
-#### frequencies())
+#### frequencies()
 - Returns a seq of Map.Entry from distinct items in this seq to the number of times they appear. **Caution:** The seq will be fully realized. If this seq is infinite, it will run infinitely or until system resources are exhausted.
 
 #### toMap()
