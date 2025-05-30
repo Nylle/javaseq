@@ -202,6 +202,18 @@ public abstract class ASeq<T> extends AList<T> implements ISeq<T> {
         return partition(n, step, List.of());
     }
 
+    public <R> ISeq<ISeq<T>> partitionBy(Function<? super T, R> f) {
+        return ISeq.lazySeq(() -> {
+            if (isEmpty()) {
+                return ISeq.of();
+            }
+            var result = f.apply(first());
+            return ISeq.cons(
+                    takeWhile(x -> f.apply(x).equals(result)),
+                    dropWhile(x -> f.apply(x).equals(result)).partitionBy(f));
+        });
+    }
+
     public ISeq<T> reductions(BinaryOperator<T> f) {
         return ISeq.lazySeq(() -> {
             if (!isEmpty()) {

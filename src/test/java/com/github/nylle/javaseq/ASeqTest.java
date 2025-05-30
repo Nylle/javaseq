@@ -10,6 +10,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -617,6 +618,42 @@ class ASeqTest {
                     ISeq.of(4, 5, 6),
                     ISeq.of(8, 9, 10),
                     ISeq.of(12, 13));
+        }
+    }
+
+    @Nested
+    class PartitionBy {
+
+        @Test
+        void returnsEmptySeq() {
+            assertThat(ISeq.<Integer>of().partitionBy(x -> x == 1)).isEmpty();
+        }
+
+        @Test
+        void returnsASeqOfPartitions() {
+            assertThat(TestSeq.from(1, 2, 2, 3, 3, 3).partitionBy(x -> x == 2))
+                    .containsExactly(ISeq.of(1), ISeq.of(2, 2), ISeq.of(3, 3, 3));
+
+            assertThat(ISeq.seq("ABBA").partitionBy(Function.identity()))
+                    .containsExactly(ISeq.of('A'), ISeq.of('B', 'B'), ISeq.of('A'));
+        }
+
+        @Test
+        void isLazy() {
+            assertThat(ISeq.repeat(1).partitionBy(x -> x == 1).first().take(3))
+                    .containsExactly(1, 1, 1);
+
+            assertThat(ISeq.range().partitionBy(x -> x % 2 == 0).take(3))
+                    .containsExactly(ISeq.of(0), ISeq.of(1), ISeq.of(2));
+        }
+
+        @Test
+        void splitsStrings() {
+            var sut = ISeq.seq("hello,world,foo,bar");
+
+            var actual = sut.partitionBy(x -> x.equals(',')).filter(x -> !x.equals(ISeq.of(','))).map(x -> x.str());
+
+            assertThat(actual).containsExactly("hello", "world", "foo", "bar");
         }
     }
 

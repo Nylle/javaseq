@@ -588,6 +588,14 @@ public interface ISeq<T> extends List<T> {
     ISeq<ISeq<T>> partitionAll(int n, int step);
 
     /**
+     * Applies f to each value in coll, splitting it each time f returns a new value. Returns a lazy seq of partitions.
+     * @param f function to apply to each value
+     * @param <R>
+     * @return a lazy seq of partitions
+     */
+    <R> ISeq<ISeq<T>> partitionBy(Function<? super T, R> f);
+
+    /**
      * Returns a lazy seq of the intermediate values of the reduction (as per {@link #reduce}) of this seq by {@code f}.
      *
      * @param f the function to reduce by
