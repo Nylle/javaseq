@@ -21,7 +21,7 @@ Feel free to copy any of this code. If you find yourself using this in your Java
 <dependency>
     <groupId>com.github.nylle</groupId>
     <artifactId>javaseq</artifactId>
-    <version>0.0.2</version>
+    <version>1.2.0</version>
 </dependency>
 ```
 
@@ -124,6 +124,10 @@ While Streams help to work with lazy collections by providing the aforementioned
 #### second()
 - Returns the second item in this seq.
 - Returns null if this seq has less than two items.
+
+#### last()
+- Returns the last item in this seq, in linear time. **Caution:** The seq will be fully realized. If this seq is infinite, it will run infinitely or until system resources are exhausted.
+- Returns null if this seq is empty. 
 
 #### rest()
 - Returns a seq of the items in this seq after the first.
