@@ -45,9 +45,18 @@ class StringSeqTest {
                 .withMessage("end 2 must be greater than index 2");
     }
 
-    @Test
-    void firstReturnsFirstCharacter() {
-        assertThat(sutFromString("foo").first()).isEqualTo('f');
+    @Nested
+    class First {
+
+        @Test
+        void returnsFirstCharacter() {
+            assertThat(sutFromString("foo").first()).isEqualTo('f');
+        }
+
+        @Test
+        void returnsNUllIfSeqIsEmpty() {
+            assertThat(sutFromString("1").drop(1).first()).isNull();
+        }
     }
 
     @Nested
@@ -65,6 +74,20 @@ class StringSeqTest {
             var sut = sutFromString("f");
 
             assertThat(sut.second()).isNull();
+        }
+    }
+
+    @Nested
+    class Last {
+
+        @Test
+        void returnsLastCharacter() {
+            assertThat(sutFromString("foo").last()).isEqualTo('o');
+        }
+
+        @Test
+        void returnsNullIfSeqIsEmpty() {
+            assertThat(sutFromString("1").drop(1).last()).isNull();
         }
     }
 

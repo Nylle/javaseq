@@ -38,6 +38,11 @@ public class StringSeq extends ASeq<Character> implements ISeq<Character> {
     }
 
     @Override
+    public Character last() {
+        return str.charAt(end-1);
+    }
+
+    @Override
     public ISeq<Character> rest() {
         if (count > 1) {
             return new StringSeq(str, index + 1, end);

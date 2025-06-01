@@ -48,6 +48,13 @@ public class ArraySeq<T> extends ASeq<T> implements ISeq<T> {
         return array[index];
     }
 
+    public T last() {
+        if (count < 1) {
+            return null;
+        }
+        return array[end-1];
+    }
+
     @Override
     public ISeq<T> rest() {
         if (count > 1) {

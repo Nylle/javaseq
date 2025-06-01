@@ -73,6 +73,21 @@ class ASeqTest {
     }
 
     @Nested
+    class Last {
+
+        @Test
+        void returnsLastItem() {
+            assertThat(new TestSeq<>(1, ISeq.of()).last()).isEqualTo(1);
+            assertThat(new TestSeq<>(1, ISeq.of(2)).last()).isEqualTo(2);
+        }
+
+        @Test
+        void returnsNullIfSeqIsEmpty() {
+            assertThat(TestSeq.from().last()).isNull();
+        }
+    }
+
+    @Nested
     class Take {
 
         @Test

@@ -21,6 +21,11 @@ public class NilTest {
     }
 
     @Test
+    void lastReturnsNull() {
+        assertThat(Nil.empty().last()).isNull();
+    }
+
+    @Test
     void secondReturnsNull() {
         assertThat(Nil.empty().second()).isNull();
     }

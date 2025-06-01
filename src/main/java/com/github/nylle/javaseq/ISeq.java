@@ -332,6 +332,16 @@ public interface ISeq<T> extends List<T> {
     T second();
 
     /**
+     * Returns the last item in this seq, in linear time.
+     * Returns null if this seq is empty.
+     * <p>
+     * <b>Caution:</b> The seq will be fully realized. If this seq is infinite, it will run infinitely or until system
+     * resources are exhausted.
+     * @return the last item in this seq
+     */
+    T last();
+
+    /**
      * Returns a seq of the items in this seq after the first.
      *
      * @return a seq of the items in this seq after the first

@@ -25,6 +25,16 @@ public abstract class ASeq<T> extends AList<T> implements ISeq<T> {
         return nth(1, (T)null);
     }
 
+    public T last() {
+        if(isEmpty()) {
+            return null;
+        }
+        if(rest().isEmpty()) {
+            return first();
+        }
+        return rest().last();
+    }
+
     public ISeq<T> cons(T x) {
         return ISeq.cons(x, this);
     }

@@ -17,6 +17,11 @@ class Nil<T> extends ASeq<T> implements ISeq<T> {
 	}
 
 	@Override
+	public T last() {
+		return null;
+	}
+
+	@Override
 	public ISeq<T> rest() {
 		return empty();
 	}

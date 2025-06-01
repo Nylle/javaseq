@@ -66,10 +66,19 @@ class ArraySeqTest {
         }
     }
 
-    @Test
-    void firstReturnsFirstItem() {
-        assertThat(sutFrom("1", "2", "3", "4").first()).isEqualTo("1");
-        assertThat(sutFrom("1", "2", "3", "4").rest().first()).isEqualTo("2");
+    @Nested
+    class First {
+
+        @Test
+        void returnsFirstItem() {
+            assertThat(sutFrom("1", "2", "3", "4").first()).isEqualTo("1");
+            assertThat(sutFrom("1", "2", "3", "4").rest().first()).isEqualTo("2");
+        }
+
+        @Test
+        void returnsNullIfSeqIsEmpty() {
+            assertThat(sutFrom(1).drop(1).first()).isNull();
+        }
     }
 
     @Nested
@@ -88,6 +97,25 @@ class ArraySeqTest {
             var sut = sutFrom("1");
 
             assertThat(sut.second()).isNull();
+        }
+    }
+
+    @Nested
+    class Last {
+
+        @Test
+        void returnsLastItem() {
+            var sut = sutFrom("1", "2", "3", "4");
+
+            assertThat(sut.last()).isEqualTo("4");
+            assertThat(sut.take(3).last()).isEqualTo("3");
+        }
+
+        @Test
+        void returnsNullIfSeqIsEmpty() {
+            var sut = sutFrom(1).drop(1);
+
+            assertThat(sut.last()).isNull();
         }
     }
 
